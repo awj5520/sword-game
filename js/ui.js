@@ -1,109 +1,99 @@
-// [js/ui.js] - 모든 UI 및 이벤트 통합 관리
+// js/ui.js
 
-// 1. DOM 요소 참조
-const elName = document.getElementById('sword-name');
-const elLevel = document.getElementById('sword-level');
-const elChance = document.getElementById('chance-percent');
-const elGold = document.getElementById('gold-display');
-const elCost = document.getElementById('upgrade-cost');
-const elMessage = document.getElementById('message');
+// DOM
+const elLevel = document.getElementById("sword-level");
+const elDamage = document.getElementById("sword-damage");
+const elName = document.getElementById("sword-name");
+const elChance = document.getElementById("chance-percent");
+const elMsg = document.getElementById("message");
 
-const btnUpgrade = document.getElementById('btn-upgrade');
-const btnHunt = document.getElementById('btn-hunt');
-const swordWrapper = document.getElementById('sword-wrapper');
+const swordWrapper = document.getElementById("sword-wrapper");
+const spinner = document.getElementById("enhance-spinner");
 
-/**
- * 화면의 모든 정보를 갱신하는 함수
- */
-function updateScreen() {
-    const currentLevel = GameData.level;
-    
-    // 텍스트 정보 업데이트
-    elLevel.innerText = `+${currentLevel}`;
-    elName.innerText = GameData.getSwordName();
-    elChance.innerText = `${GameData.getSuccessRate()}%`;
-    elGold.innerText = GameData.gold.toLocaleString();
-    elCost.innerText = `${GameData.getUpgradeCost()}G`;
+const btnUpgrade = document.getElementById("btn-upgrade");
+const btnAttack = document.getElementById("btn-attack");
 
-    // 레벨별 시각적 스타일 변화
-    if (currentLevel >= 10) {
-        // 10강 이상: 황금색 테마
-        elLevel.style.color = "#f1c40f";
-        elName.style.color = "#f1c40f";
-        elName.style.fontWeight = "bold";
-        swordWrapper.style.boxShadow = "0 0 30px #f1c40f";
-    } else if (currentLevel >= 5) {
-        // 5강 이상: 붉은색 강조 (파괴 위험 구간)
-        elLevel.style.color = "#e74c3c";
-        elName.style.color = "white";
-        elName.style.fontWeight = "normal";
-        swordWrapper.style.boxShadow = "none";
-    } else {
-        // 기본 상태
-        elLevel.style.color = "white";
-        elName.style.color = "#bbb";
-        elName.style.fontWeight = "normal";
-        swordWrapper.style.boxShadow = "none";
-    }
+const elMonsterName = document.getElementById("monster-name");
+const elMonsterHP = document.getElementById("monster-hp");
+const elMonsterImg = document.getElementById("monster-img");
+
+function updateUI() {
+  // 방어코드: 혹시 script 순서 꼬이면 바로 티나게
+  if (typeof GameData === "undefined") {
+    elMsg.textContent = "GameData가 없는데? core.js 로드 순서 확인해봐.";
+    elMsg.style.color = "#ff416c";
+    return;
+  }
+
+  elName.textContent = "연습용 목검";
+  elLevel.textContent = `+${GameData.level}`;
+  elDamage.textContent = `공격력: ${GameData.damage}`;
+  elChance.textContent = `${GameData.getSuccessRate()}%`;
+
+  elMonsterName.textContent = GameData.monster.name;
+  elMonsterHP.textContent = `HP: ${GameData.monster.hp} / ${GameData.monster.maxHP}`;
+  elMonsterImg.src = GameData.monster.img;
 }
 
-/**
- * 강화하기 버튼 클릭 이벤트
- */
-btnUpgrade.addEventListener('click', () => {
-    // 애니메이션 초기화 (리플로우 트리거)
-    swordWrapper.classList.remove('aura-success', 'aura-fail');
-    void swordWrapper.offsetWidth; 
+function spinOnce(success) {
+  if (!spinner) return;
 
-    // 로직 실행 (core.js)
-    const result = GameData.tryUpgrade();
+  spinner.classList.remove("spin", "success-rise");
+  // 리플로우 트릭(연속 클릭 시 애니 다시 재생)
+  void spinner.offsetWidth;
 
-    // 골드 부족 처리
-    if (result.error === "LACK_GOLD") {
-        elMessage.innerText = result.msg;
-        elMessage.style.color = "#e74c3c";
-        return;
-    }
+  if (success) spinner.classList.add("success-rise");
+  else spinner.classList.add("spin");
+}
 
-    // 결과 연출 분기
-    if (result.success) {
-        // 성공 시: 오라 부여
-        swordWrapper.classList.add('aura-success');
-        elMessage.style.color = "#00d4ff";
-    } else {
-        // 실패 시: 오라 부여 + 파편 효과(effects.js)
-        swordWrapper.classList.add('aura-fail');
-        elMessage.style.color = "#ff4b2b";
-        
-        if (typeof Effects !== 'undefined') {
-            Effects.createShatter(swordWrapper);
-        }
+btnUpgrade.addEventListener("click", () => {
+  // 강화 시도
+  const success = GameData.upgrade();
 
-        // 실패 오라는 잠깐 보여주고 제거
-        setTimeout(() => {
-            swordWrapper.classList.remove('aura-fail');
-        }, 500);
-    }
+  // 사운드: 성공이면 피치 상승
+  Sound.playUpgrade(success);
 
-    elMessage.innerText = result.msg;
-    updateScreen();
+  // 스피너 + 오라
+  spinOnce(success);
+  swordWrapper.classList.remove("aura-success", "aura-fail");
+  void swordWrapper.offsetWidth;
+
+  if (success) {
+    swordWrapper.classList.add("aura-success");
+    elMsg.textContent = "✨ 강화 성공! 공격력이 올라갔다!";
+    elMsg.style.color = "#00c6ff";
+  } else {
+    swordWrapper.classList.add("aura-fail");
+    elMsg.textContent = "💥 강화 실패...";
+    elMsg.style.color = "#ff416c";
+
+    // 실패 파편
+    Effects.createShatter(swordWrapper);
+  }
+
+  updateUI();
 });
 
-/**
- * 사냥하기 버튼 클릭 이벤트
- */
-btnHunt.addEventListener('click', () => {
-    const earned = GameData.hunt();
-    
-    elMessage.innerText = `${earned} 골드를 얻었습니다! 💰`;
-    elMessage.style.color = "#f1c40f";
-    
-    // 버튼 클릭 시 가벼운 흔들림 효과 (선택 사항)
-    btnHunt.style.transform = "scale(0.95)";
-    setTimeout(() => btnHunt.style.transform = "scale(1)", 100);
+btnAttack.addEventListener("click", () => {
+  const killed = GameData.attackMonster();
 
-    updateScreen();
+  if (killed) {
+    elMsg.textContent = "🏆 몬스터 처치! (리스폰)";
+    elMsg.style.color = "#00c6ff";
+    Effects.createShatter(document.getElementById("monster-img"));
+
+    // 0.35초 뒤 리스폰
+    setTimeout(() => {
+      GameData.respawnMonster();
+      updateUI();
+    }, 350);
+  } else {
+    elMsg.textContent = `⚔️ 공격! (-${GameData.damage})`;
+    elMsg.style.color = "#bcd3ff";
+  }
+
+  updateUI();
 });
 
-// 초기 화면 실행
-updateScreen();
+// 최초 갱신
+updateUI();

@@ -1,54 +1,46 @@
-// [js/core.js]
-
+// js/core.js
 const GameData = {
-    level: 0,
-    gold: 1000, // 시작 골드
-    minSuccessRate: 5,
-    
-    // 레벨별 강화 비용 계산 (예: 레벨이 높을수록 비싸짐)
-    getUpgradeCost: function() {
-        return (this.level + 1) * 100;
-    },
+  level: 0,
+  damage: 10,
 
-    getSwordName: function() {
-        if (this.level >= 30) return "🌌 신을 멸하는 신검";
-        if (this.level >= 20) return "🔥 드래곤 슬레이어";
-        if (this.level >= 10) return "✨ 빛나는 명검";
-        return "🪵 연습용 목검";
-    },
+  monster: {
+    name: "슬라임",
+    maxHP: 100,
+    hp: 100,
+    // 너가 이미지 넣으면 여기만 바꾸면 됨
+    img: "images/monsters/slime.png"
+  },
 
-    getSuccessRate: function() {
-        return Math.max(100 - (this.level * 3), this.minSuccessRate);
-    },
+  // 레벨 오를수록 확률 떨어지게 (최저 10%)
+  getSuccessRate() {
+    return Math.max(100 - this.level * 5, 10);
+  },
 
-    // 골드 획득 (사냥)
-    hunt: function() {
-        const earned = Math.floor(Math.random() * 100) + 50; // 50~150 골드 랜덤 획득
-        this.gold += earned;
-        return earned;
-    },
+  // 성공 시 레벨 +1, 공격력 증가
+  upgrade() {
+    const rate = this.getSuccessRate();
+    const success = Math.random() * 100 < rate;
 
-    tryUpgrade: function() {
-        const cost = this.getUpgradeCost();
-
-        // 골드 부족 체크
-        if (this.gold < cost) {
-            return { success: false, msg: "골드가 부족합니다!", error: "LACK_GOLD" };
-        }
-
-        this.gold -= cost; // 비용 차감
-        const rate = this.getSuccessRate();
-        const isSuccess = Math.random() * 100 < rate;
-
-        if (isSuccess) {
-            this.level++;
-            return { success: true, msg: "강화 성공! ✨" };
-        } else {
-            if (this.level >= 5) {
-                this.level = 0;
-                return { success: false, msg: "파괴되었습니다! 😱" };
-            }
-            return { success: false, msg: "강화 실패..." };
-        }
+    if (success) {
+      this.level += 1;
+      this.damage += 5;
     }
+    return success;
+  },
+
+  // 공격: 데미지 만큼 몬스터 HP 감소
+  attackMonster() {
+    this.monster.hp -= this.damage;
+
+    if (this.monster.hp <= 0) {
+      this.monster.hp = 0;
+      return true; // 처치
+    }
+    return false;
+  },
+
+  // 몬스터 리스폰(간단 버전)
+  respawnMonster() {
+    this.monster.hp = this.monster.maxHP;
+  }
 };

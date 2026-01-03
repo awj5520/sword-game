@@ -1,63 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <div class="container">
-    <div class="status-bar">
-        💰 보유 골드: <span id="gold-display">1000</span>G
-    </div>
-    
-</body>
-</html><!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>검 강화하기 온라인</title>
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/game.css">
-    <link rel="stylesheet" href="css/effects.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>검 강화 RPG</title>
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="stylesheet" href="css/effects.css" />
 </head>
 <body>
+  <div id="app">
+    <div class="container">
+      <header class="header">
+        <h1>🗡 검 강화 RPG</h1>
+        <div class="sub">강화 & 사냥터</div>
+      </header>
 
-    
+      <!-- 강화 영역 -->
+      <section class="panel">
+        <div class="panel-title">대장간</div>
 
-    <div id="app">
-        <header>
-            <h1>🗡️ 강화 시뮬레이터</h1>
-        </header>
+        <!-- 돌아가는 것(스피너) : 강화 버튼 위 -->
+        <div id="enhance-spinner" class="spinner" aria-label="강화 연출 스피너"></div>
 
-        <main class="container">
-         <div class="display-section">
-    <div id="sword-wrapper" class="aura-container">
-        <div id="sword-name">연습용 목검</div>
-        <div id="sword-level">+0</div>
+        <div id="sword-wrapper" class="sword-box aura-container">
+          <div id="sword-name" class="sword-name">연습용 목검</div>
+          <div class="row">
+            <div id="sword-level" class="sword-level">+0</div>
+            <div id="sword-damage" class="sword-damage">공격력: 10</div>
+          </div>
+          <div class="row small">
+            <div>성공 확률</div>
+            <div id="chance-percent">100%</div>
+          </div>
+        </div>
+
+        <p id="message" class="message">강화를 시도해봐.</p>
+
+        <button id="btn-upgrade" class="btn btn-main">강화하기</button>
+      </section>
+
+      <!-- 사냥터 -->
+      <section class="panel">
+        <div class="panel-title">사냥터</div>
+
+        <div class="monster-card">
+          <!-- ✅ 너가 나중에 이미지 넣으면 여기 경로만 바꾸면 됨 -->
+          <img id="monster-img" src="images/monsters/slime.png" alt="monster" />
+          <div class="monster-info">
+            <div id="monster-name" class="monster-name">슬라임</div>
+            <div id="monster-hp" class="monster-hp">HP: 100 / 100</div>
+          </div>
+        </div>
+
+        <button id="btn-attack" class="btn btn-sub">공격</button>
+      </section>
     </div>
-    <p id="message">강화를 시도하세요.</p>
-</div>
+  </div>
 
-            <div class="control-section">
-                <div class="info-row">
-                    <span>성공 확률</span>
-                    <span id="chance-percent">100%</span>
-                </div>
-                <button id="btn-upgrade" class="btn-main">강화하기</button>
-
-        <button id="btn-hunt" class="btn-sub">사냥하기 (골드 벌기)</button>
-    </div>
-</div>
-            </div>
-        </main>
-    </div>
-
-   <script src="js/core.js"></script>
-    <script src="js/effects.js"></script>
-     <script src="js/ui.js"></script>
-</body>
-</html>
+  <!-- ✅ 로드 순서 중요: core -> effects -> ui -->
+  <script src="js/core.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/ui.js"></script>
 </body>
 </html>

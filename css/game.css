@@ -1,72 +1,137 @@
-.display-section {
-    text-align: center;
-    padding: 40px 0;
-    border-bottom: 1px solid #444;
+.container{
+  background: linear-gradient(180deg, var(--card), #030a12);
+  border: 1px solid rgba(0, 71, 171, 0.35);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 0 35px rgba(0, 71, 171, 0.35);
 }
 
-#sword-name { font-size: 1.2rem; color: #bbb; }
-#sword-level { 
-    font-size: 3.5rem; 
-    font-weight: bold; 
-    margin: 10px 0;
-    text-shadow: 0 0 10px rgba(255,255,255,0.2);
+.header{
+  text-align:center;
+  margin-bottom: 14px;
+}
+.header h1{
+  font-size: 1.35rem;
+  letter-spacing: 0.5px;
+}
+.header .sub{
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    margin: 20px 0 10px;
-    font-size: 0.9rem;
+.panel{
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(0, 71, 171, 0.25);
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 12px;
 }
 
-.btn-main {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    background: var(--accent-color);
-    color: white;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
+.panel-title{
+  font-weight: 800;
+  color: #bcd3ff;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
 }
 
-.btn-main:active { transform: scale(0.98); }
-
-/* css/game.css */
-#sword-name {
-    font-size: 1.4rem;
-    margin-bottom: 5px;
-    transition: color 0.5s ease, transform 0.3s ease;
+.sword-box{
+  border: 1px solid rgba(0, 198, 255, 0.25);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 10px 0 8px;
+  background: radial-gradient(120px 80px at 50% 0%, rgba(0,198,255,0.12), transparent 70%);
 }
 
-/* 고강화 무기일 때 부드러운 흔들림 효과 추가 가능 */
-.high-level-name {
-    text-shadow: 0 0 10px rgba(241, 196, 15, 0.7);
+.sword-name{
+  color: #b9caff;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
 }
 
-/* [css/game.css] */
-.status-bar {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 10px;
-    border-radius: 5px;
-    text-align: right;
-    font-weight: bold;
-    color: #f1c40f;
-    margin-bottom: 15px;
+.row{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap: 10px;
+}
+.row.small{
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
-.btn-sub {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    background: #27ae60;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
+.sword-level{
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: var(--cobalt2);
+  text-shadow: 0 0 14px rgba(0, 198, 255, 0.25);
+}
+.sword-damage{
+  color: #d7e4ff;
+  font-size: 0.95rem;
+  opacity: 0.95;
 }
 
-.btn-sub:hover { background: #2ecc71; }
-.btn-sub:active { transform: scale(0.98); }
+.message{
+  text-align:center;
+  margin: 10px 0 6px;
+  color: var(--muted);
+  min-height: 22px;
+}
+
+.btn{
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.08s ease;
+}
+.btn:active{ transform: scale(0.98); }
+
+.btn-main{
+  background: linear-gradient(135deg, var(--cobalt), var(--cobalt2));
+  color: #001022;
+}
+.btn-sub{
+  background: rgba(0, 71, 171, 0.18);
+  border: 1px solid rgba(0, 198, 255, 0.35);
+  color: var(--text);
+}
+
+.monster-card{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(0, 71, 171, 0.25);
+}
+
+#monster-img{
+  width: 86px;
+  height: 86px;
+  object-fit: contain;
+  image-rendering: auto;
+  filter: drop-shadow(0 0 10px rgba(0,198,255,0.08));
+}
+
+.monster-name{
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+.monster-hp{
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.footer{
+  margin-top: 12px;
+  text-align:center;
+  color: rgba(234,241,255,0.6);
+  font-size: 0.78rem;
+}
+.footer .hint b{ color: #bcd3ff; }
