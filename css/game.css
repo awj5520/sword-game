@@ -108,3 +108,15 @@
     font-weight: bold;
     cursor: pointer;
 }
+
+.bottom-ui {
+    display: flex;
+    flex-direction: column;
+    align-items: center;   /* 🔥 핵심 */
+}
+
+.bottom-ui button {
+    width: 100%;
+    max-width: 360px;      /* 좌우 정렬 안정 */
+}
+

@@ -7,6 +7,7 @@ body {
     color: white;
     font-family: 'Malgun Gothic', sans-serif;
     margin: 0;
+    overflow: hidden;
 }
 
 .screen {
@@ -20,12 +21,16 @@ body {
 }
 
 button {
-    margin: 10px;
     padding: 12px 20px;
-    background: var(--main-color);
     border: none;
     border-radius: 8px;
-    color: white;
-    font-size: 1rem;
     cursor: pointer;
 }
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;   /* 🔥 진짜 중앙 */
+    gap: 10px;
+}
+

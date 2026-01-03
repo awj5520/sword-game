@@ -126,3 +126,18 @@
     transform: translateY(4px);
     box-shadow: 0 2px 0 #124015;
 }
+
+/* 강화 확률 */
+.stat.rate span {
+    color: #4da6ff;
+    font-weight: bold;
+}
+
+/* 확률 낮아질수록 위험 색 */
+.stat.rate.low span {
+    color: #ff5252;
+}
+
+.stat.rate.mid span {
+    color: #ffd700;
+}
