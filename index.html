@@ -1,67 +1,55 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>검 강화 RPG</title>
+    <meta charset="UTF-8">
+    <title>검 강화 RPG</title>
 
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/game.css" />
-  <link rel="stylesheet" href="css/effects.css" />
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/enhance.css">
+    <link rel="stylesheet" href="css/effects.css">
 </head>
 <body>
-  <div id="app">
-    <div class="container">
-      <header class="header">
-        <h1>🗡 검 강화 RPG</h1>
-        <div class="sub">강화 & 사냥터</div>
-      </header>
 
-      <!-- 강화 영역 -->
-      <section class="panel">
-        <div class="panel-title">대장간</div>
+<div class="game-wrapper">
 
-        <!-- 돌아가는 것(스피너) : 강화 버튼 위 -->
-        <div id="enhance-spinner" class="spinner" aria-label="강화 연출 스피너"></div>
-
-        <div id="sword-wrapper" class="sword-box aura-container">
-          <div id="sword-name" class="sword-name">연습용 목검</div>
-          <div class="row">
-            <div id="sword-level" class="sword-level">+0</div>
-            <div id="sword-damage" class="sword-damage">공격력: 10</div>
-          </div>
-          <div class="row small">
-            <div>성공 확률</div>
-            <div id="chance-percent">100%</div>
-          </div>
-        </div>
-
-        <p id="message" class="message">강화를 시도해봐.</p>
-
-        <button id="btn-upgrade" class="btn btn-main">강화하기</button>
-      </section>
-
-      <!-- 사냥터 -->
-      <section class="panel">
-        <div class="panel-title">사냥터</div>
-
-        <div class="monster-card">
-          <!-- ✅ 너가 나중에 이미지 넣으면 여기 경로만 바꾸면 됨 -->
-          <img id="monster-img" src="images/monsters/slime.png" alt="monster" />
-          <div class="monster-info">
-            <div id="monster-name" class="monster-name">슬라임</div>
-            <div id="monster-hp" class="monster-hp">HP: 100 / 100</div>
-          </div>
-        </div>
-
-        <button id="btn-attack" class="btn btn-sub">공격</button>
-      </section>
+    <!-- 상단 바 -->
+    <div class="top-bar">
+        <div class="title">⚔️ 검 강화 RPG</div>
+        <div id="gold-text" class="gold">💰 0</div>
     </div>
-  </div>
 
-  <!-- ✅ 로드 순서 중요: core -> effects -> ui -->
-  <script src="js/core.js"></script>
-  <script src="js/effects.js"></script>
-  <script src="js/ui.js"></script>
+    <!-- 메인 카드 -->
+    <div class="main-card">
+
+        <!-- 강화 원 -->
+        <div id="enhance-circle">
+            <div id="enhance-level">+0</div>
+        </div>
+
+        <!-- 스탯 -->
+        <div class="stats">
+            <div id="damage-text" class="stat">
+                공격력 <span>10</span>
+            </div>
+        </div>
+
+        <!-- 메시지 -->
+        <div id="message" class="message"></div>
+
+        <!-- 버튼 -->
+        <button id="btn-upgrade" class="btn upgrade">
+            🔨 강화하기
+        </button>
+
+        <button class="btn hunt" onclick="location.href='hunt.html'">
+            🗺️ 사냥터 이동
+        </button>
+    </div>
+
+</div>
+
+<script src="js/gamedata.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/enhance.js"></script>
 </body>
 </html>

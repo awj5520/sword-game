@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>초원 스테이지</title>
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="css/effects.css">
+</head>
+<body>
+
+<div class="stage-wrapper grass">
+
+    <!-- 상단 UI -->
+    <div class="top-ui">
+        <div class="hp-bar">
+            <div id="hp-fill"></div>
+        </div>
+    </div>
+
+    <!-- 배경 + 전투 필드 -->
+    <div class="battle-field">
+
+        <!-- 슬라임 (항상 중앙) -->
+        <img
+            id="monster"
+            src="images/monsters/slime.png"
+            alt="슬라임"
+        >
+
+    </div>
+
+    <!-- 하단 UI -->
+    <div class="bottom-ui">
+        <div id="log">슬라임을 클릭해서 공격!</div>
+
+        <div class="info">
+            <div id="damage-text">공격력: 0</div>
+            <div id="gold-text">💰 0</div>
+        </div>
+
+        <button onclick="location.href='hunt.html'">
+            🔙 사냥터로
+        </button>
+    </div>
+
+</div>
+
+<script src="js/gamedata.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/stage.js"></script>
+</body>
+</html>

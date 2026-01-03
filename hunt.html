@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>사냥터</title>
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/hunt.css">
+</head>
+<body>
+
+<div class="hunt-wrapper">
+
+    <!-- 지역 타이틀 -->
+    <div class="area-title">
+        🌱 초원
+    </div>
+
+    <!-- 지역 설명 -->
+    <div class="area-desc">
+        평화로운 초원 지역<br>
+        약한 슬라임들이 출몰한다
+    </div>
+
+    <!-- 스테이지 선택 -->
+    <div class="stage-list">
+        <div class="stage-card" onclick="location.href='stage.html?area=grass&stage=1'">
+            <div class="stage-name">Stage 1</div>
+            <div class="stage-info">추천 공격력 10</div>
+        </div>
+
+        <div class="stage-card" onclick="location.href='stage.html?area=grass&stage=2'">
+            <div class="stage-name">Stage 2</div>
+            <div class="stage-info">추천 공격력 20</div>
+        </div>
+
+        <div class="stage-card locked">
+            🔒 Stage 3
+        </div>
+    </div>
+
+    <button class="back-btn" onclick="location.href='index.html'">
+        🔙 강화로 돌아가기
+    </button>
+
+</div>
+
+</body>
+</html>

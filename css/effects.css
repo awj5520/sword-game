@@ -65,3 +65,28 @@
   0%   { transform: translate(0,0) rotate(0deg); opacity: 1; }
   100% { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; }
 }
+
+.damage-pop {
+    position: fixed;
+    color: red;
+    font-size: 24px;
+    font-weight: bold;
+    animation: pop 0.6s ease-out forwards;
+}
+
+@keyframes pop {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-40px); }
+}
+
+.shake {
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}

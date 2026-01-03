@@ -1,25 +1,31 @@
-:root{
-  --bg: #000;
-  --card: #071426;          /* 어두운 남색 */
-  --card2: #0a1f3a;
-  --text: #eaf1ff;
-  --muted: #9ab1d6;
-
-  --cobalt: #0047ab;        /* 메인 코발트 */
-  --cobalt2: #00c6ff;       /* 보조 하이라이트 */
-  --danger: #ff416c;
+:root {
+    --main-color: #0047ab;
 }
 
-*{ box-sizing:border-box; margin:0; padding:0; }
-
-body{
-  background: var(--bg);
-  color: var(--text);
-  font-family: "Malgun Gothic", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+body {
+    background: #000;
+    color: white;
+    font-family: 'Malgun Gothic', sans-serif;
+    margin: 0;
 }
 
-#app{ width: 380px; padding: 12px; }
+.screen {
+    display: none;
+    text-align: center;
+    padding: 30px;
+}
+
+.screen.active {
+    display: block;
+}
+
+button {
+    margin: 10px;
+    padding: 12px 20px;
+    background: var(--main-color);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
