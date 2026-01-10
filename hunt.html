@@ -11,87 +11,32 @@
 
 <div class="hunt-wrapper">
 
-    <!-- 지역 타이틀 -->
-    <div class="area-title">
-        🌱 초원
-    </div>
+    <div class="area-title">🌱 초원</div>
 
-    <!-- 지역 설명 -->
-    <div class="area-desc">
-        평화로운 초원 지역<br>
-        약한 슬라임들이 출몰한다
-    </div>
-
-    <!-- 스테이지 선택 -->
     <div class="stage-list">
-
-        <!-- 초원 1 -->
-        <div class="stage-card"
-             data-stage="1"
-             data-need="0"
-             onclick="enterStage(1)">
-            <div class="stage-name">초원 1</div>
-            <div class="stage-info">추천 공격력 10</div>
-        </div>
-
-        <!-- 초원 2 -->
-        <div class="stage-card"
-             data-stage="2"
-             data-need="3"
-             onclick="enterStage(2)">
-            <div class="stage-name">초원 2</div>
-            <div class="stage-info">추천 공격력 20</div>
-        </div>
-
-        <!-- 초원 3 -->
-        <div class="stage-card"
-             data-stage="3"
-             data-need="6"
-             onclick="enterStage(3)">
-            <div class="stage-name">초원 3</div>
-            <div class="stage-info">추천 공격력 30</div>
-        </div>
-        <!-- 초원 4 --> 
-        <div class="stage-card"
-     data-stage="4"
-     data-need="9"
-     onclick="enterStage(4)">
-    <div class="stage-name">초원 4</div>
-    <div class="stage-info">추천 공격력 40</div>
-</div>
-
-
+        <div class="stage-card" data-need="0" onclick="enterStage(1)">초원 1</div>
+        <div class="stage-card" data-need="3" onclick="enterStage(2)">초원 2</div>
+        <div class="stage-card" data-need="6" onclick="enterStage(3)">초원 3</div>
+        <div class="stage-card" data-need="9" onclick="enterStage(4)">초원 4</div>
+        <div class="stage-card boss" data-need="12" onclick="enterStage(5)">👑 초원 5</div>
     </div>
 
-    <button class="back-btn" onclick="location.href='index.html'">
-        🔙 강화로 돌아가기
-    </button>
-
+    <button onclick="location.href='index.html'">🔙 강화</button>
 </div>
 
-<!-- =========================
-     스크립트
-========================= -->
 <script src="js/gamedata.js"></script>
 <script>
-/* 현재 강화 레벨 */
-const currentLevel = GameData.level;
-
-/* 스테이지 카드 잠금 처리 */
-document.querySelectorAll('.stage-card').forEach(card => {
+document.querySelectorAll('.stage-card').forEach((card, i) => {
     const need = Number(card.dataset.need);
-
-    if (currentLevel < need) {
+    if (GameData.level < need) {
         card.classList.add('locked');
         card.onclick = null;
-        card.innerHTML = `🔒 ${card.querySelector('.stage-name')?.innerText || ''}
-                          <br>+${need}강 필요`;
+        card.innerText += ` ( +${need} )`;
     }
 });
 
-/* 스테이지 입장 */
-function enterStage(stage) {
-    location.href = `stage.html?area=grass&stage=${stage}`;
+function enterStage(n) {
+    location.href = `stage.html?stage=${n}`;
 }
 </script>
 

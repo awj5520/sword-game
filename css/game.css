@@ -13,14 +13,13 @@
 }
 
 /* =========================
-   초원 배경 이미지
-   👉 여기 그림만 바꾸면 됨
+   초원 배경
 ========================= */
 
 .stage-wrapper.grass {
     background-image: url("../images/monsters/pasture.png");
-    background-size: cover;       /* 꽉 채우기 */
-    background-position: center;  /* 가운데 */
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
 }
 
@@ -48,7 +47,7 @@
 }
 
 /* =========================
-   전투 필드 (중앙 정렬)
+   전투 필드
 ========================= */
 
 .battle-field {
@@ -58,70 +57,28 @@
     align-items: center;
 }
 
-/* 슬라임 */
-#monster {
-    width: 180px;
-    cursor: pointer;
-    transition: transform 0.1s ease;
-
-    /* 🔽 이 부분 추가 */
-    margin-top: 200px;   /* 값 키울수록 더 아래로 */
-}
-
-
-#monster:active {
-    transform: scale(0.9);
-}
+/* =========================
+   슬라임 래퍼 (이동 담당)
+========================= */
 
 #monster-wrapper {
     animation: slimeFloat 4s ease-in-out infinite;
 }
 
 /* =========================
-   하단 UI
+   슬라임 본체
 ========================= */
 
-.bottom-ui {
-    background: rgba(0,0,0,0.55);
-    padding: 14px;
-    text-align: center;
-    backdrop-filter: blur(4px);
-    z-index: 10;
-}
-
-#log {
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: #fff;
-}
-
-.info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-size: 14px;
-}
-
-.bottom-ui button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(180deg, #4caf50, #1b5e20);
-    color: #fff;
-    font-weight: bold;
+#monster {
+    width: 180px;
     cursor: pointer;
+    transition: transform 0.1s ease;
+    margin-top: 200px;
 }
 
-.bottom-ui {
-    display: flex;
-    flex-direction: column;
-    align-items: center;   /* 🔥 핵심 */
-}
-
-.bottom-ui button {
-    width: 100%;
-    max-width: 360px;      /* 좌우 정렬 안정 */
+/* transform 충돌 방지 */
+#monster:active {
+    transform: none;
 }
 
 /* =========================
@@ -136,7 +93,45 @@
     100% { transform: translate(0, 0); }
 }
 
-#monster.move {
-    animation: slimeFloat 4s ease-in-out infinite;
+/* =========================
+   하단 UI
+========================= */
+
+.bottom-ui {
+    background: rgba(0,0,0,0.55);
+    padding: 14px;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+#log {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 360px;
+}
+
+.bottom-ui button {
+    width: 100%;
+    max-width: 360px;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(180deg, #4caf50, #1b5e20);
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}

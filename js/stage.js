@@ -1,11 +1,11 @@
 // =========================
-// 1️⃣ URL 파라미터 읽기 (가장 위)
+// URL 파라미터
 // =========================
 const params = new URLSearchParams(location.search);
-const stageId = params.get('stage') || 1;
+const stageId = Number(params.get('stage') || 1);
 
 // =========================
-// 2️⃣ 스테이지 데이터
+// 스테이지 데이터
 // =========================
 const stageData = {
     1: {
@@ -21,7 +21,7 @@ const stageData = {
         monsterImage: 'images/monsters/slime_grass_2.png',
         maxHP: 130,
         baseReward: 70,
-        requireLevel: 0,
+        requireLevel: 3,
         moveSpeed: 3.5
     },
     3: {
@@ -29,47 +29,53 @@ const stageData = {
         monsterImage: 'images/monsters/slime_grass_3.png',
         maxHP: 180,
         baseReward: 100,
-        requireLevel: 0,
+        requireLevel: 6,
         moveSpeed: 2.5
     },
-
     4: {
-    name: '초원 4',
-    monsterImage: 'images/monsters/slime_grass_4.png',
-    maxHP: 260,
-    baseReward: 140,
-    requireLevel: 9,
-    moveSpeed: 1.8,        // 🔥 기본부터 빠름
-    rageSpeed: 1.1,        // 💢 광폭화 시
-    rageHPPercent: 0.3     // HP 30% 이하
-}
-
+        name: '초원 4',
+        monsterImage: 'images/monsters/slime_grass_4.png',
+        maxHP: 260,
+        baseReward: 140,
+        requireLevel: 9,
+        moveSpeed: 1.8,
+        rageSpeed: 1.2,
+        rageHPPercent: 0.3
+    },
+    5: {
+        name: '초원 5 (슬라임 왕)',
+        monsterImage: 'images/monsters/slime_grass_5.png',
+        maxHP: 420,
+        baseReward: 300,
+        requireLevel: 12,
+        moveSpeed: 2.8,
+        rageSpeed: 1.6,
+        rageSpeed2: 1.0,
+        rageHPPercent: 0.5,
+        rageHPPercent2: 0.2,
+        scale: 1.4          // 👑 보스 크기
+    }
 };
 
-// 🔥 여기서 currentStage 확정
 const currentStage = stageData[stageId];
 
-// 스테이지 입장 레벨 체크
+// 입장 제한
 if (GameData.level < currentStage.requireLevel) {
-    alert(
-        `입장 불가!\n` +
-        `필요 강화 레벨: +${currentStage.requireLevel}`
-    );
+    alert(`입장 불가! 필요 강화 레벨: +${currentStage.requireLevel}`);
     location.href = 'hunt.html';
 }
 
-
 // =========================
-// 3️⃣ DOM 요소 먼저 가져오기
+// DOM
 // =========================
 const hpFill = document.getElementById('hp-fill');
 const img = document.getElementById('monster');
+const wrapper = document.getElementById('monster-wrapper');
 const log = document.getElementById('log');
 const goldText = document.getElementById('gold-text');
-const wrapper = document.getElementById('monster-wrapper');
 
 // =========================
-// 4️⃣ 몬스터 생성
+// 몬스터
 // =========================
 const monster = {
     maxHP: currentStage.maxHP,
@@ -77,23 +83,21 @@ const monster = {
     baseReward: currentStage.baseReward
 };
 
-// =========================
-// 5️⃣ 슬라임 이미지 적용
-// =========================
+// 이미지 & 이동
 img.src = currentStage.monsterImage;
-img.alt = currentStage.name + ' 슬라임';
+img.alt = currentStage.name;
+wrapper.style.animationDuration = `${currentStage.moveSpeed}s`;
 
-// =========================
-// 슬라임 이동 적용
-// =========================
-img.style.animationDuration = `${currentStage.moveSpeed}s`;
+// 👑 보스 크기 적용
+const baseScale = currentStage.scale || 1;
+img.style.transform = `scale(${baseScale})`;
 
-
-// =========================
-// 6️⃣ 전투 로직
-// =========================
 let isDead = false;
+let ragePhase = 0;
 
+// =========================
+// UI
+// =========================
 function updateHP() {
     hpFill.style.width = `${(monster.hp / monster.maxHP) * 100}%`;
 }
@@ -102,49 +106,56 @@ function updateGoldUI() {
     goldText.innerText = `💰 ${GameData.gold}`;
 }
 
-function showDamage(amount) {
-    const dmg = document.createElement('div');
-    dmg.className = 'damage-pop';
-    dmg.innerText = `-${amount}`;
-    document.body.appendChild(dmg);
-
-    dmg.style.left = '50%';
-    dmg.style.top = '45%';
-
-    setTimeout(() => dmg.remove(), 600);
-}
-
 function getRewardGold() {
-    return monster.baseReward
-        + GameData.level * 10
-        + Math.floor(Math.random() * 20);
+    return monster.baseReward + GameData.level * 10;
 }
 
+// =========================
+// 광폭화
+// =========================
 function checkRageMode() {
-    if (!currentStage.rageSpeed) return;
+    const rate = monster.hp / monster.maxHP;
 
-    const hpRate = monster.hp / monster.maxHP;
+    if (
+        currentStage.rageSpeed2 &&
+        rate <= currentStage.rageHPPercent2 &&
+        ragePhase < 2
+    ) {
+        ragePhase = 2;
+        wrapper.style.animationDuration = `${currentStage.rageSpeed2}s`;
+        log.innerText = '👑💢 슬라임 왕이 폭주했다!';
+        return;
+    }
 
-    if (hpRate <= currentStage.rageHPPercent) {
+    if (
+        currentStage.rageSpeed &&
+        rate <= currentStage.rageHPPercent &&
+        ragePhase < 1
+    ) {
+        ragePhase = 1;
         wrapper.style.animationDuration = `${currentStage.rageSpeed}s`;
         log.innerText = '💢 슬라임이 광폭화했다!';
     }
 }
 
+// =========================
+// 공격
+// =========================
 img.onclick = () => {
     if (isDead) return;
 
-    // 데미지
+    // 클릭 피드백 (보스 대응)
+    img.style.transform = `scale(${baseScale * 0.92})`;
+    setTimeout(() => {
+        img.style.transform = `scale(${baseScale})`;
+    }, 80);
+
     monster.hp -= GameData.damage;
     if (monster.hp < 0) monster.hp = 0;
 
-    showDamage(GameData.damage);
     updateHP();
-
-    // 🔥 광폭화 체크
     checkRageMode();
 
-    // 💀 처치 체크
     if (monster.hp === 0) {
         isDead = true;
 
@@ -152,25 +163,21 @@ img.onclick = () => {
         GameData.earnGold(reward);
         updateGoldUI();
 
-        log.innerText = `🧪 슬라임 처치! 💰 +${reward}`;
+        log.innerText = `👑 처치 성공! 💰 +${reward}`;
         screenShake();
 
         setTimeout(() => {
             monster.hp = monster.maxHP;
             updateHP();
             isDead = false;
-
-            // 이동 속도 원래대로
-            wrapper.style.animationDuration =
-                `${currentStage.moveSpeed}s`;
-
+            ragePhase = 0;
+            wrapper.style.animationDuration = `${currentStage.moveSpeed}s`;
+            img.style.transform = `scale(${baseScale})`;
             log.innerText = '새로운 슬라임 등장!';
-        }, 500);
+        }, 900);
     }
 };
 
-// =========================
-// 7️⃣ 초기 UI 세팅
-// =========================
+// 초기 UI
 updateHP();
 updateGoldUI();
