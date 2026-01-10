@@ -13,8 +13,10 @@ const GameData = {
         return 50 + this.level * 30;
     },
 
+    // 강화 확률 올린 상태임
     getSuccessRate() {
-        return Math.max(100 - this.level * 5, 10);
+        // return Math.max(100 - this.level * 5, 10);
+        return Math.max(100, 10);
     },
 
     upgrade() {

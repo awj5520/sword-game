@@ -25,12 +25,12 @@
     <!-- 스테이지 선택 -->
     <div class="stage-list">
         <div class="stage-card" onclick="location.href='stage.html?area=grass&stage=1'">
-            <div class="stage-name">Stage 1</div>
+            <div class="stage-name">초원 1</div>
             <div class="stage-info">추천 공격력 10</div>
         </div>
 
         <div class="stage-card" onclick="location.href='stage.html?area=grass&stage=2'">
-            <div class="stage-name">Stage 2</div>
+            <div class="stage-name">초원 2</div>
             <div class="stage-info">추천 공격력 20</div>
         </div>
 
@@ -44,6 +44,28 @@
     </button>
 
 </div>
+
+<script src="js/gamedata.js"></script>
+<script>
+const stages = document.querySelectorAll('.stage-card');
+
+const stageRequire = {
+    1: 0,
+    2: 3,
+    3: 6
+};
+
+stages.forEach((card, index) => {
+    const stage = index + 1;
+    const need = stageRequire[stage];
+
+    if (need !== undefined && GameData.level < need) {
+        card.classList.add('locked');
+        card.onclick = null;
+        card.innerHTML = `🔒 초원 ${stage}<br>+${need}강 필요`;
+    }
+});
+</script>
 
 </body>
 </html>

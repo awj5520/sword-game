@@ -50,7 +50,13 @@
             <button class="btn hunt" onclick="location.href='hunt.html'">
                 🗺️ 사냥터 이동
             </button>
+
+            <button class="btn reset" onclick="resetGameData()">
+                ♻️ 데이터 초기화
+            </button>
         </div>
+
+        
 
     </div>
 
@@ -59,5 +65,14 @@
 <script src="js/gamedata.js"></script>
 <script src="js/effects.js"></script>
 <script src="js/enhance.js"></script>
+
+<script>
+function resetGameData() {
+    localStorage.setItem('level', 0);
+    localStorage.setItem('damage', 10);
+    localStorage.setItem('gold', 20000);
+    location.reload(); // 🔄 새로고침
+}
+</script>
 </body>
 </html>
