@@ -31,7 +31,19 @@ const stageData = {
         baseReward: 100,
         requireLevel: 0,
         moveSpeed: 2.5
-    }
+    },
+
+    4: {
+    name: '초원 4',
+    monsterImage: 'images/monsters/slime_grass_4.png',
+    maxHP: 260,
+    baseReward: 140,
+    requireLevel: 9,
+    moveSpeed: 1.8,        // 🔥 기본부터 빠름
+    rageSpeed: 1.1,        // 💢 광폭화 시
+    rageHPPercent: 0.3     // HP 30% 이하
+}
+
 };
 
 // 🔥 여기서 currentStage 확정
@@ -54,6 +66,7 @@ const hpFill = document.getElementById('hp-fill');
 const img = document.getElementById('monster');
 const log = document.getElementById('log');
 const goldText = document.getElementById('gold-text');
+const wrapper = document.getElementById('monster-wrapper');
 
 // =========================
 // 4️⃣ 몬스터 생성
@@ -73,7 +86,6 @@ img.alt = currentStage.name + ' 슬라임';
 // =========================
 // 슬라임 이동 적용
 // =========================
-img.classList.add('move');
 img.style.animationDuration = `${currentStage.moveSpeed}s`;
 
 
@@ -108,15 +120,31 @@ function getRewardGold() {
         + Math.floor(Math.random() * 20);
 }
 
+function checkRageMode() {
+    if (!currentStage.rageSpeed) return;
+
+    const hpRate = monster.hp / monster.maxHP;
+
+    if (hpRate <= currentStage.rageHPPercent) {
+        wrapper.style.animationDuration = `${currentStage.rageSpeed}s`;
+        log.innerText = '💢 슬라임이 광폭화했다!';
+    }
+}
+
 img.onclick = () => {
     if (isDead) return;
 
+    // 데미지
     monster.hp -= GameData.damage;
     if (monster.hp < 0) monster.hp = 0;
 
     showDamage(GameData.damage);
     updateHP();
 
+    // 🔥 광폭화 체크
+    checkRageMode();
+
+    // 💀 처치 체크
     if (monster.hp === 0) {
         isDead = true;
 
@@ -131,6 +159,11 @@ img.onclick = () => {
             monster.hp = monster.maxHP;
             updateHP();
             isDead = false;
+
+            // 이동 속도 원래대로
+            wrapper.style.animationDuration =
+                `${currentStage.moveSpeed}s`;
+
             log.innerText = '새로운 슬라임 등장!';
         }, 500);
     }

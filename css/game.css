@@ -73,6 +73,10 @@
     transform: scale(0.9);
 }
 
+#monster-wrapper {
+    animation: slimeFloat 4s ease-in-out infinite;
+}
+
 /* =========================
    하단 UI
 ========================= */
