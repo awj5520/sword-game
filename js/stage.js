@@ -13,21 +13,24 @@ const stageData = {
         monsterImage: 'images/monsters/slime_grass_1.png',
         maxHP: 100,
         baseReward: 50,
-        requireLevel: 0
+        requireLevel: 0,
+        moveSpeed: 4.5
     },
     2: {
         name: '초원 2',
         monsterImage: 'images/monsters/slime_grass_2.png',
         maxHP: 130,
         baseReward: 70,
-        requireLevel: 0
+        requireLevel: 0,
+        moveSpeed: 3.5
     },
     3: {
         name: '초원 3',
         monsterImage: 'images/monsters/slime_grass_3.png',
         maxHP: 180,
         baseReward: 100,
-        requireLevel: 0
+        requireLevel: 0,
+        moveSpeed: 2.5
     }
 };
 
@@ -66,6 +69,13 @@ const monster = {
 // =========================
 img.src = currentStage.monsterImage;
 img.alt = currentStage.name + ' 슬라임';
+
+// =========================
+// 슬라임 이동 적용
+// =========================
+img.classList.add('move');
+img.style.animationDuration = `${currentStage.moveSpeed}s`;
+
 
 // =========================
 // 6️⃣ 전투 로직

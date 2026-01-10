@@ -120,3 +120,19 @@
     max-width: 360px;      /* 좌우 정렬 안정 */
 }
 
+/* =========================
+   슬라임 이동 애니메이션
+========================= */
+
+@keyframes slimeFloat {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-20px, -10px); }
+    50%  { transform: translate(15px, 10px); }
+    75%  { transform: translate(-10px, 15px); }
+    100% { transform: translate(0, 0); }
+}
+
+#monster.move {
+    animation: slimeFloat 4s ease-in-out infinite;
+}
+
