@@ -11,33 +11,86 @@
 
 <div class="hunt-wrapper">
 
-    <div class="area-title">🌱 초원</div>
+    <div class="area-container">
 
-    <div class="stage-list">
-        <div class="stage-card" data-need="0" onclick="enterStage(1)">초원 1</div>
-        <div class="stage-card" data-need="3" onclick="enterStage(2)">초원 2</div>
-        <div class="stage-card" data-need="6" onclick="enterStage(3)">초원 3</div>
-        <div class="stage-card" data-need="9" onclick="enterStage(4)">초원 4</div>
-        <div class="stage-card boss" data-need="12" onclick="enterStage(5)">👑 초원 5</div>
+        <!-- 🌱 초원 -->
+        <div class="area-box">
+            <div class="area-title">🌱 초원</div>
+            <div class="stage-list">
+                <div class="stage-card" data-area="grass" data-stage="1" data-need="0">초원 1</div>
+                <div class="stage-card" data-area="grass" data-stage="2" data-need="3">초원 2</div>
+                <div class="stage-card" data-area="grass" data-stage="3" data-need="6">초원 3</div>
+                <div class="stage-card" data-area="grass" data-stage="4" data-need="9">초원 4</div>
+                <div class="stage-card boss" data-area="grass" data-stage="5" data-need="12">👑 슬라임 왕</div>
+            </div>
+        </div>
+
+        <!-- 🏕️ 오크 부락 -->
+        <div class="area-box">
+            <div class="area-title">🏕️ 오크 부락</div>
+            <div class="stage-list">
+                <div class="stage-card" data-area="orc" data-stage="1" data-need="14">풋내기 오크</div>
+                <div class="stage-card" data-area="orc" data-stage="2" data-need="16">전사 오크</div>
+                <div class="stage-card" data-area="orc" data-stage="3" data-need="18">광전사 오크</div>
+                <div class="stage-card" data-area="orc" data-stage="4" data-need="20">주술사 오크</div>
+                <div class="stage-card boss" data-area="orc" data-stage="5" data-need="25">👑 오크 족장</div>
+            </div>
+        </div>
+
+        <!-- 🐉 드래곤 협곡 -->
+        <div class="area-box">
+            <div class="area-title">🐉 드래곤 협곡</div>
+            <div class="stage-list">
+                <div class="stage-card" data-area="dragon" data-stage="1" data-need="28">새끼 드레이크</div>
+                <div class="stage-card" data-area="dragon" data-stage="2" data-need="30">불꽃 드레이크</div>
+                <div class="stage-card" data-area="dragon" data-stage="3" data-need="33">비늘 와이번</div>
+                <div class="stage-card" data-area="dragon" data-stage="4" data-need="36">고대 드래곤</div>
+                <div class="stage-card boss" data-area="dragon" data-stage="5" data-need="40">👑 용의 군주</div>
+            </div>
+        </div>
+
+        <!-- 🌌 우주 -->
+        <div class="area-box">
+            <div class="area-title">🌌 우주</div>
+            <div class="stage-list">
+                <div class="stage-card" data-area="space" data-stage="1" data-need="45">
+                    갤럭시 슬라임
+                </div>
+                <div class="stage-card" data-area="space" data-stage="2" data-need="48">
+                    갤럭시 오크
+                </div>
+                <div class="stage-card boss" data-area="space" data-stage="3" data-need="52">
+                    👑 갤럭시 드래곤
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <button onclick="location.href='index.html'">🔙 강화</button>
+    <button class="back-btn" onclick="location.href='index.html'">
+        🔙 강화로 돌아가기
+    </button>
 </div>
 
 <script src="js/gamedata.js"></script>
 <script>
-document.querySelectorAll('.stage-card').forEach((card, i) => {
-    const need = Number(card.dataset.need);
-    if (GameData.level < need) {
-        card.classList.add('locked');
-        card.onclick = null;
-        card.innerText += ` ( +${need} )`;
-    }
-});
+const level = GameData.level;
 
-function enterStage(n) {
-    location.href = `stage.html?stage=${n}`;
-}
+document.querySelectorAll('.stage-card').forEach(card => {
+    const need = Number(card.dataset.need);
+    const area = card.dataset.area;
+    const stage = card.dataset.stage;
+
+    if (level < need) {
+        card.classList.add('locked');
+        card.innerText += `\n(+${need}강 필요)`;
+        return;
+    }
+
+    card.onclick = () => {
+        location.href = `stage.html?area=${area}&stage=${stage}`;
+    };
+});
 </script>
 
 </body>

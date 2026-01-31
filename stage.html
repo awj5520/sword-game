@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>초원 스테이지</title>
+    <title>스테이지</title>
 
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/game.css">
@@ -10,22 +10,25 @@
 </head>
 <body>
 
-<div class="stage-wrapper grass">
+<div id="stage" class="stage-wrapper">
 
+    <!-- 상단 UI -->
     <div class="top-ui">
         <div class="hp-bar">
             <div id="hp-fill"></div>
         </div>
     </div>
 
+    <!-- 전투 필드 -->
     <div class="battle-field">
         <div id="monster-wrapper">
-            <img id="monster" src="" alt="슬라임">
+            <img id="monster" src="" alt="">
         </div>
     </div>
 
+    <!-- 하단 UI -->
     <div class="bottom-ui">
-        <div id="log">슬라임을 클릭해서 공격!</div>
+        <div id="log"></div>
 
         <div class="info">
             <div id="damage-text">공격력: 0</div>

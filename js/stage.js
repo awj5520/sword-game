@@ -1,183 +1,144 @@
-// =========================
-// URL 파라미터
-// =========================
 const params = new URLSearchParams(location.search);
+const area = params.get('area') || 'grass';
 const stageId = Number(params.get('stage') || 1);
 
-// =========================
-// 스테이지 데이터
-// =========================
-const stageData = {
-    1: {
-        name: '초원 1',
-        monsterImage: 'images/monsters/slime_grass_1.png',
-        maxHP: 100,
-        baseReward: 50,
-        requireLevel: 0,
-        moveSpeed: 4.5
+/* =========================
+   스테이지 데이터
+========================= */
+
+const grassStages = {
+    1:{ name:'초원 1', monster:'slime_grass_1.png', hp:100, gold:50, lvl:0, speed:4 },
+    2:{ name:'초원 2', monster:'slime_grass_2.png', hp:130, gold:70, lvl:3, speed:3 },
+    3:{ name:'초원 3', monster:'slime_grass_3.png', hp:180, gold:100, lvl:6, speed:2.5 },
+    4:{ name:'초원 4', monster:'slime_grass_4.png', hp:260, gold:140, lvl:9, speed:1.8 },
+    5:{ name:'슬라임 왕', monster:'slime_grass_boss.png', hp:420, gold:300, lvl:12, speed:2, scale:1.4 }
+};
+
+const orcStages = {
+    1:{ name:'풋내기 오크', monster:'orc_1.png', hp:520, gold:380, lvl:14, speed:3.2, scale:1.3, offsetY:80 },
+    2:{ name:'전사 오크', monster:'orc_2.png', hp:650, gold:420, lvl:16, speed:2.8 },
+    3:{ name:'광전사 오크', monster:'orc_3.png', hp:820, gold:500, lvl:18, speed:2.4 },
+    4:{ name:'주술사 오크', monster:'orc_4.png', hp:1000, gold:650, lvl:20, speed:2.0 },
+    5:{ name:'오크 족장', monster:'orc_5.png', hp:1600, gold:1200, lvl:25, speed:2.6, scale:1.6 }
+};
+
+const dragonStages = {
+    1:{ name:'새끼 드레이크', monster:'dragon_1.png', hp:2200, gold:1800, lvl:28, speed:3.0, scale:1.2, offsetY:-40 },
+    2:{ name:'불꽃 드레이크', monster:'dragon_2.png', hp:2600, gold:2200, lvl:30, speed:2.6, scale:1.3, offsetY:-60 },
+    3:{ name:'비늘 와이번', monster:'dragon_3.png', hp:3200, gold:2800, lvl:33, speed:2.2, scale:1.4, offsetY:-80 },
+    4:{ name:'다크 드래곤', monster:'dragon_4.png', hp:4000, gold:3600, lvl:36, speed:1.9, scale:1.6, offsetY:-100 },
+    5:{ name:'골드 드래곤', monster:'dragon_5.png', hp:6500, gold:7000, lvl:40, speed:1.5, scale:1.9, offsetY:-120 }
+};
+
+/* 🌌 우주 (3 스테이지만) */
+const spaceStages = {
+    1:{
+        name:'갤럭시 슬라임',
+        monster:'galaxy_slime.png',
+        hp:9000,
+        gold:9000,
+        lvl:45,
+        speed:2.4,
+        scale:2.2,
+        offsetY:-80
     },
-    2: {
-        name: '초원 2',
-        monsterImage: 'images/monsters/slime_grass_2.png',
-        maxHP: 130,
-        baseReward: 70,
-        requireLevel: 3,
-        moveSpeed: 3.5
+    2:{
+        name:'갤럭시 오크',
+        monster:'galaxy_orc.png',
+        hp:13000,
+        gold:15000,
+        lvl:48,
+        speed:2.0,
+        scale:2.5,
+        offsetY:-100
     },
-    3: {
-        name: '초원 3',
-        monsterImage: 'images/monsters/slime_grass_3.png',
-        maxHP: 180,
-        baseReward: 100,
-        requireLevel: 6,
-        moveSpeed: 2.5
-    },
-    4: {
-        name: '초원 4',
-        monsterImage: 'images/monsters/slime_grass_4.png',
-        maxHP: 260,
-        baseReward: 140,
-        requireLevel: 9,
-        moveSpeed: 1.8,
-        rageSpeed: 1.2,
-        rageHPPercent: 0.3
-    },
-    5: {
-        name: '초원 5 (슬라임 왕)',
-        monsterImage: 'images/monsters/slime_grass_5.png',
-        maxHP: 420,
-        baseReward: 300,
-        requireLevel: 12,
-        moveSpeed: 2.8,
-        rageSpeed: 1.6,
-        rageSpeed2: 1.0,
-        rageHPPercent: 0.5,
-        rageHPPercent2: 0.2,
-        scale: 1.4          // 👑 보스 크기
+    3:{
+        name:'갤럭시 드래곤',
+        monster:'galaxy_dragon.png',
+        hp:22000,
+        gold:30000,
+        lvl:52,
+        speed:1.6,
+        scale:3.0,
+        offsetY:-140
     }
 };
 
-const currentStage = stageData[stageId];
+const areaStages = {
+    grass: grassStages,
+    orc: orcStages,
+    dragon: dragonStages,
+    space: spaceStages
+};
 
-// 입장 제한
-if (GameData.level < currentStage.requireLevel) {
-    alert(`입장 불가! 필요 강화 레벨: +${currentStage.requireLevel}`);
+const data = areaStages[area][stageId];
+
+/* =========================
+   입장 제한
+========================= */
+
+if (GameData.level < data.lvl) {
+    alert(`입장 불가! 필요 강화 +${data.lvl}`);
     location.href = 'hunt.html';
 }
 
-// =========================
-// DOM
-// =========================
-const hpFill = document.getElementById('hp-fill');
+/* =========================
+   DOM
+========================= */
+
+const stageEl = document.getElementById('stage');
 const img = document.getElementById('monster');
-const wrapper = document.getElementById('monster-wrapper');
+const wrap = document.getElementById('monster-wrapper');
+const hpFill = document.getElementById('hp-fill');
 const log = document.getElementById('log');
 const goldText = document.getElementById('gold-text');
+const damageText = document.getElementById('damage-text');
 
-// =========================
-// 몬스터
-// =========================
-const monster = {
-    maxHP: currentStage.maxHP,
-    hp: currentStage.maxHP,
-    baseReward: currentStage.baseReward
-};
+stageEl.classList.add(area);
 
-// 이미지 & 이동
-img.src = currentStage.monsterImage;
-img.alt = currentStage.name;
-wrapper.style.animationDuration = `${currentStage.moveSpeed}s`;
+/* 몬스터 세팅 */
+img.src = `images/monsters/${data.monster}`;
+img.alt = data.name;
+img.style.transform = `scale(${data.scale || 1})`;
+img.style.marginTop = data.offsetY
+    ? `${200 + data.offsetY}px`
+    : '200px';
 
-// 👑 보스 크기 적용
-const baseScale = currentStage.scale || 1;
-img.style.transform = `scale(${baseScale})`;
+wrap.style.animationDuration = `${data.speed}s`;
 
-let isDead = false;
-let ragePhase = 0;
+let hp = data.hp;
+let dead = false;
 
-// =========================
-// UI
-// =========================
+/* UI 초기화 */
+log.innerText = `${data.name} 등장!`;
+goldText.innerText = `💰 ${GameData.gold}`;
+damageText.innerText = `공격력: ${GameData.damage}`;
+
 function updateHP() {
-    hpFill.style.width = `${(monster.hp / monster.maxHP) * 100}%`;
+    hpFill.style.width = `${(hp / data.hp) * 100}%`;
 }
 
-function updateGoldUI() {
-    goldText.innerText = `💰 ${GameData.gold}`;
-}
-
-function getRewardGold() {
-    return monster.baseReward + GameData.level * 10;
-}
-
-// =========================
-// 광폭화
-// =========================
-function checkRageMode() {
-    const rate = monster.hp / monster.maxHP;
-
-    if (
-        currentStage.rageSpeed2 &&
-        rate <= currentStage.rageHPPercent2 &&
-        ragePhase < 2
-    ) {
-        ragePhase = 2;
-        wrapper.style.animationDuration = `${currentStage.rageSpeed2}s`;
-        log.innerText = '👑💢 슬라임 왕이 폭주했다!';
-        return;
-    }
-
-    if (
-        currentStage.rageSpeed &&
-        rate <= currentStage.rageHPPercent &&
-        ragePhase < 1
-    ) {
-        ragePhase = 1;
-        wrapper.style.animationDuration = `${currentStage.rageSpeed}s`;
-        log.innerText = '💢 슬라임이 광폭화했다!';
-    }
-}
-
-// =========================
-// 공격
-// =========================
+/* 공격 */
 img.onclick = () => {
-    if (isDead) return;
+    if (dead) return;
 
-    // 클릭 피드백 (보스 대응)
-    img.style.transform = `scale(${baseScale * 0.92})`;
-    setTimeout(() => {
-        img.style.transform = `scale(${baseScale})`;
-    }, 80);
-
-    monster.hp -= GameData.damage;
-    if (monster.hp < 0) monster.hp = 0;
-
+    hp -= GameData.damage;
+    if (hp < 0) hp = 0;
     updateHP();
-    checkRageMode();
 
-    if (monster.hp === 0) {
-        isDead = true;
-
-        const reward = getRewardGold();
-        GameData.earnGold(reward);
-        updateGoldUI();
-
-        log.innerText = `👑 처치 성공! 💰 +${reward}`;
-        screenShake();
+    if (hp === 0) {
+        dead = true;
+        GameData.earnGold(data.gold);
+        goldText.innerText = `💰 ${GameData.gold}`;
+        log.innerText = `${data.name} 처치!`;
 
         setTimeout(() => {
-            monster.hp = monster.maxHP;
+            hp = data.hp;
             updateHP();
-            isDead = false;
-            ragePhase = 0;
-            wrapper.style.animationDuration = `${currentStage.moveSpeed}s`;
-            img.style.transform = `scale(${baseScale})`;
-            log.innerText = '새로운 슬라임 등장!';
-        }, 900);
+            dead = false;
+            log.innerText = `${data.name} 등장!`;
+        }, 1200);
     }
 };
 
-// 초기 UI
 updateHP();
-updateGoldUI();

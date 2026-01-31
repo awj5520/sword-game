@@ -13,14 +13,31 @@
 }
 
 /* =========================
-   초원 배경
+   지역 배경
 ========================= */
 
+/* 🌱 초원 */
 .stage-wrapper.grass {
-    background-image: url("../images/monsters/pasture.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: url("../images/monsters/pasture.png")
+        center / cover no-repeat;
+}
+
+/* 🏕️ 오크 부락 */
+.stage-wrapper.orc {
+    background: url("../images/monsters/orc_camp.png")
+        center / cover no-repeat;
+}
+
+/* 🐉 드래곤 협곡 */
+.stage-wrapper.dragon {
+    background: url("../images/monsters/dragon_canyon.png")
+        center / cover no-repeat;
+}
+
+/* 🌌 우주 */
+.stage-wrapper.space {
+    background: url("../images/monsters/space.png")
+        center / cover no-repeat;
 }
 
 /* =========================
@@ -58,15 +75,15 @@
 }
 
 /* =========================
-   슬라임 래퍼 (이동 담당)
+   몬스터 이동 래퍼
 ========================= */
 
 #monster-wrapper {
-    animation: slimeFloat 4s ease-in-out infinite;
+    animation: monsterFloat 4s ease-in-out infinite;
 }
 
 /* =========================
-   슬라임 본체
+   몬스터 본체
 ========================= */
 
 #monster {
@@ -76,16 +93,15 @@
     margin-top: 200px;
 }
 
-/* transform 충돌 방지 */
 #monster:active {
     transform: none;
 }
 
 /* =========================
-   슬라임 이동 애니메이션
+   이동 애니메이션
 ========================= */
 
-@keyframes slimeFloat {
+@keyframes monsterFloat {
     0%   { transform: translate(0, 0); }
     25%  { transform: translate(-20px, -10px); }
     50%  { transform: translate(15px, 10px); }
