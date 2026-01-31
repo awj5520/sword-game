@@ -80,6 +80,8 @@
 
 #monster-wrapper {
     animation: monsterFloat 4s ease-in-out infinite;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 /* =========================
@@ -87,11 +89,16 @@
 ========================= */
 
 #monster {
+    -webkit-tap-highlight-color: transparent;
+     user-select: none;                         /* 드래그 선택 방지 */
+    -webkit-user-drag: none;                   /* 이미지 드래그 방지 */
+    outline: none;   
     width: 180px;
     cursor: pointer;
     transition: transform 0.1s ease;
     margin-top: 200px;
 }
+    
 
 #monster:active {
     transform: none;
