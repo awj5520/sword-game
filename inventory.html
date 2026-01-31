@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>배낭</title>
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/inventory.css">
+</head>
+<body>
+
+<div class="inventory-wrapper">
+
+    <div class="inventory-top">
+        <div class="title">🎒 배낭</div>
+    </div>
+
+    <div class="inventory-body">
+
+        <!-- ⚔️ 데미지 2배 물약 -->
+        <div class="inv-item">
+            <div class="inv-name">⚔️ 데미지 2배 물약</div>
+            <div id="damage-buff" class="inv-info"></div>
+        </div>
+
+        <!-- 💰 골드 2배 물약 -->
+        <div class="inv-item">
+            <div class="inv-name">💰 골드 2배 물약</div>
+            <div id="gold-buff" class="inv-info"></div>
+        </div>
+
+        <!-- 🛡️ 하락 방지권 -->
+        <div class="inv-item">
+            <div class="inv-name">
+                🛡️ 하락 방지권
+                <span id="nodrop-count" class="inv-count"></span>
+            </div>
+            <div id="nodrop-info" class="inv-info"></div>
+            <button id="btn-nodrop" onclick="toggleNoDrop()">활성화</button>
+        </div>
+
+        <!-- ⭐ 100% 강화권 -->
+        <div class="inv-item">
+            <div class="inv-name">
+                ⭐ 100% 강화권
+                <span id="guarantee-count" class="inv-count"></span>
+            </div>
+            <div id="guarantee-info" class="inv-info"></div>
+            <button id="btn-guarantee" onclick="toggleGuarantee()">활성화</button>
+        </div>
+
+    </div>
+
+    <button class="back-btn" onclick="location.href='index.html'">
+        🔙 돌아가기
+    </button>
+
+</div>
+
+<script src="js/gamedata.js"></script>
+<script src="js/inventory.js"></script>
+</body>
+</html>

@@ -7,11 +7,11 @@ const stageId = Number(params.get('stage') || 1);
 ========================= */
 
 const grassStages = {
-    1:{ name:'초원 1', monster:'slime_grass_1.png', hp:100, gold:50, lvl:0, speed:4 },
-    2:{ name:'초원 2', monster:'slime_grass_2.png', hp:130, gold:70, lvl:3, speed:3 },
-    3:{ name:'초원 3', monster:'slime_grass_3.png', hp:180, gold:100, lvl:6, speed:2.5 },
-    4:{ name:'초원 4', monster:'slime_grass_4.png', hp:260, gold:140, lvl:9, speed:1.8 },
-    5:{ name:'슬라임 왕', monster:'slime_grass_boss.png', hp:420, gold:300, lvl:12, speed:2, scale:1.4 }
+    1:{ name:'슬라임', monster:'slime_grass_1.png', hp:100, gold:50, lvl:0, speed:4 },
+    2:{ name:'투구 슬라임', monster:'slime_grass_2.png', hp:130, gold:70, lvl:3, speed:3 },
+    3:{ name:'전사 슬라임', monster:'slime_grass_3.png', hp:180, gold:100, lvl:6, speed:2.5 },
+    4:{ name:'광폭화 슬라임', monster:'slime_grass_4.png', hp:260, gold:140, lvl:9, speed:1.8 },
+    5:{ name:'슬라임 왕', monster:'slime_grass_5.png', hp:420, gold:300, lvl:12, speed:2, scale:1.4 }
 };
 
 const orcStages = {
@@ -30,38 +30,10 @@ const dragonStages = {
     5:{ name:'골드 드래곤', monster:'dragon_5.png', hp:6500, gold:7000, lvl:40, speed:1.5, scale:1.9, offsetY:-120 }
 };
 
-/* 🌌 우주 (3 스테이지만) */
 const spaceStages = {
-    1:{
-        name:'갤럭시 슬라임',
-        monster:'galaxy_slime.png',
-        hp:9000,
-        gold:9000,
-        lvl:45,
-        speed:2.4,
-        scale:2.2,
-        offsetY:-80
-    },
-    2:{
-        name:'갤럭시 오크',
-        monster:'galaxy_orc.png',
-        hp:13000,
-        gold:15000,
-        lvl:48,
-        speed:2.0,
-        scale:2.5,
-        offsetY:-100
-    },
-    3:{
-        name:'갤럭시 드래곤',
-        monster:'galaxy_dragon.png',
-        hp:22000,
-        gold:30000,
-        lvl:52,
-        speed:1.6,
-        scale:3.0,
-        offsetY:-140
-    }
+    1:{ name:'갤럭시 슬라임', monster:'galaxy_slime.png', hp:9000, gold:9000, lvl:45, speed:2.4, scale:2.2, offsetY:-80 },
+    2:{ name:'갤럭시 오크', monster:'galaxy_orc.png', hp:13000, gold:15000, lvl:48, speed:2.0, scale:2.5, offsetY:-100 },
+    3:{ name:'갤럭시 드래곤', monster:'galaxy_dragon.png', hp:22000, gold:30000, lvl:52, speed:1.6, scale:3.0, offsetY:-140 }
 };
 
 const areaStages = {
@@ -76,7 +48,6 @@ const data = areaStages[area][stageId];
 /* =========================
    입장 제한
 ========================= */
-
 if (GameData.level < data.lvl) {
     alert(`입장 불가! 필요 강화 +${data.lvl}`);
     location.href = 'hunt.html';
@@ -85,7 +56,6 @@ if (GameData.level < data.lvl) {
 /* =========================
    DOM
 ========================= */
-
 const stageEl = document.getElementById('stage');
 const img = document.getElementById('monster');
 const wrap = document.getElementById('monster-wrapper');
@@ -118,27 +88,45 @@ function updateHP() {
     hpFill.style.width = `${(hp / data.hp) * 100}%`;
 }
 
-/* 공격 */
+/* =========================
+   공격
+========================= */
 img.onclick = () => {
     if (dead) return;
 
-    hp -= GameData.damage;
+    hp -= GameData.getCurrentDamage();
     if (hp < 0) hp = 0;
     updateHP();
 
+    // 피격 연출
+    img.classList.add('hit');
+    setTimeout(() => img.classList.remove('hit'), 120);
+
     if (hp === 0) {
         dead = true;
+
+        // 클릭 방지 + 죽음 연출
+        img.style.pointerEvents = 'none';
+        img.style.opacity = '0.3';
+
         GameData.earnGold(data.gold);
         goldText.innerText = `💰 ${GameData.gold}`;
         log.innerText = `${data.name} 처치!`;
 
         setTimeout(() => {
+            // 리스폰
             hp = data.hp;
             updateHP();
             dead = false;
+
+            img.style.opacity = '1';
+            img.style.pointerEvents = 'auto';
+
             log.innerText = `${data.name} 등장!`;
         }, 1200);
     }
 };
+
+
 
 updateHP();

@@ -1,121 +1,103 @@
 /* =========================
-   사냥터 전체 레이아웃
+   사냥터 전체 래퍼
 ========================= */
-
 .hunt-wrapper {
-    max-width: 420px;
-    margin: auto;
-    padding: 18px;
+    padding: 16px;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
 /* =========================
-   지역 좌우 컨테이너
+   지역 가로 정렬
 ========================= */
-
-.area-container {
+.area-row {
     display: flex;
-    gap: 18px;
+    gap: 12px;
+    justify-content: space-between;
 }
 
-/* 각 지역 박스 */
-.area-box {
+/* =========================
+   지역 컬럼
+========================= */
+.area-column {
     flex: 1;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 14px;
+    padding: 12px 8px;
+    box-sizing: border-box;
 }
 
 /* =========================
-   지역 타이틀
+   지역 제목
 ========================= */
-
 .area-title {
-    font-size: 22px;          /* 🔥 크게 */
+    font-size: 16px;
     font-weight: bold;
-    text-align: center;
-    margin-bottom: 6px;
-
-    white-space: nowrap;
-    word-break: keep-all;
-}
-
-/* 지역 설명 */
-.area-desc {
-    font-size: 15px;          /* 🔥 조금 크게 */
-    text-align: center;
-    margin: 8px 0 14px;
-    color: #ddd;
+    margin-bottom: 10px;
 }
 
 /* =========================
-   스테이지 리스트
+   🔥 몬스터 버튼
 ========================= */
+.monster {
+    margin: 6px 0;
+    padding: 8px 0;
+    font-size: 14px;
 
-.stage-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* 스테이지 카드 */
-.stage-card {
-    padding: 14px;            /* 🔥 버튼 영역 확대 */
-    border-radius: 10px;
-    background: rgba(255,255,255,0.1);
-    text-align: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;              /* 🔵 동그랗게 */
     cursor: pointer;
 
-    font-size: 16px;          /* 🔥 글자 큼 */
+    transition: 
+        transform 0.1s ease,
+        background 0.1s ease;
+}
+
+/* 마우스 올렸을 때 */
+.monster:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* 눌렀을 때 */
+.monster:active {
+    transform: scale(0.96);           /* 🔥 눌림 느낌 */
+    background: rgba(255,255,255,0.2);
+}
+
+/* =========================
+   보스 몬스터
+========================= */
+.monster.boss {
+    color: #ffd700;
     font-weight: bold;
-}
-
-/* 보스 스테이지 강조 */
-.stage-card.boss {
-    border: 2px solid gold;
-    background: rgba(255,215,0,0.15);
-}
-
-/* 잠김 상태 */
-.stage-card.locked {
-    opacity: 0.4;
-    pointer-events: none;
+    background: rgba(255, 215, 0, 0.12);
 }
 
 /* =========================
    하단 버튼
 ========================= */
-
 .back-btn {
-    margin-top: 18px;
+    margin-top: 20px;
     width: 100%;
-    padding: 14px;            /* 🔥 버튼 큼 */
+    padding: 12px;
     border-radius: 12px;
     border: none;
-
-    background: linear-gradient(180deg, #4caf50, #1b5e20);
+    background: linear-gradient(180deg, #444, #222);
     color: #fff;
-    font-size: 18px;          /* 🔥 글자 큼 */
-    font-weight: bold;
     cursor: pointer;
 }
 
 /* =========================
-   모바일 대응
+   모바일 대응 (가로 스크롤)
 ========================= */
-
-@media (max-width: 420px) {
-    .area-container {
-        flex-direction: column;
+@media (max-width: 768px) {
+    .area-row {
+        overflow-x: auto;
     }
 
-    .area-title {
-        font-size: 24px;      /* 📱 모바일에서 더 큼 */
-    }
-
-    .stage-card {
-        font-size: 17px;
-        padding: 16px;
-    }
-
-    .back-btn {
-        font-size: 19px;
-        padding: 16px;
+    .area-column {
+        min-width: 180px;
+        flex: none;
     }
 }

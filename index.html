@@ -12,67 +12,41 @@
 
 <div class="game-wrapper">
 
-    <!-- 상단 바 -->
     <div class="top-bar">
         <div class="title">⚔️ 검 강화 RPG</div>
         <div id="gold-text" class="gold">💰 0</div>
     </div>
 
-    <!-- 메인 카드 -->
     <div class="main-card">
 
-        <!-- 강화 원 -->
         <div id="enhance-circle">
             <div id="enhance-level">+0</div>
         </div>
 
-        <!-- 스탯 -->
         <div class="stats">
             <div id="damage-text" class="stat">
                 공격력 <span>10</span>
             </div>
+
+            <div id="success-rate" class="stat rate">
+                강화 성공 확률 <span>100%</span>
+            </div>
         </div>
 
-         <!-- 🔥 강화 확률 -->
-        <div id="success-rate" class="stat rate">
-            강화 성공 확률 <span>100%</span>
-        </div>
-
-        <!-- 메시지 -->
         <div id="message" class="message"></div>
 
-        <!-- 버튼 -->
         <div class="button-group">
-            <button id="btn-upgrade" class="btn upgrade">
-                🔨 강화하기
-            </button>
-
-            <button class="btn hunt" onclick="location.href='hunt.html'">
-                🗺️ 사냥터 이동
-            </button>
-
-            <button class="btn reset" onclick="resetGameData()">
-                ♻️ 데이터 초기화
-            </button>
+            <button id="btn-upgrade" class="btn upgrade">🔨 강화하기</button>
+            <button class="btn hunt" onclick="location.href='hunt.html'">🗺️ 사냥터</button>
+            <button class="btn shop" onclick="location.href='shop.html'">🏪 상점</button>
+            <button class="btn bag" onclick="location.href='inventory.html'">🎒 배낭</button>
         </div>
 
-        
-
     </div>
-
 </div>
 
 <script src="js/gamedata.js"></script>
 <script src="js/effects.js"></script>
 <script src="js/enhance.js"></script>
-
-<script>
-function resetGameData() {
-    localStorage.setItem('level', 0);
-    localStorage.setItem('damage', 10);
-    localStorage.setItem('gold', 20000);
-    location.reload(); // 🔄 새로고침
-}
-</script>
 </body>
 </html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>상점</title>
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/shop.css">
+</head>
+<body>
+
+<div class="shop-wrapper">
+
+    <!-- 상단 -->
+    <div class="shop-top">
+        <div class="shop-title">🏪 상점</div>
+        <div id="gold-text" class="gold">💰 0</div>
+    </div>
+
+    <!-- 상점 아이템 리스트 -->
+    <div class="shop-body">
+
+        <div class="shop-item" onclick="buy('damage')">
+            <div class="item-left">
+                <div class="item-name">⚔️ 데미지 2배 물약</div>
+                <div class="item-desc">10분 동안 데미지 2배</div>
+            </div>
+            <div class="item-right">
+                <div class="item-price">💰 500</div>
+            </div>
+        </div>
+
+        <div class="shop-item" onclick="buy('gold')">
+            <div class="item-left">
+                <div class="item-name">💰 골드 2배 물약</div>
+                <div class="item-desc">10분 동안 골드 2배</div>
+            </div>
+            <div class="item-right">
+                <div class="item-price">💰 500</div>
+            </div>
+        </div>
+
+        <div class="shop-item" onclick="buy('nodrop')">
+            <div class="item-left">
+                <div class="item-name">🛡️ 하락 방지권</div>
+                <div class="item-desc">강화 실패 시 단계 하락 방지</div>
+            </div>
+            <div class="item-right">
+                <div class="item-price">💰 800</div>
+            </div>
+        </div>
+
+        <div class="shop-item" onclick="buy('guarantee')">
+            <div class="item-left">
+                <div class="item-name">⭐ 100% 강화권</div>
+                <div class="item-desc">다음 강화 무조건 성공</div>
+            </div>
+            <div class="item-right">
+                <div class="item-price">💰 1200</div>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="back-btn" onclick="location.href='index.html'">
+        🔙 돌아가기
+    </button>
+
+</div>
+
+<script src="js/gamedata.js"></script>
+<script src="js/shop.js"></script>
+<script>
+    document.getElementById('gold-text').innerText = `💰 ${GameData.gold}`;
+</script>
+</body>
+</html>

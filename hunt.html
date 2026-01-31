@@ -11,86 +11,63 @@
 
 <div class="hunt-wrapper">
 
-    <div class="area-container">
+    <div class="area-row">
 
         <!-- 🌱 초원 -->
-        <div class="area-box">
+        <div class="area-column">
             <div class="area-title">🌱 초원</div>
-            <div class="stage-list">
-                <div class="stage-card" data-area="grass" data-stage="1" data-need="0">초원 1</div>
-                <div class="stage-card" data-area="grass" data-stage="2" data-need="3">초원 2</div>
-                <div class="stage-card" data-area="grass" data-stage="3" data-need="6">초원 3</div>
-                <div class="stage-card" data-area="grass" data-stage="4" data-need="9">초원 4</div>
-                <div class="stage-card boss" data-area="grass" data-stage="5" data-need="12">👑 슬라임 왕</div>
-            </div>
+
+            <div class="monster" onclick="enterStage('grass', 1)">슬라임</div>
+            <div class="monster" onclick="enterStage('grass', 2)">투구 슬라임</div>
+            <div class="monster" onclick="enterStage('grass', 3)">전사 슬라임</div>
+            <div class="monster" onclick="enterStage('grass', 4)">광폭화 슬라임</div>
+            <div class="monster boss" onclick="enterStage('grass', 5)">👑 슬라임 왕</div>
         </div>
 
-        <!-- 🏕️ 오크 부락 -->
-        <div class="area-box">
-            <div class="area-title">🏕️ 오크 부락</div>
-            <div class="stage-list">
-                <div class="stage-card" data-area="orc" data-stage="1" data-need="14">풋내기 오크</div>
-                <div class="stage-card" data-area="orc" data-stage="2" data-need="16">전사 오크</div>
-                <div class="stage-card" data-area="orc" data-stage="3" data-need="18">광전사 오크</div>
-                <div class="stage-card" data-area="orc" data-stage="4" data-need="20">주술사 오크</div>
-                <div class="stage-card boss" data-area="orc" data-stage="5" data-need="25">👑 오크 족장</div>
-            </div>
+        <!-- 🪓 오크부락 -->
+        <div class="area-column">
+            <div class="area-title">🪓 오크부락</div>
+
+            <div class="monster" onclick="enterStage('orc', 1)">풋내기 오크</div>
+            <div class="monster" onclick="enterStage('orc', 2)">전사 오크</div>
+            <div class="monster" onclick="enterStage('orc', 3)">광전사 오크</div>
+            <div class="monster" onclick="enterStage('orc', 4)">주술사 오크</div>
+            <div class="monster boss" onclick="enterStage('orc', 5)">👑 오크 족장</div>
         </div>
 
         <!-- 🐉 드래곤 협곡 -->
-        <div class="area-box">
+        <div class="area-column">
             <div class="area-title">🐉 드래곤 협곡</div>
-            <div class="stage-list">
-                <div class="stage-card" data-area="dragon" data-stage="1" data-need="28">새끼 드레이크</div>
-                <div class="stage-card" data-area="dragon" data-stage="2" data-need="30">불꽃 드레이크</div>
-                <div class="stage-card" data-area="dragon" data-stage="3" data-need="33">비늘 와이번</div>
-                <div class="stage-card" data-area="dragon" data-stage="4" data-need="36">고대 드래곤</div>
-                <div class="stage-card boss" data-area="dragon" data-stage="5" data-need="40">👑 용의 군주</div>
-            </div>
+
+            <div class="monster" onclick="enterStage('dragon', 1)">새끼 드레이크</div>
+            <div class="monster" onclick="enterStage('dragon', 2)">불꽃 드레이크</div>
+            <div class="monster" onclick="enterStage('dragon', 3)">비늘 와이번</div>
+            <div class="monster" onclick="enterStage('dragon', 4)">다크 드래곤</div>
+            <div class="monster boss" onclick="enterStage('dragon', 5)">👑 골드 드래곤</div>
         </div>
 
         <!-- 🌌 우주 -->
-        <div class="area-box">
+        <div class="area-column">
             <div class="area-title">🌌 우주</div>
-            <div class="stage-list">
-                <div class="stage-card" data-area="space" data-stage="1" data-need="45">
-                    갤럭시 슬라임
-                </div>
-                <div class="stage-card" data-area="space" data-stage="2" data-need="48">
-                    갤럭시 오크
-                </div>
-                <div class="stage-card boss" data-area="space" data-stage="3" data-need="52">
-                    👑 갤럭시 드래곤
-                </div>
-            </div>
+
+            <div class="monster" onclick="enterStage('space', 1)">갤럭시 슬라임</div>
+            <div class="monster" onclick="enterStage('space', 2)">갤럭시 오크</div>
+            <div class="monster boss" onclick="enterStage('space', 3)">👑 갤럭시 드래곤</div>
         </div>
 
     </div>
 
     <button class="back-btn" onclick="location.href='index.html'">
-        🔙 강화로 돌아가기
+        🔙 돌아가기
     </button>
+
 </div>
 
-<script src="js/gamedata.js"></script>
 <script>
-const level = GameData.level;
-
-document.querySelectorAll('.stage-card').forEach(card => {
-    const need = Number(card.dataset.need);
-    const area = card.dataset.area;
-    const stage = card.dataset.stage;
-
-    if (level < need) {
-        card.classList.add('locked');
-        card.innerText += `\n(+${need}강 필요)`;
-        return;
-    }
-
-    card.onclick = () => {
-        location.href = `stage.html?area=${area}&stage=${stage}`;
-    };
-});
+/* 사냥터 입장 */
+function enterStage(area, stage) {
+    location.href = `stage.html?area=${area}&stage=${stage}`;
+}
 </script>
 
 </body>

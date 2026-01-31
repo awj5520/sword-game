@@ -1,0 +1,110 @@
+/* =========================
+   전체 스테이지
+========================= */
+#stage {
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* =========================
+   상단 UI
+========================= */
+#top-ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+}
+
+/* =========================
+   몬스터 래퍼
+========================= */
+#monster-wrapper {
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+/* =========================
+   몬스터 이미지
+========================= */
+#monster {
+    width: 160px;
+    user-select: none;
+    cursor: pointer;
+
+    pointer-events: auto;      /* 🔥 반드시 필요 */
+    position: relative;
+    z-index: 10;
+}
+
+/* =========================
+   데미지 이펙트 레이어
+========================= */
+#damage-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;      /* 🔥 클릭 방해 금지 */
+}
+
+/* =========================
+   HP 바
+========================= */
+#hp-bar {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    height: 18px;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+
+    z-index: 15;
+    pointer-events: none;      /* 🔥 클릭 방해 금지 */
+}
+
+#hp-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #ff4444, #ff0000);
+}
+
+#hp-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    top: 1px;
+}
+
+/* =========================
+   로그
+========================= */
+#log {
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* =========================
+   피격 연출
+========================= */
+#monster.hit {
+    animation: hitShake 0.12s;
+}
+
+@keyframes hitShake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}
