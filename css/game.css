@@ -13,7 +13,7 @@
 }
 
 /* =========================
-   지역 배경
+   🌍 1세계 배경
 ========================= */
 
 /* 🌱 초원 */
@@ -37,6 +37,34 @@
 /* 🌌 우주 */
 .stage-wrapper.space {
     background: url("../images/monsters/space.png")
+        center / cover no-repeat;
+}
+
+/* =========================
+   🌌 2세계 배경 (🔥 추가)
+========================= */
+
+/* 🕳️ 동굴 */
+.stage-wrapper.cave {
+    background: url("../images/monsters/cave.png")
+        center / cover no-repeat;
+}
+
+/* 🪦 무덤 */
+.stage-wrapper.grave {
+    background: url("../images/backgrounds/world2_grave.png")
+        center / cover no-repeat;
+}
+
+/* 🏰 악마성 */
+.stage-wrapper.demon {
+    background: url("../images/backgrounds/world2_demon.png")
+        center / cover no-repeat;
+}
+
+/* 🔥 마계 */
+.stage-wrapper.hell {
+    background: url("../images/backgrounds/world2_hell.png")
         center / cover no-repeat;
 }
 
@@ -90,15 +118,14 @@
 
 #monster {
     -webkit-tap-highlight-color: transparent;
-     user-select: none;                         /* 드래그 선택 방지 */
-    -webkit-user-drag: none;                   /* 이미지 드래그 방지 */
-    outline: none;   
+    user-select: none;
+    -webkit-user-drag: none;
+    outline: none;
     width: 180px;
     cursor: pointer;
     transition: transform 0.1s ease;
     margin-top: 200px;
 }
-    
 
 #monster:active {
     transform: none;

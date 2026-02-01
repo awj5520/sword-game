@@ -1,103 +1,101 @@
-/* =========================
-   사냥터 전체 래퍼
-========================= */
 .hunt-wrapper {
+    max-width: 420px;
+    margin: auto;
     padding: 16px;
-    min-height: 100vh;
-    box-sizing: border-box;
 }
 
-/* =========================
-   지역 가로 정렬
-========================= */
-.area-row {
-    display: flex;
-    gap: 12px;
-    justify-content: space-between;
-}
-
-/* =========================
-   지역 컬럼
-========================= */
-.area-column {
-    flex: 1;
+.world-title {
     text-align: center;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 14px;
-    padding: 12px 8px;
-    box-sizing: border-box;
+    margin-bottom: 16px;
 }
 
 /* =========================
-   지역 제목
+   지역 그리드
 ========================= */
-.area-title {
-    font-size: 16px;
+#region-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+/* =========================
+   지역 박스
+========================= */
+.region-box {
+    background: rgba(0,0,0,0.55);
+    border-radius: 16px;
+    padding: 12px;
+}
+
+/* =========================
+   큰 스테이지 제목
+========================= */
+.region-title {
     font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 15px;
+    padding: 10px;
+    margin-bottom: 8px;
+
+    border: 2px solid #4caf50;
+    border-radius: 12px;
+
+    background: linear-gradient(180deg, #2e2e2e, #1a1a1a);
+    color: #ffffff;
+
+    text-align: center; /* 제목은 가운데 */
 }
 
 /* =========================
-   🔥 몬스터 버튼
+   🔘 몬스터 버튼 (1자 정렬 핵심)
 ========================= */
-.monster {
-    margin: 6px 0;
-    padding: 8px 0;
-    font-size: 14px;
+.monster-text {
+    display: block;              /* 한 줄씩 */
+    width: 100%;                 /* 박스 꽉 채움 */
+    text-align: left;            /* 🔥 왼쪽 정렬 */
+    font-size: 13px;
+    line-height: 1.4;
 
-    background: rgba(255,255,255,0.08);
-    border-radius: 10px;              /* 🔵 동그랗게 */
+    color: #e0e0e0;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+
+    border: 1.5px solid #777;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #3a3a3a, #242424);
+
     cursor: pointer;
-
-    transition: 
-        transform 0.1s ease,
-        background 0.1s ease;
 }
 
-/* 마우스 올렸을 때 */
-.monster:hover {
-    background: rgba(255,255,255,0.15);
+/* 마지막 몬스터 여백 제거 */
+.monster-text:last-child {
+    margin-bottom: 0;
 }
 
-/* 눌렀을 때 */
-.monster:active {
-    transform: scale(0.96);           /* 🔥 눌림 느낌 */
-    background: rgba(255,255,255,0.2);
+/* 눌림 효과 */
+.monster-text:active {
+    transform: translateY(2px);
 }
 
 /* =========================
-   보스 몬스터
+   모바일 대응
 ========================= */
-.monster.boss {
-    color: #ffd700;
-    font-weight: bold;
-    background: rgba(255, 215, 0, 0.12);
+@media (max-width: 360px) {
+    #region-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* =========================
-   하단 버튼
+   뒤로가기 버튼
 ========================= */
 .back-btn {
-    margin-top: 20px;
     width: 100%;
-    padding: 12px;
-    border-radius: 12px;
+    margin-top: 22px;
+    padding: 14px;
+    border-radius: 14px;
     border: none;
-    background: linear-gradient(180deg, #444, #222);
+    background: linear-gradient(180deg, #666, #333);
     color: #fff;
+    font-weight: bold;
     cursor: pointer;
-}
-
-/* =========================
-   모바일 대응 (가로 스크롤)
-========================= */
-@media (max-width: 768px) {
-    .area-row {
-        overflow-x: auto;
-    }
-
-    .area-column {
-        min-width: 180px;
-        flex: none;
-    }
 }

@@ -33,11 +33,25 @@
             </div>
         </div>
 
+        <button class="menu-btn" onclick="location.href='achievement.html'">
+            🏆 업적
+        </button>
+
         <div id="message" class="message"></div>
 
         <div class="button-group">
             <button id="btn-upgrade" class="btn upgrade">🔨 강화하기</button>
-            <button class="btn hunt" onclick="location.href='hunt.html'">🗺️ 사냥터</button>
+
+            <!-- 🌍 1세계 -->
+            <button class="btn hunt" onclick="goWorld(1)">
+                🗺️ 1세계 사냥터
+            </button>
+
+            <!-- 🔒 2세계 -->
+            <button class="btn hunt" onclick="goWorld(2)">
+                🌌 2세계 사냥터
+            </button>
+
             <button class="btn shop" onclick="location.href='shop.html'">🏪 상점</button>
             <button class="btn bag" onclick="location.href='inventory.html'">🎒 배낭</button>
         </div>
@@ -48,5 +62,16 @@
 <script src="js/gamedata.js"></script>
 <script src="js/effects.js"></script>
 <script src="js/enhance.js"></script>
+
+<script>
+function goWorld(world) {
+    if (world === 2 && GameData.level < 100) {
+        alert('2세계는 강화 +100 이상 필요합니다!');
+        return;
+    }
+    location.href = `hunt.html?world=${world}`;
+}
+</script>
+
 </body>
 </html>

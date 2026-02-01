@@ -10,6 +10,7 @@
 </head>
 <body>
 
+<!-- 🔥 stage.js에서 area에 따라 배경 class 추가 -->
 <div id="stage" class="stage-wrapper">
 
     <!-- 상단 UI -->
@@ -19,25 +20,24 @@
         </div>
     </div>
 
-    <!-- 전투 필드 -->
+    <!-- 전투 영역 -->
     <div class="battle-field">
         <div id="monster-wrapper">
-            <img id="monster" src="" alt="">
+            <img id="monster" src="" alt="monster">
         </div>
     </div>
 
     <!-- 하단 UI -->
     <div class="bottom-ui">
-        <div id="log"></div>
+        <div id="log">전투 시작!</div>
 
         <div class="info">
-            <div id="damage-text">공격력: 0</div>
             <div id="gold-text">💰 0</div>
+            <div id="damage-text">공격력 0</div>
         </div>
 
-        <button onclick="location.href='hunt.html'">
-            🔙 사냥터로
-        </button>
+        <!-- 🔙 월드 유지 나가기 버튼 -->
+        <button id="back-btn">사냥터로 돌아가기</button>
     </div>
 
 </div>
@@ -45,5 +45,18 @@
 <script src="js/gamedata.js"></script>
 <script src="js/effects.js"></script>
 <script src="js/stage.js"></script>
+
+<script>
+/* =========================
+   🔙 월드 유지해서 사냥터로 돌아가기
+========================= */
+document.getElementById('back-btn').onclick = () => {
+    const params = new URLSearchParams(location.search);
+    const world = params.get('world') || 1;
+
+    location.href = `hunt.html?world=${world}`;
+};
+</script>
+
 </body>
 </html>
