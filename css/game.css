@@ -52,19 +52,19 @@
 
 /* 🪦 무덤 */
 .stage-wrapper.grave {
-    background: url("../images/backgrounds/world2_grave.png")
+    background: url("../images/monsters/grave.png")
         center / cover no-repeat;
 }
 
 /* 🏰 악마성 */
 .stage-wrapper.demon {
-    background: url("../images/backgrounds/world2_demon.png")
+    background: url("../images/monsters/devil_castle.png")
         center / cover no-repeat;
 }
 
 /* 🔥 마계 */
 .stage-wrapper.hell {
-    background: url("../images/backgrounds/world2_hell.png")
+    background: url("../images/monsters/hell.png")
         center / cover no-repeat;
 }
 

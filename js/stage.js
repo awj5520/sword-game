@@ -48,41 +48,41 @@ const spaceStages = {
 };
 
 /* =========================
-   🌌 2세계 스테이지 데이터 (신규 추가)
+   🌌 2세계 스테이지 데이터 (전부 갤럭시 드래곤 이상)
 ========================= */
 
 /* 🕳️ 동굴 – 박쥐 */
 const caveStages = {
-    1:{ name:'동굴 박쥐', monster:'bat_1.png', hp:10000, gold:1800, lvl:100, speed:3.5, achId:'bat_1' },
-    2:{ name:'어둠 박쥐', monster:'bat_2.png', hp:11000, gold:2000, lvl:102, speed:3.2, achId:'bat_2' },
-    3:{ name:'흡혈 박쥐', monster:'bat_3.png', hp:13000, gold:2400, lvl:104, speed:3.0, achId:'bat_3', scale:1.5 },
-    4:{ name:'광폭 박쥐', monster:'bat_4.png', hp:14000, gold:2800, lvl:106, speed:2.6, achId:'bat_4', scale:1.7 },
-    5:{ name:'박쥐 군주', monster:'bat_boss.png', hp:15000, gold:4500, lvl:108, speed:2.4, scale:2.0, achId:'bat_king' }
+    1:{ name:'동굴 박쥐', monster:'bat_1.png', hp:25000, gold:35000, lvl:100, speed:3.5, achId:'bat_1' },
+    2:{ name:'어둠 박쥐', monster:'bat_2.png', hp:28000, gold:38000, lvl:102, speed:3.2, achId:'bat_2' },
+    3:{ name:'흡혈 박쥐', monster:'bat_3.png', hp:32000, gold:42000, lvl:104, speed:3.0, achId:'bat_3', scale:1.5 },
+    4:{ name:'광폭 박쥐', monster:'bat_4.png', hp:36000, gold:46000, lvl:106, speed:2.6, achId:'bat_4', scale:1.7 },
+    5:{ name:'박쥐 군주', monster:'bat_boss.png', hp:42000, gold:52000, lvl:108, speed:2.4, scale:2.0, achId:'bat_king' }
 };
 
 /* 🪦 무덤 – 해골 */
 const graveStages = {
-    1:{ name:'해골 병사', monster:'skeleton_1.png', hp:4800, gold:5200, lvl:110, speed:2.4, achId:'skeleton_1' },
-    2:{ name:'해골 궁수', monster:'skeleton_2.png', hp:5200, gold:5600, lvl:112, speed:2.2, achId:'skeleton_2' },
-    3:{ name:'해골 기사', monster:'skeleton_3.png', hp:6000, gold:6200, lvl:114, speed:2.0, achId:'skeleton_3' },
-    4:{ name:'저주받은 해골', monster:'skeleton_4.png', hp:6800, gold:7000, lvl:116, speed:1.8, achId:'skeleton_4' },
-    5:{ name:'해골 군주', monster:'skeleton_boss.png', hp:9000, gold:9500, lvl:118, speed:1.6, scale:1.5, achId:'skeleton_king' }
+    1:{ name:'해골 병사', monster:'skeleton_1.png', hp:45000, gold:60000, lvl:110, speed:2.4, achId:'skeleton_1' , scale:1.7 },
+    2:{ name:'해골 궁수', monster:'skeleton_2.png', hp:50000, gold:65000, lvl:112, speed:2.2, achId:'skeleton_2' , scale:1.7},
+    3:{ name:'해골 기사', monster:'skeleton_3.png', hp:56000, gold:72000, lvl:114, speed:2.0, achId:'skeleton_3' , scale:1.7},
+    4:{ name:'저주받은 해골', monster:'skeleton_4.png', hp:62000, gold:80000, lvl:116, speed:1.8, achId:'skeleton_4' , scale:1.7},
+    5:{ name:'해골 군주', monster:'skeleton_boss.png', hp:70000, gold:90000, lvl:118, speed:1.6, scale:2.0, achId:'skeleton_king' }
 };
 
 /* 🏰 악마성 */
 const demonStages = {
-    1:{ name:'악마 하수인', monster:'demon_1.png', hp:11000, gold:12000, lvl:120, speed:2.2, achId:'demon_1' },
-    2:{ name:'악마 기사', monster:'demon_2.png', hp:12500, gold:13500, lvl:122, speed:2.0, achId:'demon_2' },
-    3:{ name:'지옥 마법사', monster:'demon_3.png', hp:14500, gold:15500, lvl:124, speed:1.8, achId:'demon_3' },
-    4:{ name:'타락한 군주', monster:'demon_4.png', hp:17000, gold:18000, lvl:126, speed:1.6, achId:'demon_4' },
-    5:{ name:'마왕의 사자', monster:'demon_boss.png', hp:23000, gold:26000, lvl:128, speed:1.4, scale:1.6, achId:'demon_king' }
+    1:{ name:'악마 하수인', monster:'demon_1.png', hp:80000, gold:100000, lvl:120, speed:2.2, achId:'demon_1' , scale:1.7 },
+    2:{ name:'악마 기사', monster:'demon_2.png', hp:90000, gold:120000, lvl:122, speed:2.0, achId:'demon_2' , scale:1.7},
+    3:{ name:'지옥 마법사', monster:'demon_3.png', hp:105000, gold:140000, lvl:124, speed:1.8, achId:'demon_3' , scale:2.0},
+    4:{ name:'타락한 군주', monster:'demon_4.png', hp:120000, gold:160000, lvl:126, speed:1.6, achId:'demon_4' , scale:2.1},
+    5:{ name:'마왕', monster:'demon_boss.png', hp:150000, gold:200000, lvl:128, speed:1.4, scale:2.4, achId:'demon_king' }
 };
 
-/* 🔥 마계 – 3마리만 */
+/* 🔥 마계 – 최종 구간 */
 const hellStages = {
-    1:{ name:'탐욕의 망령', monster:'sin_greed.png', hp:30000, gold:35000, lvl:130, speed:1.8, scale:1.6, achId:'sin_greed' },
-    2:{ name:'질투의 망령', monster:'sin_envy.png', hp:34000, gold:40000, lvl:132, speed:1.7, scale:1.7, achId:'sin_envy' },
-    3:{ name:'👑 분노의 신', monster:'sin_god.png', hp:65000, gold:80000, lvl:140, speed:1.3, scale:2.2, achId:'sin_god' }
+    1:{ name:'탐욕의 망령', monster:'sin_greed.png', hp:200000, gold:260000, lvl:130, speed:1.8, scale:2.4, achId:'sin_greed' },
+    2:{ name:'질투의 망령', monster:'sin_envy.png', hp:260000, gold:340000, lvl:132, speed:1.7, scale:2.9, achId:'sin_envy' },
+    3:{ name:'👑 분노의 신', monster:'sin_god.png', hp:350000, gold:500000, lvl:140, speed:1.3, scale:2.5, achId:'sin_god' }
 };
 
 /* =========================

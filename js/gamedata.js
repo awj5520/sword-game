@@ -24,6 +24,7 @@ const GameData = {
   noDropTicket: Number(localStorage.getItem('noDropTicket')) || 0,
   guaranteeTicket: Number(localStorage.getItem('guaranteeTicket')) || 0,
 
+  /* 🔥 지속 사용 상태 */
   noDropActive: localStorage.getItem('noDropActive') === 'true',
   guaranteeActive: localStorage.getItem('guaranteeActive') === 'true',
 
@@ -32,29 +33,7 @@ const GameData = {
   ========================= */
   totalGold: Number(localStorage.getItem('totalGold')) || 0,
 
-  killStats: JSON.parse(localStorage.getItem('killStats')) || {
-    slime: 0,
-    slime_helmet: 0,
-    slime_warrior: 0,
-    slime_rage: 0,
-    slime_king: 0,
-
-    orc_1: 0,
-    orc_2: 0,
-    orc_3: 0,
-    orc_4: 0,
-    orc_king: 0,
-
-    dragon_1: 0,
-    dragon_2: 0,
-    dragon_3: 0,
-    dragon_4: 0,
-    dragon_king: 0,
-
-    space_slime: 0,
-    space_orc: 0,
-    space_dragon: 0
-  },
+  killStats: JSON.parse(localStorage.getItem('killStats')) || {},
 
   now() {
     return Date.now();
@@ -96,34 +75,10 @@ const GameData = {
   },
 
   /* =========================
-     💰 골드 획득
-  ========================= */
-  earnGold(amount) {
-    let gain = amount;
-
-    gain *= this.achievementGoldMul;
-
-    if (this.goldBuffUntil > this.now()) {
-      gain *= 1.5;
-    }
-
-    gain = Math.floor(gain);
-
-    this.gold += gain;
-    this.totalGold += gain;
-
-    this.save();
-
-    if (window.Achievement) Achievement.checkAll();
-
-    return gain;
-  },
-
-  /* =========================
      강화 확률
   ========================= */
   getSuccessRate() {
-    if (this.guaranteeActive) return 100;
+    if (this.guaranteeActive && this.guaranteeTicket > 0) return 100;
 
     if (this.level < 10) return 100;
     if (this.level < 30) return Math.max(95 - (this.level - 10), 75);
@@ -134,7 +89,7 @@ const GameData = {
   },
 
   /* =========================
-     🔨 강화 (🔥 수정 핵심)
+     🔨 강화 (🔥 핵심 수정)
   ========================= */
   upgrade() {
     const rate = this.getSuccessRate();
@@ -144,23 +99,28 @@ const GameData = {
       this.level++;
       this.damage += 5;
 
-      // ✅ 100% 강화권 소모
+      /* ✅ 100% 강화권: 성공 시 1개 소모, 계속 ON */
       if (this.guaranteeActive) {
-        this.guaranteeTicket = Math.max(0, this.guaranteeTicket - 1);
-        this.guaranteeActive = false;
+        this.guaranteeTicket--;
+        if (this.guaranteeTicket <= 0) {
+          this.guaranteeTicket = 0;
+          this.guaranteeActive = false;
+        }
       }
     } else {
       if (this.noDropActive) {
-        // ✅ 하락 방지권 소모
-        this.noDropTicket = Math.max(0, this.noDropTicket - 1);
-        this.noDropActive = false;
+        /* ✅ 하락 방지권: 실패 시 1개 소모, 계속 ON */
+        this.noDropTicket--;
+        if (this.noDropTicket <= 0) {
+          this.noDropTicket = 0;
+          this.noDropActive = false;
+        }
       } else {
         this.level = Math.max(0, this.level - 1);
       }
     }
 
     this.save();
-
     if (window.Achievement) Achievement.checkAll();
 
     return success;
