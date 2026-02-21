@@ -41,7 +41,7 @@
 }
 
 /* =========================
-   🌌 2세계 배경 (🔥 추가)
+   🌌 2세계 배경
 ========================= */
 
 /* 🕳️ 동굴 */
@@ -65,6 +65,35 @@
 /* 🔥 마계 */
 .stage-wrapper.hell {
     background: url("../images/monsters/hell.png")
+        center / cover no-repeat;
+}
+
+/* =========================
+   🌠 3세계 배경 (✅ 추가)
+   너가 이 파일명으로 배경 이미지만 넣으면 됨
+========================= */
+
+/* 🌊 아틀란티스 */
+.stage-wrapper.atlantis {
+    background: url("../images/monsters/w3_atlantis_bg.png")
+        center / cover no-repeat;
+}
+
+/* 💀 저승 */
+.stage-wrapper.underworld {
+    background: url("../images/monsters/w3_underworld_bg.png")
+        center / cover no-repeat;
+}
+
+/* ⚡ 천둥의 성 */
+.stage-wrapper.thunder {
+    background: url("../images/monsters/w3_thunder_bg.png")
+        center / cover no-repeat;
+}
+
+/* ✨ 신계 */
+.stage-wrapper.divine {
+    background: url("../images/monsters/w3_divine_bg.png")
         center / cover no-repeat;
 }
 

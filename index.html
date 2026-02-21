@@ -47,9 +47,14 @@
                 🗺️ 1세계 사냥터
             </button>
 
-            <!-- 🔒 2세계 -->
+            <!-- 🌌 2세계 -->
             <button class="btn hunt" onclick="goWorld(2)">
                 🌌 2세계 사냥터
+            </button>
+
+            <!-- 🌠 3세계 (✅ 추가) -->
+            <button class="btn hunt" onclick="goWorld(3)">
+                🌠 3세계 사냥터
             </button>
 
             <button class="btn shop" onclick="location.href='shop.html'">🏪 상점</button>
@@ -67,6 +72,11 @@
 function goWorld(world) {
     if (world === 2 && GameData.level < 100) {
         alert('2세계는 강화 +100 이상 필요합니다!');
+        return;
+    }
+    // ✅ 3세계 입장 제한(원하면 숫자 바꿔도 됨)
+    if (world === 3 && GameData.level < 200) {
+        alert('3세계는 강화 +200 이상 필요합니다!');
         return;
     }
     location.href = `hunt.html?world=${world}`;

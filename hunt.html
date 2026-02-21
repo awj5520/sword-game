@@ -32,8 +32,16 @@ if (world === 2 && GameData.level < 100) {
     location.href = 'index.html';
 }
 
+/* 🔒 3세계 제한 */
+if (world === 3 && GameData.level < 200) {
+    alert('3세계는 강화 +200 이상 필요합니다!');
+    location.href = 'index.html';
+}
+
 document.getElementById('world-title').innerText =
-    world === 1 ? '🌍 1세계 사냥터' : '🌌 2세계 사냥터';
+    world === 1 ? '🌍 1세계 사냥터'
+  : world === 2 ? '🌌 2세계 사냥터'
+  : '🌠 3세계 사냥터';
 
 const DATA = {
     1: [
@@ -91,13 +99,43 @@ const DATA = {
             ['질투의 망령',2],
             ['👑 분노의 신',3]
         ]}
+    ],
+
+    /* ✅ 3세계 추가 */
+    3: [
+        { title:'🌊 아틀란티스', area:'atlantis', monsters:[
+            ['산호 슬라임',1],
+            ['심해 해마 기사',2],
+            ['잠수꾼 망령',3],
+            ['크라켄',4],
+            ['👑 포세이돈',5]
+        ]},
+        { title:'💀 저승', area:'underworld', monsters:[
+            ['길잃은 영혼',1],
+            ['지옥 사냥개',2],
+            ['사신의 그림자',3],
+            ['스틱스 망령',4],
+            ['👑 하데스',5]
+        ]},
+        { title:'⚡ 천둥의 성', area:'thunder', monsters:[
+            ['구름 정령',1],
+            ['번개 박쥐',2],
+            ['스톰 나이트',3],
+            ['천둥 골렘',4],
+            ['👑 제우스',5]
+        ]},
+        { title:'✨ 신계', area:'divine', monsters:[
+            ['크로노스',1],
+            ['가이아',2],
+            ['카오스',3]
+        ]}
     ]
 };
 
 const grid = document.getElementById('region-grid');
 
 /* 렌더링 */
-DATA[world].forEach(region => {
+(DATA[world] || []).forEach(region => {
     const box = document.createElement('div');
     box.className = 'region-box';
 
@@ -111,7 +149,7 @@ DATA[world].forEach(region => {
         btn.className = 'monster-text';
         btn.innerText = name;
         btn.onclick = (e) => {
-            e.stopPropagation(); // 🔥 상위 클릭 방지
+            e.stopPropagation();
             location.href =
                 `stage.html?world=${world}&area=${region.area}&stage=${stage}`;
         };
