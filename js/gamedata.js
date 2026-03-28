@@ -15,10 +15,8 @@ const GameData = {
   /* =========================
      🏆 업적 배율
   ========================= */
-  achievementDamageMul:
-    Number(localStorage.getItem('achievementDamageMul')) || 1.0,
-  achievementGoldMul:
-    Number(localStorage.getItem('achievementGoldMul')) || 1.0,
+  achievementDamageMul: Number(localStorage.getItem('achievementDamageMul')) || 1.0,
+  achievementGoldMul: Number(localStorage.getItem('achievementGoldMul')) || 1.0,
 
   /* =========================
      버프 / 아이템
@@ -35,20 +33,16 @@ const GameData = {
   /* =========================
      💥 200% 강화권
   ========================= */
-  doubleGuaranteeTicket:
-    Number(localStorage.getItem('doubleGuaranteeTicket')) || 0,
-  doubleGuaranteeActive:
-    localStorage.getItem('doubleGuaranteeActive') === 'true',
-  unlockDoubleGuarantee:
-    localStorage.getItem('unlockDoubleGuarantee') === 'true',
+  doubleGuaranteeTicket: Number(localStorage.getItem('doubleGuaranteeTicket')) || 0,
+  doubleGuaranteeActive: localStorage.getItem('doubleGuaranteeActive') === 'true',
+  unlockDoubleGuarantee: localStorage.getItem('unlockDoubleGuarantee') === 'true',
 
   /* =========================
      🌠 월드3 보상
   ========================= */
   poseidonGoldMul: Number(localStorage.getItem('poseidonGoldMul')) || 1.0,
   hadesDamageMul: Number(localStorage.getItem('hadesDamageMul')) || 1.0,
-  world3BossPowerMul:
-    Number(localStorage.getItem('world3BossPowerMul')) || 1.0,
+  world3BossPowerMul: Number(localStorage.getItem('world3BossPowerMul')) || 1.0,
 
   atlantisToken: Number(localStorage.getItem('atlantisToken')) || 0,
   underworldToken: Number(localStorage.getItem('underworldToken')) || 0,

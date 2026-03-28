@@ -10,28 +10,34 @@
 </head>
 <body>
 
-<!-- 🔥 stage.js에서 area에 따라 배경 class 추가 -->
 <div id="stage" class="stage-wrapper">
 
-    <!-- 상단 UI -->
     <div class="top-ui">
-        <div class="hp-bar">
-            <div id="hp-fill"></div>
+        <div class="status-box player-status">
+            <div id="player-hp-text" class="status-label">유저 HP 0 / 0</div>
+            <div class="hp-bar">
+                <div id="player-hp-fill" class="hp-fill"></div>
+            </div>
         </div>
     </div>
 
-    <!-- 전투 영역 -->
     <div class="battle-field">
         <div id="monster-wrapper">
             <img id="monster" src="" alt="monster">
         </div>
     </div>
 
-    <img id="monster-img">
-<div id="stage-bg"></div>
+    <img id="monster-img" alt="">
+    <div id="stage-bg"></div>
 
-    <!-- 하단 UI -->
     <div class="bottom-ui">
+        <div class="status-box monster-status">
+            <div id="monster-hp-text" class="status-label">몬스터 HP 0 / 0</div>
+            <div class="hp-bar">
+                <div id="monster-hp-fill" class="hp-fill"></div>
+            </div>
+        </div>
+
         <div id="log">전투 시작!</div>
 
         <div class="info">
@@ -39,7 +45,6 @@
             <div id="damage-text">공격력 0</div>
         </div>
 
-        <!-- 🔙 월드 유지 나가기 버튼 -->
         <button id="back-btn">사냥터로 돌아가기</button>
     </div>
 
@@ -50,13 +55,9 @@
 <script src="js/stage.js"></script>
 
 <script>
-/* =========================
-   🔙 월드 유지해서 사냥터로 돌아가기
-========================= */
 document.getElementById('back-btn').onclick = () => {
     const params = new URLSearchParams(location.search);
     const world = params.get('world') || 1;
-
     location.href = `hunt.html?world=${world}`;
 };
 </script>

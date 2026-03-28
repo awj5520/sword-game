@@ -1,10 +1,81 @@
-/* =========================
+﻿/* =========================
    파라미터
 ========================= */
 const params = new URLSearchParams(location.search);
 const world = Number(params.get('world') || 1);
 const area = params.get('area') || 'grass';
 const stageId = Number(params.get('stage') || 1);
+
+// Stage monster damage table
+// key format: "world:area:stage"
+// example: "1:grass:1": 3
+const STAGE_MONSTER_DAMAGE = {
+  // World 1
+  "1:grass:1": 4,
+  "1:grass:2": 5,
+  "1:grass:3": 6,
+  "1:grass:4": 7,
+  "1:grass:5": 8,
+  "1:orc:1": 6,
+  "1:orc:2": 7,
+  "1:orc:3": 8,
+  "1:orc:4": 9,
+  "1:orc:5": 10,
+  "1:dragon:1": 8,
+  "1:dragon:2": 9,
+  "1:dragon:3": 10,
+  "1:dragon:4": 11,
+  "1:dragon:5": 12,
+  "1:space:1": 10,
+  "1:space:2": 11,
+  "1:space:3": 13,
+
+  // World 2
+  "2:cave:1": 14,
+  "2:cave:2": 15,
+  "2:cave:3": 16,
+  "2:cave:4": 17,
+  "2:cave:5": 18,
+  "2:grave:1": 16,
+  "2:grave:2": 17,
+  "2:grave:3": 18,
+  "2:grave:4": 20,
+  "2:grave:5": 22,
+  "2:demon:1": 20,
+  "2:demon:2": 22,
+  "2:demon:3": 24,
+  "2:demon:4": 26,
+  "2:demon:5": 28,
+  "2:hell:1": 26,
+  "2:hell:2": 28,
+  "2:hell:3": 32,
+
+  // World 3
+  "3:atlantis:1": 30,
+  "3:atlantis:2": 33,
+  "3:atlantis:3": 36,
+  "3:atlantis:4": 39,
+  "3:atlantis:5": 42,
+  "3:underworld:1": 34,
+  "3:underworld:2": 37,
+  "3:underworld:3": 41,
+  "3:underworld:4": 45,
+  "3:underworld:5": 50,
+  "3:thunder:1": 36,
+  "3:thunder:2": 40,
+  "3:thunder:3": 44,
+  "3:thunder:4": 49,
+  "3:thunder:5": 54,
+  "3:divine:1": 48,
+  "3:divine:2": 56,
+  "3:divine:3": 64,
+  "3:rift:1": 52,
+  "3:rift:2": 58,
+  "3:rift:3": 66,
+  "3:rift:4": 75
+};
+
+
 
 /* =========================
    🔒 월드 입장 제한
@@ -169,7 +240,10 @@ if (GameData.level < data.lvl) {
 const stageEl = document.getElementById('stage');
 const img = document.getElementById('monster');
 const wrap = document.getElementById('monster-wrapper');
-const hpFill = document.getElementById('hp-fill');
+const playerHpFill = document.getElementById('player-hp-fill');
+const playerHpText = document.getElementById('player-hp-text');
+const monsterHpFill = document.getElementById('monster-hp-fill');
+const monsterHpText = document.getElementById('monster-hp-text');
 const log = document.getElementById('log');
 const goldText = document.getElementById('gold-text');
 const damageText = document.getElementById('damage-text');
@@ -196,6 +270,19 @@ wrap.style.animationDuration = `${data.speed}s`;
 ========================= */
 let hp = data.hp;
 let dead = false;
+let playerDead = false;
+let monsterAttackTimer = null;
+
+const MONSTER_ATTACK_INTERVAL_MS = 5000;
+const defaultMonsterAttackDamage = Math.max(1, Math.ceil((data.lvl + 1) / 40));
+const stageDamageKey = `${world}:${area}:${stageId}`;
+const configuredMonsterAttackDamage = Number(STAGE_MONSTER_DAMAGE[stageDamageKey]);
+const monsterAttackDamage =
+  (Number.isFinite(configuredMonsterAttackDamage) && configuredMonsterAttackDamage > 0)
+    ? Math.floor(configuredMonsterAttackDamage)
+    : (Number.isFinite(Number(data.atk)) && Number(data.atk) > 0)
+    ? Math.floor(Number(data.atk))
+    : defaultMonsterAttackDamage;
 
 /* =========================
    UI 초기화
@@ -204,8 +291,65 @@ log.innerText = `${data.name} 등장!`;
 goldText.innerText = `💰 ${GameData.gold}`;
 damageText.innerText = `공격력: ${GameData.getCurrentDamage()}`;
 
-function updateHP() {
-  hpFill.style.width = `${(hp / data.hp) * 100}%`;
+if (GameData.currentHp <= 0) {
+  GameData.healFull();
+} else if (GameData.currentHp > GameData.maxHp) {
+  GameData.currentHp = GameData.maxHp;
+  GameData.save();
+}
+
+function updateMonsterHP() {
+  const ratio = data.hp > 0 ? (hp / data.hp) * 100 : 0;
+  monsterHpFill.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
+  monsterHpText.innerText = `몬스터 HP ${hp} / ${data.hp}`;
+}
+
+function updatePlayerHP() {
+  const ratio = GameData.maxHp > 0 ? (GameData.currentHp / GameData.maxHp) * 100 : 0;
+  playerHpFill.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
+  playerHpText.innerText = `유저 HP ${GameData.currentHp} / ${GameData.maxHp}`;
+}
+
+function handlePlayerDefeat() {
+  if (playerDead) return;
+  playerDead = true;
+  dead = true;
+  img.style.pointerEvents = 'none';
+  stopMonsterAutoAttack();
+  log.innerText = '사망했습니다. 데이터를 초기화합니다...';
+
+  setTimeout(() => {
+    if (typeof GameData.resetAllProgress === 'function') {
+      GameData.resetAllProgress();
+    }
+    alert('유저가 사망하여 강화/골드/인벤토리/업적이 초기화되었습니다.');
+    location.href = 'index.html';
+  }, 600);
+}
+
+function runMonsterAutoAttack() {
+  if (dead || playerDead || hp === 0) return;
+
+  GameData.takeDamage(monsterAttackDamage);
+  updatePlayerHP();
+
+  if (GameData.isDead()) {
+    handlePlayerDefeat();
+    return;
+  }
+
+  log.innerText = `${data.name}의 공격! -${monsterAttackDamage} HP`;
+}
+
+function stopMonsterAutoAttack() {
+  if (!monsterAttackTimer) return;
+  clearInterval(monsterAttackTimer);
+  monsterAttackTimer = null;
+}
+
+function startMonsterAutoAttack() {
+  stopMonsterAutoAttack();
+  monsterAttackTimer = setInterval(runMonsterAutoAttack, MONSTER_ATTACK_INTERVAL_MS);
 }
 
 function tryDropRiftItem() {
@@ -237,11 +381,11 @@ function tryDropRiftItem() {
    공격 처리
 ========================= */
 img.onclick = () => {
-  if (dead) return;
+  if (dead || playerDead) return;
 
   hp -= GameData.getCurrentDamage();
   if (hp < 0) hp = 0;
-  updateHP();
+  updateMonsterHP();
 
   img.classList.add('hit');
   setTimeout(() => img.classList.remove('hit'), 120);
@@ -277,7 +421,7 @@ img.onclick = () => {
 
     setTimeout(() => {
       hp = data.hp;
-      updateHP();
+      updateMonsterHP();
       dead = false;
 
       img.style.opacity = '1';
@@ -314,4 +458,8 @@ function renderStage() {
 }
 
 renderStage();
-updateHP();
+updateMonsterHP();
+updatePlayerHP();
+startMonsterAutoAttack();
+
+window.addEventListener('beforeunload', stopMonsterAutoAttack);
