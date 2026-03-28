@@ -67,3 +67,35 @@
     color: #ffd700;
 }
 
+/* =========================
+   배낭 스크롤 가능
+========================= */
+
+.inventory-wrapper {
+    max-width: 420px;
+    height: 100vh;
+    margin: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-y: auto;   /* ⭐ 세로 스크롤 */
+}
+
+/* 아이템 영역 */
+.inventory-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 80px;
+}
+
+/* 스크롤 디자인 (선택) */
+.inventory-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.inventory-body::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+}
+

@@ -97,7 +97,7 @@ const atlantisStages = {
 };
 
 const underworldStages = {
-  1:{ name:'길잃은 영혼', monster:'w3_underworld_1.png', hp:540000,  gold:680000,  lvl:200, speed:3.0, scale:1.6,achId:'w3_underworld_1' },
+  1:{ name:'길잃은 영혼', monster:'w3_underworld_1.png', hp:540000,  gold:680000,  lvl:200, speed:3.0, scale:1.6, achId:'w3_underworld_1' },
   2:{ name:'지옥 사냥개', monster:'w3_underworld_2.png', hp:670000,  gold:820000,  lvl:206, speed:2.4, scale:2.6, achId:'w3_underworld_2' },
   3:{ name:'사신의 그림자', monster:'w3_underworld_3.png', hp:820000,  gold:1050000, lvl:212, speed:2.1, scale:2.0, achId:'w3_underworld_3' },
   4:{ name:'스틱스 망령', monster:'w3_underworld_4.png', hp:1050000, gold:1350000, lvl:218, speed:1.9, scale:2.9, achId:'w3_underworld_4' },
@@ -113,9 +113,24 @@ const thunderStages = {
 };
 
 const divineStages = {
-  1:{ name:'크로노스', monster:'w3_divine_1_cronos.png', hp:1400000, gold:2600000, lvl:235, speed:1.7, scale:1.85, achId:'w3_cronos' },
-  2:{ name:'가이아', monster:'w3_divine_2_gaia.png', hp:1850000, gold:3200000, lvl:245, speed:1.55, scale:2.05, achId:'w3_gaia' },
-  3:{ name:'카오스', monster:'w3_divine_3_chaos.png', hp:2400000, gold:4200000, lvl:255, speed:1.4, scale:2.25, achId:'w3_chaos' }
+  1:{ name:'크로노스', monster:'w3_divine_1_cronos.png', hp:1400000, gold:2600000, lvl:235, speed:100.0, scale:5.5, offsetY:100, achId:'w3_cronos' },
+  2:{ name:'가이아', monster:'w3_divine_2_gaia.png', hp:1850000, gold:3200000, lvl:245, speed:100.0, scale:5.2, offsetY:100, achId:'w3_gaia' },
+  3:{ name:'카오스', monster:'w3_divine_3_chaos.png', hp:2400000, gold:4200000, lvl:255, speed:100.0, scale:5.3, offsetY:100, achId:'w3_chaos' }
+};
+
+/* =========================
+   🎲 운명의 균열 (✅ 추가)
+   - 드랍 확률:
+     운명의 주사위 10%
+     양면의 인장 6%
+     운명의 저울 3%
+     카오스 인장 1%
+========================= */
+const riftStages = {
+  1:{ name:'🎲 확률의 도사', monster:'rift_1.png', hp:900000, gold:1500000, lvl:230, speed:2.0, scale:4.0, achId:'rift_1', drop:'dice', dropRate:1.00, bg:'bg_rift_1.png' },
+  2:{ name:'🌓 양면의 문지기', monster:'rift_2.png', hp:1100000, gold:1800000, lvl:235, speed:1.9, scale:3.5, achId:'rift_2', drop:'dual', dropRate:0.10, bg:'bg_rift_2.png' },
+  3:{ name:'⚖️ 균형의 심판관', monster:'rift_3.png', hp:1300000, gold:2200000, lvl:240, speed:1.8, scale:2.4, achId:'rift_3', drop:'scale', dropRate:0.05, bg:'bg_rift_3.png' },
+  4:{ name:'🌀 심연의 분열체', monster:'rift_4.png', hp:1600000, gold:2800000, lvl:250, speed:1.7, scale:2.6, achId:'rift_4', drop:'chaos', dropRate:0.03, bg:'bg_rift_4.png' }
 };
 
 /* =========================
@@ -123,24 +138,15 @@ const divineStages = {
 ========================= */
 const areaStages =
   world === 1
-    ? {
-        grass: grassStages,
-        orc: orcStages,
-        dragon: dragonStages,
-        space: spaceStages
-      }
+    ? { grass: grassStages, orc: orcStages, dragon: dragonStages, space: spaceStages }
     : world === 2
-    ? {
-        cave: caveStages,
-        grave: graveStages,
-        demon: demonStages,
-        hell: hellStages
-      }
+    ? { cave: caveStages, grave: graveStages, demon: demonStages, hell: hellStages }
     : {
         atlantis: atlantisStages,
         underworld: underworldStages,
         thunder: thunderStages,
-        divine: divineStages
+        divine: divineStages,
+        rift: riftStages // ✅ 추가
       };
 
 const data = areaStages[area]?.[stageId];
@@ -170,6 +176,11 @@ const damageText = document.getElementById('damage-text');
 
 stageEl.classList.add(area);
 
+/* ✅ 운명의 균열은 스테이지별 배경을 JS로 직접 적용 */
+if (area === 'rift' && data.bg) {
+  stageEl.style.background = `url("images/backgrounds/${data.bg}") center / cover no-repeat`;
+}
+
 /* =========================
    몬스터 세팅
 ========================= */
@@ -197,6 +208,31 @@ function updateHP() {
   hpFill.style.width = `${(hp / data.hp) * 100}%`;
 }
 
+function tryDropRiftItem() {
+  if (area !== 'rift') return null;
+  if (!data.drop || !data.dropRate) return null;
+
+  if (Math.random() >= data.dropRate) return null;
+
+  if (data.drop === 'dice') {
+    GameData.fateDiceTicket++;
+    return '🎲 운명의 주사위';
+  }
+  if (data.drop === 'dual') {
+    GameData.dualSealTicket++;
+    return '🌓 양면의 인장';
+  }
+  if (data.drop === 'scale') {
+    GameData.fateScaleTicket++;
+    return '⚖️ 운명의 저울';
+  }
+  if (data.drop === 'chaos') {
+    GameData.chaosSealTicket++;
+    return '🌀 카오스 인장';
+  }
+  return null;
+}
+
 /* =========================
    공격 처리
 ========================= */
@@ -219,21 +255,25 @@ img.onclick = () => {
     const earned = GameData.earnGold(data.gold);
     goldText.innerText = `💰 ${GameData.gold}`;
 
-    /* ✅✅✅ 여기만 핵심 수정 ✅✅✅
-       - 기존: killStats 키가 미리 있어야만 증가(월드3는 누적 안될 수 있음)
-       - 변경: 무조건 누적 + 월드3 보스 보상 트리거 호출
-    */
+    // ✅ 킬 카운트 누적
     GameData.killStats[data.achId] = (GameData.killStats[data.achId] || 0) + 1;
 
-    // 월드3 보스 보상(포세이돈/하데스/제우스 10/100회)
+    // ✅ 월드3 보스 보상
     if (typeof GameData.onBossKilled === 'function') {
       GameData.onBossKilled(data.achId);
     }
 
+    // ✅ 운명의 균열 드랍
+    const dropName = tryDropRiftItem();
+
     GameData.save();
     if (window.Achievement) Achievement.checkAll();
 
-    log.innerText = `${data.name} 처치! +${earned}G`;
+    if (dropName) {
+      log.innerText = `${data.name} 처치! +${earned}G  🎁 ${dropName} 획득!`;
+    } else {
+      log.innerText = `${data.name} 처치! +${earned}G`;
+    }
 
     setTimeout(() => {
       hp = data.hp;
@@ -248,4 +288,30 @@ img.onclick = () => {
   }
 };
 
+
+/* =========================
+   🎨 몬스터 & 배경 표시 (🔥 핵심)
+========================= */
+const monsterImg = document.getElementById('monster-img');
+const stageBg = document.getElementById('stage-bg');
+
+function renderStage() {
+
+  /* 몬스터 이미지 */
+  if (monsterImg && data.monster) {
+    monsterImg.src = `img/monsters/${data.monster}`;
+  }
+
+  /* 배경 */
+  if (stageBg) {
+    if (data.bg) {
+      stageBg.style.backgroundImage = `url(img/bg/${data.bg})`;
+    } else {
+      // 기본 배경 (area 기준)
+      stageBg.style.backgroundImage = `url(img/bg/${area}.png)`;
+    }
+  }
+}
+
+renderStage();
 updateHP();

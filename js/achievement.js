@@ -49,7 +49,7 @@ const Achievement = {
     },
 
     /* =========================
-       🔨 강화 업적 (🔥 신규)
+       🔨 강화 업적
     ========================= */
     {
       id: 'upgrade_50',
@@ -64,6 +64,15 @@ const Achievement = {
       desc: '+100강 달성',
       damageMul: 1.3,
       check: () => GameData.level >= 100
+    },
+
+    /* 🔥 추가된 업적 */
+    {
+      id: 'upgrade_god',
+      title: '🔥 강화의 신',
+      desc: '1경 달성',
+      damageMul: 2.0,
+      check: () => GameData.level >= 1e16
     },
 
     /* =========================
@@ -98,7 +107,6 @@ const Achievement = {
       if (!this.unlocked[a.id] && a.check()) {
         this.unlocked[a.id] = true;
 
-        /* 🔥 보상 적용 */
         if (a.damageMul) {
           GameData.achievementDamageMul *= a.damageMul;
         }

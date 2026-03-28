@@ -18,25 +18,25 @@
 
 /* 🌱 초원 */
 .stage-wrapper.grass {
-    background: url("../images/monsters/pasture.png")
+    background: url("../images/backgrounds/pasture.png")
         center / cover no-repeat;
 }
 
 /* 🏕️ 오크 부락 */
 .stage-wrapper.orc {
-    background: url("../images/monsters/orc_camp.png")
+    background: url("../images/backgrounds/orc_camp.png")
         center / cover no-repeat;
 }
 
 /* 🐉 드래곤 협곡 */
 .stage-wrapper.dragon {
-    background: url("../images/monsters/dragon_canyon.png")
+    background: url("../images/backgrounds/dragon_canyon.png")
         center / cover no-repeat;
 }
 
 /* 🌌 우주 */
 .stage-wrapper.space {
-    background: url("../images/monsters/space.png")
+    background: url("../images/backgrounds/space.png")
         center / cover no-repeat;
 }
 
@@ -46,25 +46,25 @@
 
 /* 🕳️ 동굴 */
 .stage-wrapper.cave {
-    background: url("../images/monsters/cave.png")
+    background: url("../images/backgrounds/cave.png")
         center / cover no-repeat;
 }
 
 /* 🪦 무덤 */
 .stage-wrapper.grave {
-    background: url("../images/monsters/grave.png")
+    background: url("../images/backgrounds/grave.png")
         center / cover no-repeat;
 }
 
 /* 🏰 악마성 */
 .stage-wrapper.demon {
-    background: url("../images/monsters/devil_castle.png")
+    background: url("../images/backgrounds/devil_castle.png")
         center / cover no-repeat;
 }
 
 /* 🔥 마계 */
 .stage-wrapper.hell {
-    background: url("../images/monsters/hell.png")
+    background: url("../images/backgrounds/hell.png")
         center / cover no-repeat;
 }
 
@@ -75,25 +75,66 @@
 
 /* 🌊 아틀란티스 */
 .stage-wrapper.atlantis {
-    background: url("../images/monsters/w3_atlantis_bg.png")
+    background: url("../images/backgrounds/w3_atlantis_bg.png")
         center / cover no-repeat;
 }
 
 /* 💀 저승 */
 .stage-wrapper.underworld {
-    background: url("../images/monsters/w3_underworld_bg.png")
+    background: url("../images/backgrounds/w3_underworld_bg.png")
         center / cover no-repeat;
 }
 
 /* ⚡ 천둥의 성 */
 .stage-wrapper.thunder {
-    background: url("../images/monsters/w3_thunder_bg.png")
+    background: url("../images/backgrounds/w3_thunder_bg.png")
         center / cover no-repeat;
 }
 
 /* ✨ 신계 */
 .stage-wrapper.divine {
-    background: url("../images/monsters/w3_divine_bg.png")
+    background: url("../images/backgrounds/w3_divine_bg.png")
+        center / cover no-repeat;
+}
+
+/* =========================
+   🎲 운명의 균열 기본 배경
+   (JS에서 스테이지별 배경으로 덮어씀)
+========================= */
+
+.stage-wrapper.rift {
+    background:
+        radial-gradient(circle at center, rgba(120,0,180,0.8), rgba(10,0,30,0.95)),
+        linear-gradient(135deg, #2a0040, #000000);
+    background-blend-mode: screen;
+}
+
+/* =========================
+   🎲 운명의 균열 샘플 배경 이미지
+   images/backgrounds 폴더에 넣으면 자동 적용
+========================= */
+
+/* 🎲 주사위 제단 */
+.bg-rift-1 {
+    background: url("../images/backgrounds/bg_rift_1.png")
+        center / cover no-repeat;
+}
+
+/* 🌓 양면의 문 */
+.bg-rift-2 {
+    background: url("../images/backgrounds/bg_rift_2.png")
+        center / cover no-repeat;
+}
+
+/* ⚖️ 균형의 심판대 */
+.bg-rift-3 {
+    background: url("../images/backgrounds/bg_rift_3.png")
+        center / cover no-repeat;
+}
+
+/* 🌀 카오스 심연 */
+.bg-rift-4 {
+    background: url("../images/backgrounds/bg_rift_4.png")
         center / cover no-repeat;
 }
 

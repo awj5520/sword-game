@@ -7,16 +7,21 @@ const GameData = {
   gold: Number(localStorage.getItem('gold')) || 0,
 
   /* =========================
-     🏆 업적 배율(기존)
+     ❤️ 플레이어 HP
+  ========================= */
+  maxHp: Number(localStorage.getItem('maxHp')) || 100,
+  currentHp: Number(localStorage.getItem('currentHp')) || 100,
+
+  /* =========================
+     🏆 업적 배율
   ========================= */
   achievementDamageMul:
     Number(localStorage.getItem('achievementDamageMul')) || 1.0,
-
   achievementGoldMul:
     Number(localStorage.getItem('achievementGoldMul')) || 1.0,
 
   /* =========================
-     버프 / 아이템(기존)
+     버프 / 아이템
   ========================= */
   damageBuffUntil: Number(localStorage.getItem('damageBuffUntil')) || 0,
   goldBuffUntil: Number(localStorage.getItem('goldBuffUntil')) || 0,
@@ -28,33 +33,45 @@ const GameData = {
   guaranteeActive: localStorage.getItem('guaranteeActive') === 'true',
 
   /* =========================
-     🔥 200% 강화권(✅ 신규)
-     - 성공 100% + 강화가 +2
+     💥 200% 강화권
   ========================= */
-  doubleGuaranteeTicket: Number(localStorage.getItem('doubleGuaranteeTicket')) || 0,
-  doubleGuaranteeActive: localStorage.getItem('doubleGuaranteeActive') === 'true',
-
-  /* 제우스 100회 보상: 상점에 200% 강화권 해금 */
-  unlockDoubleGuarantee: localStorage.getItem('unlockDoubleGuarantee') === 'true',
+  doubleGuaranteeTicket:
+    Number(localStorage.getItem('doubleGuaranteeTicket')) || 0,
+  doubleGuaranteeActive:
+    localStorage.getItem('doubleGuaranteeActive') === 'true',
+  unlockDoubleGuarantee:
+    localStorage.getItem('unlockDoubleGuarantee') === 'true',
 
   /* =========================
-     🌠 월드3 영구 보상(✅ 신규)
+     🌠 월드3 보상
   ========================= */
-  // 포세이돈 100회: 골드 영구 1.5배
   poseidonGoldMul: Number(localStorage.getItem('poseidonGoldMul')) || 1.0,
-  // 하데스 100회: 데미지 영구 2배
   hadesDamageMul: Number(localStorage.getItem('hadesDamageMul')) || 1.0,
+  world3BossPowerMul:
+    Number(localStorage.getItem('world3BossPowerMul')) || 1.0,
 
-  // 증표/강해짐 시스템: (아틀란티스/저승/천둥의 성) 보스 10회마다 영구 데미지 강화
-  world3BossPowerMul: Number(localStorage.getItem('world3BossPowerMul')) || 1.0,
-
-  // “증표” 카운트(표시용)
   atlantisToken: Number(localStorage.getItem('atlantisToken')) || 0,
   underworldToken: Number(localStorage.getItem('underworldToken')) || 0,
   thunderToken: Number(localStorage.getItem('thunderToken')) || 0,
 
   /* =========================
-     업적/기록 데이터(기존)
+     🎲 운명 아이템
+  ========================= */
+  fateDiceTicket: Number(localStorage.getItem('fateDiceTicket')) || 0,
+  dualSealTicket: Number(localStorage.getItem('dualSealTicket')) || 0,
+  fateScaleTicket: Number(localStorage.getItem('fateScaleTicket')) || 0,
+  chaosSealTicket: Number(localStorage.getItem('chaosSealTicket')) || 0,
+
+  fateDiceActive: localStorage.getItem('fateDiceActive') === 'true',
+  dualSealActive: localStorage.getItem('dualSealActive') === 'true',
+  fateScaleActive: localStorage.getItem('fateScaleActive') === 'true',
+  chaosSealActive: localStorage.getItem('chaosSealActive') === 'true',
+
+  /* 운명의 저울 실패 보정 */
+  fateScalePity: localStorage.getItem('fateScalePity') === 'true',
+
+  /* =========================
+     기록
   ========================= */
   totalGold: Number(localStorage.getItem('totalGold')) || 0,
   killStats: JSON.parse(localStorage.getItem('killStats')) || {},
@@ -63,10 +80,70 @@ const GameData = {
     return Date.now();
   },
 
+  /* =========================
+     ❤️ HP 처리
+  ========================= */
+  takeDamage(amount) {
+    const dmg = Math.max(0, Number(amount) || 0);
+    this.currentHp = Math.max(0, this.currentHp - dmg);
+    this.save();
+  },
+
+  healFull() {
+    this.currentHp = this.maxHp;
+    this.save();
+  },
+
+  isDead() {
+    return this.currentHp <= 0;
+  },
+
+  /* =========================
+     공격력 계산
+  ========================= */
+  getCurrentDamage() {
+    let dmg = this.damage;
+
+    dmg *= this.achievementDamageMul;
+    dmg *= this.hadesDamageMul;
+    dmg *= this.world3BossPowerMul;
+
+    if (this.damageBuffUntil > this.now()) {
+      dmg *= 1.5;
+    }
+
+    return Math.max(1, Math.floor(dmg));
+  },
+
+  /* =========================
+     골드 획득
+  ========================= */
+  earnGold(baseGold) {
+    let g = Number(baseGold) || 0;
+
+    g *= this.achievementGoldMul;
+    g *= this.poseidonGoldMul;
+
+    if (this.goldBuffUntil > this.now()) {
+      g *= 2;
+    }
+
+    g = Math.floor(g);
+    this.gold += g;
+    this.totalGold += g;
+    return g;
+  },
+
+  /* =========================
+     저장
+  ========================= */
   save() {
     localStorage.setItem('level', this.level);
     localStorage.setItem('damage', this.damage);
     localStorage.setItem('gold', this.gold);
+
+    localStorage.setItem('maxHp', this.maxHp);
+    localStorage.setItem('currentHp', this.currentHp);
 
     localStorage.setItem('achievementDamageMul', this.achievementDamageMul);
     localStorage.setItem('achievementGoldMul', this.achievementGoldMul);
@@ -79,78 +156,51 @@ const GameData = {
     localStorage.setItem('noDropActive', this.noDropActive);
     localStorage.setItem('guaranteeActive', this.guaranteeActive);
 
-    /* ✅ 200% 강화권 저장 */
     localStorage.setItem('doubleGuaranteeTicket', this.doubleGuaranteeTicket);
     localStorage.setItem('doubleGuaranteeActive', this.doubleGuaranteeActive);
     localStorage.setItem('unlockDoubleGuarantee', this.unlockDoubleGuarantee);
 
-    /* ✅ 월드3 영구 보상 저장 */
     localStorage.setItem('poseidonGoldMul', this.poseidonGoldMul);
     localStorage.setItem('hadesDamageMul', this.hadesDamageMul);
     localStorage.setItem('world3BossPowerMul', this.world3BossPowerMul);
+
     localStorage.setItem('atlantisToken', this.atlantisToken);
     localStorage.setItem('underworldToken', this.underworldToken);
     localStorage.setItem('thunderToken', this.thunderToken);
+
+    localStorage.setItem('fateDiceTicket', this.fateDiceTicket);
+    localStorage.setItem('dualSealTicket', this.dualSealTicket);
+    localStorage.setItem('fateScaleTicket', this.fateScaleTicket);
+    localStorage.setItem('chaosSealTicket', this.chaosSealTicket);
+
+    localStorage.setItem('fateDiceActive', this.fateDiceActive);
+    localStorage.setItem('dualSealActive', this.dualSealActive);
+    localStorage.setItem('fateScaleActive', this.fateScaleActive);
+    localStorage.setItem('chaosSealActive', this.chaosSealActive);
+
+    localStorage.setItem('fateScalePity', this.fateScalePity);
 
     localStorage.setItem('totalGold', this.totalGold);
     localStorage.setItem('killStats', JSON.stringify(this.killStats));
   },
 
   /* =========================
-     데미지 계산
+     운명 아이템 상태
   ========================= */
-  getCurrentDamage() {
-    let dmg = this.damage;
-
-    // 기존 업적 배율
-    dmg *= this.achievementDamageMul;
-
-    // ✅ 월드3: 보스 10회 보상 누적(영구)
-    dmg *= this.world3BossPowerMul;
-
-    // ✅ 하데스 100회 보상(영구 2배)
-    dmg *= this.hadesDamageMul;
-
-    // 기존 물약(원본 유지: 1.5배로 돼있었음)
-    if (this.damageBuffUntil > this.now()) {
-      dmg *= 1.5;
-    }
-
-    return Math.floor(dmg);
-  },
-
-  /* =========================
-     💰 골드 획득
-  ========================= */
-  earnGold(baseGold) {
-    let g = Number(baseGold) || 0;
-
-    // 기존 업적 배율
-    g *= this.achievementGoldMul;
-
-    // ✅ 포세이돈 100회 보상(영구 1.5배)
-    g *= this.poseidonGoldMul;
-
-    // 기존 물약 2배
-    if (this.goldBuffUntil > this.now()) {
-      g *= 2;
-    }
-
-    g = Math.floor(g);
-
-    this.gold += g;
-    this.totalGold += g;
-
-    return g;
+  getActiveFateType() {
+    if (this.fateDiceActive && this.fateDiceTicket > 0) return 'dice';
+    if (this.dualSealActive && this.dualSealTicket > 0) return 'dual';
+    if (this.fateScaleActive && this.fateScaleTicket > 0) return 'scale';
+    if (this.chaosSealActive && this.chaosSealTicket > 0) return 'chaos';
+    return null;
   },
 
   /* =========================
      강화 확률
   ========================= */
   getSuccessRate() {
-    // ✅ 200% 강화권이 최우선
+    if (this.fateScalePity) return 100;
     if (this.doubleGuaranteeActive && this.doubleGuaranteeTicket > 0) return 100;
-    // ✅ 100% 강화권
     if (this.guaranteeActive && this.guaranteeTicket > 0) return 100;
 
     if (this.level < 10) return 100;
@@ -162,50 +212,132 @@ const GameData = {
   },
 
   /* =========================
-     🔨 강화
-     - 200% 강화권: 성공 100% + level +2 (한번에 2강)
-     - 100% 강화권: 성공 100% + level +1
-     - 하락 방지권: 실패 시 하락 방지
+     강화
+     - 성공 시 HP +5
+     - 200% 강화권: +2강, 공격력 +10
+     - 일반/100%: +1강, 공격력 +5
+     - 운명 아이템은 레벨 변환 우선
   ========================= */
   upgrade() {
+    const startLevel = this.level;
+    const fateType = this.getActiveFateType();
+
     const rate = this.getSuccessRate();
-    const success = Math.random() * 100 < rate;
+    let success = this.fateScalePity
+      ? true
+      : (Math.random() * 100 < rate);
 
-    if (success) {
-      // ✅ 200% 강화권이 켜져있으면 +2
-      if (this.doubleGuaranteeActive && this.doubleGuaranteeTicket > 0) {
-        this.level += 2;
-        this.damage += 10; // 기존 +1당 damage+5였으니 2배
+    if (this.fateScalePity) {
+      this.fateScalePity = false;
+    }
 
-        this.doubleGuaranteeTicket--;
-        if (this.doubleGuaranteeTicket <= 0) {
-          this.doubleGuaranteeTicket = 0;
-          this.doubleGuaranteeActive = false;
-        }
-      }
-      // ✅ 아니면 100% 강화권(또는 일반 성공) +1
-      else {
-        this.level += 1;
-        this.damage += 5;
+    const isDouble =
+      this.doubleGuaranteeActive && this.doubleGuaranteeTicket > 0;
+    const isGuarantee =
+      this.guaranteeActive && this.guaranteeTicket > 0;
 
-        if (this.guaranteeActive && this.guaranteeTicket > 0) {
-          this.guaranteeTicket--;
-          if (this.guaranteeTicket <= 0) {
-            this.guaranteeTicket = 0;
-            this.guaranteeActive = false;
+    if (!fateType) {
+      if (success) {
+        if (isDouble) {
+          this.damage += 10;
+          this.level += 2;
+
+          this.doubleGuaranteeTicket--;
+          if (this.doubleGuaranteeTicket <= 0) {
+            this.doubleGuaranteeTicket = 0;
+            this.doubleGuaranteeActive = false;
+          }
+        } else {
+          this.damage += 5;
+          this.level += 1;
+
+          if (isGuarantee) {
+            this.guaranteeTicket--;
+            if (this.guaranteeTicket <= 0) {
+              this.guaranteeTicket = 0;
+              this.guaranteeActive = false;
+            }
           }
         }
-      }
-    } else {
-      // 실패
-      if (this.noDropActive && this.noDropTicket > 0) {
-        this.noDropTicket--;
-        if (this.noDropTicket <= 0) {
-          this.noDropTicket = 0;
-          this.noDropActive = false;
-        }
+
+        this.maxHp += 5;
+        this.currentHp += 5;
       } else {
-        this.level = Math.max(0, this.level - 1);
+        if (this.noDropActive && this.noDropTicket > 0) {
+          this.noDropTicket--;
+          if (this.noDropTicket <= 0) {
+            this.noDropTicket = 0;
+            this.noDropActive = false;
+          }
+        } else {
+          this.level = Math.max(0, this.level - 1);
+        }
+      }
+    }
+
+    if (fateType) {
+      if (success) {
+        if (isDouble) {
+          this.damage += 10;
+          this.doubleGuaranteeTicket--;
+          if (this.doubleGuaranteeTicket <= 0) {
+            this.doubleGuaranteeTicket = 0;
+            this.doubleGuaranteeActive = false;
+          }
+        } else {
+          this.damage += 5;
+          if (isGuarantee) {
+            this.guaranteeTicket--;
+            if (this.guaranteeTicket <= 0) {
+              this.guaranteeTicket = 0;
+              this.guaranteeActive = false;
+            }
+          }
+        }
+
+        this.maxHp += 5;
+        this.currentHp += 5;
+      }
+
+      if (fateType === 'dice') {
+        this.level = success ? startLevel * 2 : Math.floor(startLevel / 2);
+        this.fateDiceTicket--;
+        if (this.fateDiceTicket <= 0) {
+          this.fateDiceTicket = 0;
+          this.fateDiceActive = false;
+        }
+      }
+
+      if (fateType === 'dual') {
+        this.level = success
+          ? startLevel * 2
+          : Math.max(Math.floor(startLevel / 2), Math.floor(startLevel * 0.7));
+        this.dualSealTicket--;
+        if (this.dualSealTicket <= 0) {
+          this.dualSealTicket = 0;
+          this.dualSealActive = false;
+        }
+      }
+
+      if (fateType === 'scale') {
+        this.level = success ? startLevel * 2 : Math.floor(startLevel / 2);
+        if (!success) {
+          this.fateScalePity = true;
+        }
+        this.fateScaleTicket--;
+        if (this.fateScaleTicket <= 0) {
+          this.fateScaleTicket = 0;
+          this.fateScaleActive = false;
+        }
+      }
+
+      if (fateType === 'chaos') {
+        this.level = success ? startLevel * 3 : Math.floor(startLevel / 3);
+        this.chaosSealTicket--;
+        if (this.chaosSealTicket <= 0) {
+          this.chaosSealTicket = 0;
+          this.chaosSealActive = false;
+        }
       }
     }
 
@@ -215,42 +347,27 @@ const GameData = {
   },
 
   /* =========================
-     🌠 월드3 보스 처치 보상 처리(✅ 신규)
-     - 보스 10회: “증표” 1개 지급 + 영구 데미지 강화(누적)
-     - 포세이돈 100회: 골드 영구 1.5배
-     - 하데스 100회: 데미지 영구 2배
-     - 제우스 100회: 200% 강화권 상점 해금
+     월드3 보스 보상
   ========================= */
-  onBossKilled(achId) {
-    // 3세계 보스 achId 기준
-    const isPoseidon = achId === 'w3_poseidon';
-    const isHades = achId === 'w3_hades';
-    const isZeus = achId === 'w3_zeus';
+  onBossKilled(id) {
+    const kills = this.killStats[id] || 0;
 
-    if (!isPoseidon && !isHades && !isZeus) return;
-
-    const kills = this.killStats[achId] || 0;
-
-    // ✅ 10회마다: 증표 + 영구 강화(누적)
-    // 강화량은 원하는대로 바꿀 수 있음(현재: 10회마다 데미지 5% 증가)
     if (kills > 0 && kills % 10 === 0) {
-      if (isPoseidon) this.atlantisToken++;
-      if (isHades) this.underworldToken++;
-      if (isZeus) this.thunderToken++;
-
+      if (id === 'w3_poseidon') this.atlantisToken++;
+      if (id === 'w3_hades') this.underworldToken++;
+      if (id === 'w3_zeus') this.thunderToken++;
       this.world3BossPowerMul *= 1.05;
     }
 
-    // ✅ 100회 보상
-    if (isPoseidon && kills >= 100 && this.poseidonGoldMul < 1.5) {
+    if (id === 'w3_poseidon' && kills >= 100 && this.poseidonGoldMul < 1.5) {
       this.poseidonGoldMul = 1.5;
     }
 
-    if (isHades && kills >= 100 && this.hadesDamageMul < 2.0) {
+    if (id === 'w3_hades' && kills >= 100 && this.hadesDamageMul < 2.0) {
       this.hadesDamageMul = 2.0;
     }
 
-    if (isZeus && kills >= 100 && !this.unlockDoubleGuarantee) {
+    if (id === 'w3_zeus' && kills >= 100 && !this.unlockDoubleGuarantee) {
       this.unlockDoubleGuarantee = true;
     }
 

@@ -81,6 +81,26 @@ function renderUpgrade() {
     upgradeList.appendChild(card);
   });
 }
+function renderHunt() {
+  huntList.innerHTML = '';
+  HUNT_ACH.forEach(ach => {
+    const done = Achievement.unlocked[ach.id];
+    const card = makeCard(ach.title, done);
+
+    // 업적을 완료했을 경우 'done' 클래스 추가
+    if (done) {
+      card.classList.add('done');
+    }
+
+    // 진행 상태 추가
+    ach.monsters.forEach(([k, n]) => {
+      const left = Math.max(0, ach.target - (GameData.killStats[k] || 0));
+      addLine(card, `${n}: ${left === 0 ? '완료' : left + '마리 남음'}`);
+    });
+
+    huntList.appendChild(card);
+  });
+}
 
 /* -------- 골드 -------- */
 function renderGold() {

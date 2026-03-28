@@ -49,8 +49,19 @@
             <button id="btn-guarantee" onclick="toggleGuarantee()">활성화</button>
         </div>
 
+        <!-- 💥 200% 강화권 -->
+<div class="inv-item">
+    <div class="inv-name">
+        💥 200% 강화권
+        <span id="double-count" class="inv-count"></span>
+    </div>
+    <div class="inv-info">다음 강화 100% 성공 + 2강 상승</div>
+    <div id="double-info" class="inv-info"></div>
+    <button id="btn-double" onclick="toggleDouble()">활성화</button>
+</div>
+
         <!-- =========================
-             🌠 3세계 증표(✅ 추가)
+             🌠 3세계 증표(✅ 기존 그대로)
              - 보스 10회마다 증표 1개로 계산해서 보여줌
         ========================= -->
         <div class="inv-item">
@@ -66,6 +77,38 @@
         <div class="inv-item">
             <div class="inv-name">⚡ 천둥의 성 증표 <span id="tok-thunder" class="inv-count"></span></div>
             <div id="tok-thunder-info" class="inv-info"></div>
+        </div>
+
+        <!-- =========================
+             🎲 운명의 균열 아이템 4종 (✅ 추가)
+             - 아직 GameData에 값이 없어도 UI가 에러 없이 뜨게 JS에서 안전 처리함
+        ========================= -->
+        <div class="inv-item">
+            <div class="inv-name">🎲 운명의 주사위 <span id="fd-count" class="inv-count"></span></div>
+            <div class="inv-info">다음 강화에만 적용. 성공 시 강화레벨 2배, 실패 시 1/2.</div>
+            <div id="fd-info" class="inv-info"></div>
+            <button id="btn-fd" onclick="toggleFate('dice')">활성화</button>
+        </div>
+
+        <div class="inv-item">
+            <div class="inv-name">🌓 양면의 인장 <span id="ds-count" class="inv-count"></span></div>
+            <div class="inv-info">다음 강화에만 적용. 성공 시 2배 / 실패 시 1/2. (실패 하락 -30% 제한)</div>
+            <div id="ds-info" class="inv-info"></div>
+            <button id="btn-ds" onclick="toggleFate('dual')">활성화</button>
+        </div>
+
+        <div class="inv-item">
+            <div class="inv-name">⚖️ 운명의 저울 <span id="fs-count" class="inv-count"></span></div>
+            <div class="inv-info">다음 강화에만 적용. 성공 시 2배 / 실패 시 1/2. (실패하면 다음 1회 100%)</div>
+            <div id="fs-info" class="inv-info"></div>
+            <button id="btn-fs" onclick="toggleFate('scale')">활성화</button>
+        </div>
+
+        <div class="inv-item">
+            <div class="inv-name">🌀 카오스 인장 <span id="cs-count" class="inv-count"></span></div>
+            <div class="inv-info">다음 강화에만 적용. 성공 시 3배, 실패 시 1/3.</div>
+            <div id="cs-info" class="inv-info"></div>
+            <button id="btn-cs" onclick="toggleFate('chaos')">활성화</button>
         </div>
 
     </div>
