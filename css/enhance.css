@@ -4,6 +4,9 @@
     max-width: 420px;
     margin: auto;
     padding: 20px;
+    min-height: 100dvh;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 /* 상단 바 */

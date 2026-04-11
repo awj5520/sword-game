@@ -75,6 +75,189 @@ const STAGE_MONSTER_DAMAGE = {
   "3:rift:4": 75
 };
 
+// 상태이상 정의
+const STATUS_EFFECT_LIBRARY = {
+  poison: { label: '중독', durationMs: 12000, tickMs: 1000, damageRatio: 0.009, minDamage: 1 },
+  bleed: { label: '출혈', durationMs: 15000, tickMs: 3000, damageRatio: 0.045, minDamage: 2 },
+  burn: { label: '화상', durationMs: 10000, tickMs: 2000, damageRatio: 0.022, minDamage: 2 },
+  shock: { label: '감전', durationMs: 8000, incomingDamageMul: 1.2 },
+  frost: { label: '빙결', durationMs: 7000, outgoingDamageMul: 0.65 },
+  timeStop: { label: '시간 정지', durationMs: 1000, blockPlayerAttack: true },
+  chaos: { label: '혼돈', durationMs: 1000, playerHitChance: 0.5 }
+};
+
+const STATUS_NULLIFY_POTION_MAP = {
+  poison: 'antidotePoison',
+  bleed: 'antidoteBleed',
+  burn: 'antidoteBurn',
+  shock: 'antidoteShock',
+  frost: 'antidoteFrost'
+};
+
+// 지역 기본 상태이상 확률 (필요 시 여기 숫자만 조절)
+const AREA_STATUS_EFFECT_PROFILE = {
+  grass: [{ type: 'poison', chance: 0.05 }],
+  orc: [{ type: 'bleed', chance: 0.06 }],
+  dragon: [{ type: 'burn', chance: 0.07 }],
+  space: [{ type: 'shock', chance: 0.08 }, { type: 'burn', chance: 0.06 }],
+  cave: [{ type: 'bleed', chance: 0.08 }],
+  grave: [{ type: 'poison', chance: 0.10 }, { type: 'bleed', chance: 0.08 }],
+  demon: [{ type: 'burn', chance: 0.11 }, { type: 'shock', chance: 0.08 }],
+  hell: [{ type: 'burn', chance: 0.14 }, { type: 'bleed', chance: 0.10 }],
+  atlantis: [{ type: 'poison', chance: 0.12 }, { type: 'frost', chance: 0.07 }],
+  underworld: [{ type: 'bleed', chance: 0.14 }, { type: 'shock', chance: 0.09 }],
+  thunder: [{ type: 'shock', chance: 0.16 }, { type: 'burn', chance: 0.08 }],
+  divine: [{ type: 'frost', chance: 0.14 }, { type: 'burn', chance: 0.12 }],
+  rift: [{ type: 'poison', chance: 0.10 }, { type: 'bleed', chance: 0.10 }, { type: 'shock', chance: 0.08 }]
+};
+
+// 스테이지별 상태이상 확률 오버라이드 (원하는 키만 추가/수정)
+// key 예시: "1:grass:1"
+const STAGE_STATUS_EFFECT_OVERRIDES = {
+  "1:grass:5": [{ type: 'poison', chance: 0.22 }, { type: 'bleed', chance: 0.16 }],
+  "1:orc:5": [{ type: 'bleed', chance: 0.24 }, { type: 'shock', chance: 0.14 }],
+  "1:dragon:5": [{ type: 'burn', chance: 0.26 }, { type: 'bleed', chance: 0.16 }],
+  "1:space:3": [{ type: 'shock', chance: 0.28 }, { type: 'burn', chance: 0.20 }],
+  "2:cave:5": [{ type: 'bleed', chance: 0.25 }, { type: 'poison', chance: 0.18 }],
+  "2:grave:5": [{ type: 'poison', chance: 0.28 }, { type: 'bleed', chance: 0.24 }],
+  "2:demon:5": [{ type: 'burn', chance: 0.30 }, { type: 'shock', chance: 0.20 }],
+  "2:hell:3": [{ type: 'burn', chance: 0.34 }, { type: 'bleed', chance: 0.26 }],
+  "3:atlantis:5": [{ type: 'poison', chance: 0.34 }, { type: 'frost', chance: 0.24 }],
+  "3:underworld:5": [{ type: 'bleed', chance: 0.36 }, { type: 'shock', chance: 0.24 }],
+  "3:thunder:5": [{ type: 'shock', chance: 0.40 }, { type: 'burn', chance: 0.24 }],
+  "3:divine:1": [],
+  "3:divine:2": [],
+  "3:divine:3": [],
+  "3:rift:4": [{ type: 'poison', chance: 0.30 }, { type: 'bleed', chance: 0.30 }, { type: 'shock', chance: 0.26 }]
+};
+
+// 보스 패턴: 각 보스 스테이지마다 독립 패턴
+const BOSS_PATTERN_TABLE = {
+  "1:grass:5": [
+    { name: '점액 강타', weight: 40, damageMul: 1.35, effects: [] },
+    { name: '산성 분출', weight: 35, damageMul: 0.95, effects: [{ type: 'poison', chance: 1 }] },
+    { name: '왕의 압착', weight: 25, damageMul: 1.75, effects: [{ type: 'bleed', chance: 1 }] }
+  ],
+  "1:orc:5": [
+    { name: '족장 내려찍기', weight: 36, damageMul: 1.4, effects: [] },
+    { name: '전장의 절개', weight: 34, damageMul: 1.1, effects: [{ type: 'bleed', chance: 1 }] },
+    { name: '포효 진동파', weight: 30, damageMul: 1.2, effects: [{ type: 'shock', chance: 0.7 }] }
+  ],
+  "1:dragon:5": [
+    { name: '용의 발톱', weight: 34, damageMul: 1.45, effects: [] },
+    { name: '화염 숨결', weight: 36, damageMul: 1.15, effects: [{ type: 'burn', chance: 1 }] },
+    { name: '분쇄 꼬리치기', weight: 30, damageMul: 1.8, effects: [{ type: 'bleed', chance: 0.8 }] }
+  ],
+  "1:space:3": [
+    { name: '중력 파동', weight: 33, damageMul: 1.5, effects: [{ type: 'frost', chance: 0.6 }] },
+    { name: '플라즈마 과충전', weight: 34, damageMul: 1.2, effects: [{ type: 'shock', chance: 1 }] },
+    { name: '항성 폭발', weight: 33, damageMul: 1.9, effects: [{ type: 'burn', chance: 1 }] }
+  ],
+  "2:cave:5": [
+    { name: '흡혈 급습', weight: 34, damageMul: 1.35, effects: [{ type: 'bleed', chance: 0.8 }] },
+    { name: '암흑 박쥐 떼', weight: 36, damageMul: 1.1, effects: [{ type: 'poison', chance: 1 }] },
+    { name: '밤의 절단', weight: 30, damageMul: 1.75, effects: [{ type: 'bleed', chance: 1 }] }
+  ],
+  "2:grave:5": [
+    { name: '저주의 손아귀', weight: 34, damageMul: 1.3, effects: [{ type: 'frost', chance: 0.8 }] },
+    { name: '부패의 숨결', weight: 34, damageMul: 1.1, effects: [{ type: 'poison', chance: 1 }] },
+    { name: '뼈의 폭풍', weight: 32, damageMul: 1.85, effects: [{ type: 'bleed', chance: 1 }] }
+  ],
+  "2:demon:5": [
+    { name: '지옥 난타', weight: 32, damageMul: 1.45, effects: [{ type: 'burn', chance: 0.7 }] },
+    { name: '마력 방전', weight: 34, damageMul: 1.2, effects: [{ type: 'shock', chance: 1 }] },
+    { name: '멸망의 불길', weight: 34, damageMul: 1.95, effects: [{ type: 'burn', chance: 1 }] }
+  ],
+  "2:hell:3": [
+    { name: '분노의 징벌', weight: 30, damageMul: 1.55, effects: [{ type: 'bleed', chance: 0.8 }] },
+    { name: '죄악의 화염', weight: 35, damageMul: 1.25, effects: [{ type: 'burn', chance: 1 }] },
+    { name: '신벌의 낙뢰', weight: 35, damageMul: 2.1, effects: [{ type: 'shock', chance: 1 }] }
+  ],
+  "3:atlantis:5": [
+    { name: '해왕의 창격', weight: 32, damageMul: 1.55, effects: [{ type: 'bleed', chance: 0.8 }] },
+    { name: '심해 독수', weight: 33, damageMul: 1.2, effects: [{ type: 'poison', chance: 1 }] },
+    { name: '파멸의 해일', weight: 35, damageMul: 2.0, effects: [{ type: 'frost', chance: 1 }] }
+  ],
+  "3:underworld:5": [
+    { name: '명계 베기', weight: 33, damageMul: 1.6, effects: [{ type: 'bleed', chance: 1 }] },
+    { name: '망령 침식', weight: 34, damageMul: 1.2, effects: [{ type: 'poison', chance: 1 }] },
+    { name: '죽음의 속박', weight: 33, damageMul: 2.05, effects: [{ type: 'shock', chance: 1 }] }
+  ],
+  "3:thunder:5": [
+    { name: '천둥 강타', weight: 33, damageMul: 1.6, effects: [{ type: 'shock', chance: 1 }] },
+    { name: '번개 사슬', weight: 34, damageMul: 1.25, effects: [{ type: 'shock', chance: 1 }, { type: 'burn', chance: 0.6 }] },
+    { name: '신의 심판', weight: 33, damageMul: 2.15, effects: [{ type: 'burn', chance: 1 }] }
+  ],
+  "3:divine:1": [
+    { name: '시간의 낫', weight: 30, damageMul: 1.6, effects: [] },
+    { name: '연대기 붕괴', weight: 35, damageMul: 1.25, effects: [{ type: 'timeStop', chance: 1 }] },
+    { name: '시간 정지', weight: 35, damageMul: 1.9, effects: [{ type: 'timeStop', chance: 1 }] }
+  ],
+  "3:divine:2": [
+    { name: '대지의 심판', weight: 34, damageMul: 1.45, effects: [{ type: 'burn', chance: 1 }, { type: 'shock', chance: 1 }, { type: 'frost', chance: 1 }] },
+    { name: '원소 융해', weight: 33, damageMul: 1.3, effects: [{ type: 'burn', chance: 1 }, { type: 'shock', chance: 1 }, { type: 'frost', chance: 1 }] },
+    { name: '생명의 역류', weight: 33, damageMul: 1.85, effects: [{ type: 'burn', chance: 1 }, { type: 'shock', chance: 1 }, { type: 'frost', chance: 1 }] }
+  ],
+  "3:divine:3": [
+    { name: '혼돈 파동', weight: 34, damageMul: 1.5, effects: [{ type: 'chaos', chance: 1 }] },
+    { name: '무질서의 장막', weight: 33, damageMul: 1.25, effects: [{ type: 'chaos', chance: 1 }] },
+    { name: '카오스 붕괴', weight: 33, damageMul: 2.2, effects: [{ type: 'chaos', chance: 1 }] }
+  ],
+  "3:rift:4": [
+    { name: '확률 붕괴', weight: 33, damageMul: 1.6, effects: [{ type: 'poison', chance: 1 }] },
+    { name: '운명 절단', weight: 33, damageMul: 1.45, effects: [{ type: 'bleed', chance: 1 }] },
+    { name: '카오스 붕괴', weight: 34, damageMul: 2.2, effects: [{ type: 'shock', chance: 1 }, { type: 'burn', chance: 1 }] }
+  ]
+};
+
+// 보스 패턴 발동 주기(ms): 값이 작을수록 더 빠름
+const BOSS_PATTERN_INTERVAL_MS = {
+  "1:grass:5": 3000,
+  "1:orc:5": 2800,
+  "1:dragon:5": 2600,
+  "1:space:3": 2400,
+  "2:cave:5": 2300,
+  "2:grave:5": 2200,
+  "2:demon:5": 2100,
+  "2:hell:3": 2000,
+  "3:atlantis:5": 1850,
+  "3:underworld:5": 1750,
+  "3:thunder:5": 1650,
+  "3:divine:1": 1600,
+  "3:divine:2": 1500,
+  "3:divine:3": 1400,
+  "3:rift:4": 1600
+};
+
+function clampChance(value) {
+  return Math.max(0, Math.min(1, Number(value) || 0));
+}
+
+function getStageStatusEffects(stageKey, currentArea, currentStage) {
+  const override = STAGE_STATUS_EFFECT_OVERRIDES[stageKey];
+  if (Array.isArray(override)) return override;
+
+  const profile = AREA_STATUS_EFFECT_PROFILE[currentArea] || [];
+  const stageScale = 1 + Math.max(0, Number(currentStage) - 1) * 0.1;
+
+  return profile.map((entry) => ({
+    type: entry.type,
+    chance: clampChance((Number(entry.chance) || 0) * stageScale)
+  }));
+}
+
+function pickWeightedPattern(patterns) {
+  const total = patterns.reduce((sum, p) => sum + Math.max(0, Number(p.weight) || 0), 0);
+  if (total <= 0) return patterns[0];
+
+  let roll = Math.random() * total;
+  for (const pattern of patterns) {
+    roll -= Math.max(0, Number(pattern.weight) || 0);
+    if (roll <= 0) return pattern;
+  }
+  return patterns[patterns.length - 1];
+}
+
 
 
 /* =========================
@@ -198,7 +381,7 @@ const divineStages = {
      카오스 인장 1%
 ========================= */
 const riftStages = {
-  1:{ name:'🎲 확률의 도사', monster:'rift_1.png', hp:900000, gold:1500000, lvl:230, speed:2.0, scale:4.0, achId:'rift_1', drop:'dice', dropRate:1.00, bg:'bg_rift_1.png' },
+  1:{ name:'🎲 확률의 도사', monster:'rift_1.png', hp:900000, gold:1500000, lvl:230, speed:2.0, scale:4.0, achId:'rift_1', drop:'dice', dropRate:0.13, bg:'bg_rift_1.png' },
   2:{ name:'🌓 양면의 문지기', monster:'rift_2.png', hp:1100000, gold:1800000, lvl:235, speed:1.9, scale:3.5, achId:'rift_2', drop:'dual', dropRate:0.10, bg:'bg_rift_2.png' },
   3:{ name:'⚖️ 균형의 심판관', monster:'rift_3.png', hp:1300000, gold:2200000, lvl:240, speed:1.8, scale:2.4, achId:'rift_3', drop:'scale', dropRate:0.05, bg:'bg_rift_3.png' },
   4:{ name:'🌀 심연의 분열체', monster:'rift_4.png', hp:1600000, gold:2800000, lvl:250, speed:1.7, scale:2.6, achId:'rift_4', drop:'chaos', dropRate:0.03, bg:'bg_rift_4.png' }
@@ -242,13 +425,40 @@ const img = document.getElementById('monster');
 const wrap = document.getElementById('monster-wrapper');
 const playerHpFill = document.getElementById('player-hp-fill');
 const playerHpText = document.getElementById('player-hp-text');
+const playerStatusEl = document.querySelector('.player-status');
 const monsterHpFill = document.getElementById('monster-hp-fill');
 const monsterHpText = document.getElementById('monster-hp-text');
 const log = document.getElementById('log');
 const goldText = document.getElementById('gold-text');
 const damageText = document.getElementById('damage-text');
+const playerStatusEffectsEl = document.createElement('div');
+const playerHpBarEl = playerStatusEl ? playerStatusEl.querySelector('.hp-bar') : null;
+const patternFxTextEl = document.createElement('div');
+const bottomUiEl = document.querySelector('.bottom-ui');
+const battleStatsEl = document.createElement('div');
 
 stageEl.classList.add(area);
+
+playerStatusEffectsEl.className = 'status-effects';
+if (playerStatusEl) {
+  if (playerHpBarEl) {
+    playerStatusEl.insertBefore(playerStatusEffectsEl, playerHpBarEl);
+  } else {
+    playerStatusEl.appendChild(playerStatusEffectsEl);
+  }
+}
+
+patternFxTextEl.className = 'pattern-fx-text';
+stageEl.appendChild(patternFxTextEl);
+
+battleStatsEl.id = 'battle-stats';
+if (bottomUiEl) {
+  if (log && log.parentNode === bottomUiEl) {
+    bottomUiEl.insertBefore(battleStatsEl, log.nextSibling);
+  } else {
+    bottomUiEl.appendChild(battleStatsEl);
+  }
+}
 
 /* ✅ 운명의 균열은 스테이지별 배경을 JS로 직접 적용 */
 if (area === 'rift' && data.bg) {
@@ -272,10 +482,39 @@ let hp = data.hp;
 let dead = false;
 let playerDead = false;
 let monsterAttackTimer = null;
+let statusEffectTimer = null;
+let patternEffectTimer = null;
+let battleStatsTimer = null;
+let lowHpWarned = false;
+const activeStatusEffects = {};
+const battleStats = {
+  startedAt: Date.now(),
+  damageTakenTotal: 0,
+  damageTakenByHit: 0,
+  damageTakenByDot: 0,
+  monsterHitCount: 0,
+  dotHitCount: 0,
+  statusAppliedCount: 0,
+  statusBlockedCount: 0,
+  antidoteUsedCount: 0,
+  playerAttackAttempts: 0,
+  playerAttackHits: 0,
+  playerAttackMisses: 0,
+  playerAttackBlockedByTimeStop: 0,
+  monsterKillCount: 0
+};
 
-const MONSTER_ATTACK_INTERVAL_MS = 5000;
+const DEFAULT_MONSTER_ATTACK_INTERVAL_MS = 5000;
+const LOW_HP_WARNING_RATIO = 0.2;
 const defaultMonsterAttackDamage = Math.max(1, Math.ceil((data.lvl + 1) / 40));
 const stageDamageKey = `${world}:${area}:${stageId}`;
+const stageStatusEffectPool = getStageStatusEffects(stageDamageKey, area, stageId);
+const stageBossPatterns = BOSS_PATTERN_TABLE[stageDamageKey] || null;
+const configuredBossPatternIntervalMs = Number(BOSS_PATTERN_INTERVAL_MS[stageDamageKey]);
+const monsterAttackIntervalMs =
+  stageBossPatterns && Number.isFinite(configuredBossPatternIntervalMs) && configuredBossPatternIntervalMs > 0
+    ? Math.floor(configuredBossPatternIntervalMs)
+    : DEFAULT_MONSTER_ATTACK_INTERVAL_MS;
 const configuredMonsterAttackDamage = Number(STAGE_MONSTER_DAMAGE[stageDamageKey]);
 const monsterAttackDamage =
   (Number.isFinite(configuredMonsterAttackDamage) && configuredMonsterAttackDamage > 0)
@@ -297,6 +536,10 @@ if (GameData.currentHp <= 0) {
   GameData.currentHp = GameData.maxHp;
   GameData.save();
 }
+if (GameData.protectTicket <= 0 && GameData.protectActive) {
+  GameData.protectActive = false;
+  GameData.save();
+}
 
 function updateMonsterHP() {
   const ratio = data.hp > 0 ? (hp / data.hp) * 100 : 0;
@@ -308,6 +551,364 @@ function updatePlayerHP() {
   const ratio = GameData.maxHp > 0 ? (GameData.currentHp / GameData.maxHp) * 100 : 0;
   playerHpFill.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
   playerHpText.innerText = `유저 HP ${GameData.currentHp} / ${GameData.maxHp}`;
+
+  const isLowHp = ratio <= LOW_HP_WARNING_RATIO;
+  if (playerStatusEl) {
+    playerStatusEl.classList.toggle('is-low-hp', isLowHp);
+  }
+
+  if (!playerDead && isLowHp && !lowHpWarned) {
+    lowHpWarned = true;
+    log.innerText = '⚠️ HP가 위험합니다! 회복 또는 보호권을 확인하세요.';
+    if (typeof screenShake === 'function') {
+      screenShake();
+    }
+  } else if (!isLowHp) {
+    lowHpWarned = false;
+  }
+}
+
+function formatBattleElapsed(ms) {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const min = Math.floor(totalSec / 60);
+  const sec = totalSec % 60;
+  return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+}
+
+function renderBattleStatsPanel() {
+  if (!battleStatsEl) return;
+
+  const elapsed = formatBattleElapsed(Date.now() - battleStats.startedAt);
+  battleStatsEl.innerHTML = `
+    <div class="battle-stats-title">전투 통계</div>
+    <div class="battle-stats-grid">
+      <div>진행 시간 <span>${elapsed}</span></div>
+      <div>처치 수 <span>${battleStats.monsterKillCount}</span></div>
+      <div>받은 피해(총) <span>${battleStats.damageTakenTotal}</span></div>
+      <div>상태이상 적용 <span>${battleStats.statusAppliedCount}</span></div>
+      <div>상태이상 무효화 <span>${battleStats.statusBlockedCount}</span></div>
+      <div>내 공격 적중/실패 <span>${battleStats.playerAttackHits}/${battleStats.playerAttackMisses}</span></div>
+      <div>시간정지 차단 <span>${battleStats.playerAttackBlockedByTimeStop}</span></div>
+    </div>
+  `;
+}
+
+function startBattleStatsLoop() {
+  stopBattleStatsLoop();
+  renderBattleStatsPanel();
+  battleStatsTimer = setInterval(renderBattleStatsPanel, 1000);
+}
+
+function stopBattleStatsLoop() {
+  if (!battleStatsTimer) return;
+  clearInterval(battleStatsTimer);
+  battleStatsTimer = null;
+}
+
+function getStatusRemainingSec(effectState) {
+  return Math.max(1, Math.ceil((effectState.expiresAt - Date.now()) / 1000));
+}
+
+function renderStatusEffects() {
+  if (!playerStatusEffectsEl) return;
+
+  const effectKeys = Object.keys(activeStatusEffects);
+  if (!effectKeys.length) {
+    playerStatusEffectsEl.innerHTML = '';
+    playerStatusEffectsEl.style.display = 'none';
+    return;
+  }
+
+  playerStatusEffectsEl.style.display = 'flex';
+  playerStatusEffectsEl.innerHTML = effectKeys
+    .map((type) => {
+      const def = STATUS_EFFECT_LIBRARY[type];
+      const state = activeStatusEffects[type];
+      if (!def || !state) return '';
+      const sec = getStatusRemainingSec(state);
+      return `<span class="status-chip status-${type}">${def.label} ${sec}s</span>`;
+    })
+    .join('');
+}
+
+function clearAllStatusEffects() {
+  Object.keys(activeStatusEffects).forEach((type) => {
+    delete activeStatusEffects[type];
+  });
+  renderStatusEffects();
+}
+
+function applyStatusEffect(type) {
+  const def = STATUS_EFFECT_LIBRARY[type];
+  if (!def) return false;
+
+  const now = Date.now();
+  const current = activeStatusEffects[type];
+  const potionKey = STATUS_NULLIFY_POTION_MAP[type];
+
+  if (!current && potionKey && (GameData[potionKey] || 0) > 0) {
+    GameData[potionKey]--;
+    GameData.save();
+    battleStats.statusBlockedCount++;
+    battleStats.antidoteUsedCount++;
+    renderBattleStatsPanel();
+    return 'blocked';
+  }
+
+  if (current) {
+    current.expiresAt = Math.max(current.expiresAt, now + def.durationMs);
+    if (def.tickMs > 0 && !current.nextTickAt) {
+      current.nextTickAt = now + def.tickMs;
+    }
+    renderStatusEffects();
+    return 'refresh';
+  } else {
+    activeStatusEffects[type] = {
+      appliedAt: now,
+      expiresAt: now + def.durationMs,
+      nextTickAt: def.tickMs > 0 ? now + def.tickMs : 0
+    };
+    battleStats.statusAppliedCount++;
+    renderBattleStatsPanel();
+    renderStatusEffects();
+    return 'new';
+  }
+}
+
+function removeExpiredStatusEffects() {
+  const now = Date.now();
+  let changed = false;
+
+  Object.keys(activeStatusEffects).forEach((type) => {
+    const state = activeStatusEffects[type];
+    if (!state) return;
+    if (now >= state.expiresAt) {
+      delete activeStatusEffects[type];
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    renderStatusEffects();
+  }
+}
+
+function getIncomingDamageMultiplier() {
+  let mult = 1;
+  if (activeStatusEffects.shock) {
+    mult *= STATUS_EFFECT_LIBRARY.shock.incomingDamageMul || 1;
+  }
+  return mult;
+}
+
+function getOutgoingDamageMultiplier() {
+  let mult = 1;
+  if (activeStatusEffects.frost) {
+    mult *= STATUS_EFFECT_LIBRARY.frost.outgoingDamageMul || 1;
+  }
+  return mult;
+}
+
+function isPlayerAttackBlocked() {
+  return !!activeStatusEffects.timeStop;
+}
+
+function getPlayerChaosHitChance() {
+  if (!activeStatusEffects.chaos) return 1;
+  return clampChance(STATUS_EFFECT_LIBRARY.chaos.playerHitChance);
+}
+
+function getStatusTickDamage(type) {
+  const def = STATUS_EFFECT_LIBRARY[type];
+  if (!def) return 0;
+  const ratioDamage = Math.floor(GameData.maxHp * (def.damageRatio || 0));
+  return Math.max(def.minDamage || 1, ratioDamage);
+}
+
+function applyDamageToPlayer(amount, reasonText, sourceType = 'hit') {
+  if (playerDead) return false;
+  const finalDamage = Math.max(1, Math.floor(amount));
+
+  battleStats.damageTakenTotal += finalDamage;
+  if (sourceType === 'dot') {
+    battleStats.damageTakenByDot += finalDamage;
+    battleStats.dotHitCount++;
+  } else {
+    battleStats.damageTakenByHit += finalDamage;
+    battleStats.monsterHitCount++;
+  }
+  renderBattleStatsPanel();
+
+  GameData.takeDamage(finalDamage);
+  updatePlayerHP();
+
+  if (GameData.isDead()) {
+    if (tryUseProtectTicket()) {
+      if (reasonText) {
+        log.innerText = `${reasonText} -${finalDamage} HP (보호권 발동)`;
+      }
+      return false;
+    }
+    handlePlayerDefeat();
+    return true;
+  }
+
+  if (reasonText) {
+    log.innerText = `${reasonText} -${finalDamage} HP`;
+  }
+  return false;
+}
+
+function processStatusEffectTicks() {
+  if (playerDead) return;
+
+  const now = Date.now();
+  for (const type of Object.keys(activeStatusEffects)) {
+    const state = activeStatusEffects[type];
+    const def = STATUS_EFFECT_LIBRARY[type];
+    if (!state || !def || !def.tickMs) continue;
+
+    if (now < state.nextTickAt) continue;
+
+    const tickDamage = getStatusTickDamage(type);
+    while (state.nextTickAt <= now) {
+      state.nextTickAt += def.tickMs;
+    }
+
+    const died = applyDamageToPlayer(tickDamage, `${def.label} 지속 피해`, 'dot');
+    if (died) return;
+  }
+
+  removeExpiredStatusEffects();
+  renderStatusEffects();
+}
+
+function stopStatusEffectLoop() {
+  if (!statusEffectTimer) return;
+  clearInterval(statusEffectTimer);
+  statusEffectTimer = null;
+}
+
+function startStatusEffectLoop() {
+  stopStatusEffectLoop();
+  statusEffectTimer = setInterval(processStatusEffectTicks, 250);
+}
+
+function rollEffectsByChance(effectEntries) {
+  const rolled = [];
+  (effectEntries || []).forEach((entry) => {
+    const type = entry.type;
+    const chance = clampChance(entry.chance);
+    if (!STATUS_EFFECT_LIBRARY[type]) return;
+    if (Math.random() < chance) {
+      rolled.push(type);
+    }
+  });
+  return rolled;
+}
+
+function buildBossPatternAttack() {
+  if (!Array.isArray(stageBossPatterns) || stageBossPatterns.length === 0) {
+    return {
+      attackName: '기본 공격',
+      damageMul: 1,
+      statusEffects: []
+    };
+  }
+
+  const chosen = pickWeightedPattern(stageBossPatterns);
+  return {
+    attackName: chosen.name || '보스 패턴',
+    damageMul: Number(chosen.damageMul) || 1,
+    statusEffects: rollEffectsByChance(chosen.effects)
+  };
+}
+
+function getBossPatternVisualClass(attackPlan) {
+  const effects = attackPlan.statusEffects || [];
+  if (effects.includes('timeStop')) return 'pattern-fx-time-stop';
+  if (effects.includes('chaos')) return 'pattern-fx-chaos';
+  if (effects.includes('burn')) return 'pattern-fx-burn';
+  if (effects.includes('shock')) return 'pattern-fx-shock';
+  if (effects.includes('frost')) return 'pattern-fx-frost';
+  if (effects.includes('poison')) return 'pattern-fx-poison';
+  if (effects.includes('bleed')) return 'pattern-fx-bleed';
+  if ((Number(attackPlan.damageMul) || 1) >= 1.8) return 'pattern-fx-heavy';
+  return 'pattern-fx-basic';
+}
+
+function clearBossPatternEffectVisual() {
+  const classes = [
+    'pattern-fx-active',
+    'pattern-fx-basic',
+    'pattern-fx-heavy',
+    'pattern-fx-poison',
+    'pattern-fx-bleed',
+    'pattern-fx-burn',
+    'pattern-fx-shock',
+    'pattern-fx-frost',
+    'pattern-fx-time-stop',
+    'pattern-fx-chaos'
+  ];
+  stageEl.classList.remove(...classes);
+  img.classList.remove('boss-strike');
+  patternFxTextEl.classList.remove('show');
+  patternFxTextEl.innerText = '';
+  if (patternEffectTimer) {
+    clearTimeout(patternEffectTimer);
+    patternEffectTimer = null;
+  }
+}
+
+function playBossPatternEffect(attackPlan) {
+  if (!stageBossPatterns || !attackPlan) return;
+
+  clearBossPatternEffectVisual();
+
+  const visualClass = getBossPatternVisualClass(attackPlan);
+  stageEl.classList.add('pattern-fx-active', visualClass);
+  img.classList.add('boss-strike');
+
+  patternFxTextEl.innerText = `⚠ ${attackPlan.attackName}`;
+  void patternFxTextEl.offsetWidth;
+  patternFxTextEl.classList.add('show');
+
+  patternEffectTimer = setTimeout(() => {
+    clearBossPatternEffectVisual();
+  }, 700);
+}
+
+function applyMonsterStatusEffects(effectTypes) {
+  if (!Array.isArray(effectTypes) || effectTypes.length === 0) {
+    return { applied: [], blocked: [] };
+  }
+
+  const unique = Array.from(new Set(effectTypes));
+  const applied = [];
+  const blocked = [];
+  unique.forEach((type) => {
+    const result = applyStatusEffect(type);
+    if (result === 'new') {
+      applied.push(STATUS_EFFECT_LIBRARY[type].label);
+    } else if (result === 'blocked') {
+      blocked.push(STATUS_EFFECT_LIBRARY[type].label);
+    }
+  });
+  return { applied, blocked };
+}
+
+function tryUseProtectTicket() {
+  if (!(GameData.protectActive && GameData.protectTicket > 0)) return false;
+
+  const recoverHp = Math.max(1, Math.floor(GameData.maxHp / 4));
+  GameData.protectTicket = 0;
+  GameData.protectActive = false;
+  GameData.currentHp = recoverHp;
+  GameData.save();
+  updatePlayerHP();
+
+  log.innerText = `🛡️ 보호권 발동! HP ${recoverHp}로 복귀했습니다.`;
+  return true;
 }
 
 function handlePlayerDefeat() {
@@ -316,6 +917,10 @@ function handlePlayerDefeat() {
   dead = true;
   img.style.pointerEvents = 'none';
   stopMonsterAutoAttack();
+  stopStatusEffectLoop();
+  stopBattleStatsLoop();
+  clearBossPatternEffectVisual();
+  clearAllStatusEffects();
   log.innerText = '사망했습니다. 데이터를 초기화합니다...';
 
   setTimeout(() => {
@@ -330,15 +935,35 @@ function handlePlayerDefeat() {
 function runMonsterAutoAttack() {
   if (dead || playerDead || hp === 0) return;
 
-  GameData.takeDamage(monsterAttackDamage);
-  updatePlayerHP();
+  const attackPlan = buildBossPatternAttack();
+  playBossPatternEffect(attackPlan);
+  const stageRolledEffects = rollEffectsByChance(stageStatusEffectPool);
+  const incomingMult = getIncomingDamageMultiplier();
+  const finalDamage = Math.max(
+    1,
+    Math.floor(monsterAttackDamage * attackPlan.damageMul * incomingMult)
+  );
 
-  if (GameData.isDead()) {
-    handlePlayerDefeat();
-    return;
+  const died = applyDamageToPlayer(
+    finalDamage,
+    `${data.name}의 ${attackPlan.attackName}`,
+    'hit'
+  );
+  if (died) return;
+
+  const statusResult = applyMonsterStatusEffects([
+    ...attackPlan.statusEffects,
+    ...stageRolledEffects
+  ]);
+
+  const messageParts = [`${data.name}의 ${attackPlan.attackName}! -${finalDamage} HP`];
+  if (statusResult.applied.length > 0) {
+    messageParts.push(`상태이상: ${statusResult.applied.join(', ')}`);
   }
-
-  log.innerText = `${data.name}의 공격! -${monsterAttackDamage} HP`;
+  if (statusResult.blocked.length > 0) {
+    messageParts.push(`무효화: ${statusResult.blocked.join(', ')}`);
+  }
+  log.innerText = messageParts.join(' | ');
 }
 
 function stopMonsterAutoAttack() {
@@ -349,7 +974,7 @@ function stopMonsterAutoAttack() {
 
 function startMonsterAutoAttack() {
   stopMonsterAutoAttack();
-  monsterAttackTimer = setInterval(runMonsterAutoAttack, MONSTER_ATTACK_INTERVAL_MS);
+  monsterAttackTimer = setInterval(runMonsterAutoAttack, monsterAttackIntervalMs);
 }
 
 function tryDropRiftItem() {
@@ -382,8 +1007,36 @@ function tryDropRiftItem() {
 ========================= */
 img.onclick = () => {
   if (dead || playerDead) return;
+  battleStats.playerAttackAttempts++;
 
-  hp -= GameData.getCurrentDamage();
+  if (isPlayerAttackBlocked()) {
+    battleStats.playerAttackBlockedByTimeStop++;
+    renderBattleStatsPanel();
+    const freezeSec = Math.floor((STATUS_EFFECT_LIBRARY.timeStop.durationMs || 0) / 1000);
+    log.innerText = `⏳ 시간 정지 상태입니다. ${freezeSec}초 동안 공격할 수 없습니다.`;
+    if (typeof screenShake === 'function') {
+      screenShake();
+    }
+    return;
+  }
+
+  if (Math.random() > getPlayerChaosHitChance()) {
+    battleStats.playerAttackMisses++;
+    renderBattleStatsPanel();
+    img.classList.add('hit');
+    setTimeout(() => img.classList.remove('hit'), 120);
+    log.innerText = '🌀 혼돈 상태! 공격이 빗나갔습니다.';
+    return;
+  }
+
+  battleStats.playerAttackHits++;
+  renderBattleStatsPanel();
+
+  const playerDamage = Math.max(
+    1,
+    Math.floor(GameData.getCurrentDamage() * getOutgoingDamageMultiplier())
+  );
+  hp -= playerDamage;
   if (hp < 0) hp = 0;
   updateMonsterHP();
 
@@ -392,6 +1045,9 @@ img.onclick = () => {
 
   if (hp === 0) {
     dead = true;
+    battleStats.monsterKillCount++;
+    renderBattleStatsPanel();
+    clearBossPatternEffectVisual();
 
     img.style.pointerEvents = 'none';
     img.style.opacity = '0.3';
@@ -460,6 +1116,14 @@ function renderStage() {
 renderStage();
 updateMonsterHP();
 updatePlayerHP();
+renderStatusEffects();
+startBattleStatsLoop();
 startMonsterAutoAttack();
+startStatusEffectLoop();
 
-window.addEventListener('beforeunload', stopMonsterAutoAttack);
+window.addEventListener('beforeunload', () => {
+  stopMonsterAutoAttack();
+  stopStatusEffectLoop();
+  stopBattleStatsLoop();
+  clearBossPatternEffectVisual();
+});

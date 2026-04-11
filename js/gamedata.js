@@ -1,3 +1,13 @@
+// 운명 아이템 성공 확률 보정값 (%p)
+// 예) 10이면 기본 확률에서 +10%p, -5이면 -5%p
+// 이 값만 바꾸면 운명 아이템 강화 성공확률을 직접 조정할 수 있습니다.
+const FATE_SUCCESS_RATE_BONUS = {
+  dice: 5,
+  dual: 10,
+  scale: 10,
+  chaos: 10,
+};
+
 const GameData = {
   /* =========================
      기본 스탯
@@ -26,9 +36,16 @@ const GameData = {
 
   noDropTicket: Number(localStorage.getItem('noDropTicket')) || 0,
   guaranteeTicket: Number(localStorage.getItem('guaranteeTicket')) || 0,
+  protectTicket: Number(localStorage.getItem('protectTicket')) || 0,
+  antidotePoison: Number(localStorage.getItem('antidotePoison')) || 0,
+  antidoteBleed: Number(localStorage.getItem('antidoteBleed')) || 0,
+  antidoteBurn: Number(localStorage.getItem('antidoteBurn')) || 0,
+  antidoteShock: Number(localStorage.getItem('antidoteShock')) || 0,
+  antidoteFrost: Number(localStorage.getItem('antidoteFrost')) || 0,
 
   noDropActive: localStorage.getItem('noDropActive') === 'true',
   guaranteeActive: localStorage.getItem('guaranteeActive') === 'true',
+  protectActive: localStorage.getItem('protectActive') === 'true',
 
   /* =========================
      💥 200% 강화권
@@ -85,6 +102,12 @@ const GameData = {
 
   healFull() {
     this.currentHp = this.maxHp;
+    this.save();
+  },
+
+  heal(amount) {
+    const value = Math.max(0, Number(amount) || 0);
+    this.currentHp = Math.min(this.maxHp, this.currentHp + value);
     this.save();
   },
 
@@ -147,8 +170,15 @@ const GameData = {
 
     localStorage.setItem('noDropTicket', this.noDropTicket);
     localStorage.setItem('guaranteeTicket', this.guaranteeTicket);
+    localStorage.setItem('protectTicket', this.protectTicket);
+    localStorage.setItem('antidotePoison', this.antidotePoison);
+    localStorage.setItem('antidoteBleed', this.antidoteBleed);
+    localStorage.setItem('antidoteBurn', this.antidoteBurn);
+    localStorage.setItem('antidoteShock', this.antidoteShock);
+    localStorage.setItem('antidoteFrost', this.antidoteFrost);
     localStorage.setItem('noDropActive', this.noDropActive);
     localStorage.setItem('guaranteeActive', this.guaranteeActive);
+    localStorage.setItem('protectActive', this.protectActive);
 
     localStorage.setItem('doubleGuaranteeTicket', this.doubleGuaranteeTicket);
     localStorage.setItem('doubleGuaranteeActive', this.doubleGuaranteeActive);
@@ -178,6 +208,54 @@ const GameData = {
     localStorage.setItem('killStats', JSON.stringify(this.killStats));
   },
 
+  resetAllProgress() {
+    Object.assign(this, {
+      level: 0,
+      damage: 10,
+      gold: 0,
+      maxHp: 100,
+      currentHp: 100,
+      achievementDamageMul: 1.0,
+      achievementGoldMul: 1.0,
+      damageBuffUntil: 0,
+      goldBuffUntil: 0,
+      noDropTicket: 0,
+      guaranteeTicket: 0,
+      protectTicket: 0,
+      antidotePoison: 0,
+      antidoteBleed: 0,
+      antidoteBurn: 0,
+      antidoteShock: 0,
+      antidoteFrost: 0,
+      noDropActive: false,
+      guaranteeActive: false,
+      protectActive: false,
+      doubleGuaranteeTicket: 0,
+      doubleGuaranteeActive: false,
+      unlockDoubleGuarantee: false,
+      poseidonGoldMul: 1.0,
+      hadesDamageMul: 1.0,
+      world3BossPowerMul: 1.0,
+      atlantisToken: 0,
+      underworldToken: 0,
+      thunderToken: 0,
+      fateDiceTicket: 0,
+      dualSealTicket: 0,
+      fateScaleTicket: 0,
+      chaosSealTicket: 0,
+      fateDiceActive: false,
+      dualSealActive: false,
+      fateScaleActive: false,
+      chaosSealActive: false,
+      fateScalePity: false,
+      totalGold: 0,
+      killStats: {}
+    });
+
+    localStorage.removeItem('achievements');
+    this.save();
+  },
+
   /* =========================
      운명 아이템 상태
   ========================= */
@@ -189,20 +267,28 @@ const GameData = {
     return null;
   },
 
-  /* =========================
-     강화 확률
-  ========================= */
-  getSuccessRate() {
-    if (this.fateScalePity) return 100;
-    if (this.doubleGuaranteeActive && this.doubleGuaranteeTicket > 0) return 100;
-    if (this.guaranteeActive && this.guaranteeTicket > 0) return 100;
-
+  getBaseSuccessRate() {
     if (this.level < 10) return 100;
     if (this.level < 30) return Math.max(95 - (this.level - 10), 75);
     if (this.level < 60) return Math.max(75 - (this.level - 30) * 0.67, 55);
     if (this.level < 100) return Math.max(55 - (this.level - 60) * 0.5, 35);
     if (this.level < 200) return Math.max(35 - (this.level - 100) * 0.15, 20);
     return 20;
+  },
+
+  /* =========================
+     강화 확률
+  ========================= */
+  getSuccessRate(fateType = this.getActiveFateType()) {
+    if (this.fateScalePity) return 100;
+    if (this.doubleGuaranteeActive && this.doubleGuaranteeTicket > 0) return 100;
+    if (this.guaranteeActive && this.guaranteeTicket > 0) return 100;
+
+    let rate = this.getBaseSuccessRate();
+    const bonus = Number(FATE_SUCCESS_RATE_BONUS[fateType] || 0);
+    rate += bonus;
+
+    return Math.max(1, Math.min(100, Math.round(rate)));
   },
 
   /* =========================
@@ -216,7 +302,7 @@ const GameData = {
     const startLevel = this.level;
     const fateType = this.getActiveFateType();
 
-    const rate = this.getSuccessRate();
+    const rate = this.getSuccessRate(fateType);
     let success = this.fateScalePity
       ? true
       : (Math.random() * 100 < rate);

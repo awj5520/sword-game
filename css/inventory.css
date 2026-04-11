@@ -1,101 +1,216 @@
+:root {
+    --inv-bg-top: #0d1b2a;
+    --inv-bg-mid: #13243a;
+    --inv-bg-bottom: #07111f;
+    --inv-card: rgba(8, 16, 32, 0.78);
+    --inv-card-border: rgba(255, 210, 120, 0.28);
+    --inv-title: #fff3cf;
+    --inv-text: #e8edf7;
+    --inv-muted: #b8c6dc;
+    --inv-accent: #ffd36a;
+    --inv-accent-strong: #f6b93b;
+}
+
 .inventory-wrapper {
+    position: relative;
     max-width: 420px;
-    height: 100vh;
+    height: 100dvh;
     margin: auto;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 12% 14%, rgba(255, 184, 77, 0.14), transparent 32%),
+        radial-gradient(circle at 88% 10%, rgba(90, 170, 255, 0.16), transparent 30%),
+        linear-gradient(180deg, var(--inv-bg-top), var(--inv-bg-mid) 42%, var(--inv-bg-bottom));
+}
+
+.inventory-wrapper::before,
+.inventory-wrapper::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.inventory-wrapper::before {
+    inset: auto -30% -18% auto;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 211, 106, 0.18), transparent 68%);
+}
+
+.inventory-wrapper::after {
+    inset: 10% auto auto -28%;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(125, 185, 255, 0.14), transparent 70%);
+}
+
+.inventory-top,
+.inventory-body,
+.back-btn {
+    position: relative;
+    z-index: 1;
 }
 
 .inventory-top {
     padding: 16px;
-    background: rgba(0,0,0,0.85);
     text-align: center;
+    background: linear-gradient(180deg, rgba(4, 10, 24, 0.92), rgba(4, 10, 24, 0.58));
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .inventory-top .title {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 22px;
+    letter-spacing: 0.6px;
+    font-weight: 800;
+    color: var(--inv-title);
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
 }
 
 .inventory-body {
     flex: 1;
-    padding: 16px;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 14px 14px 84px;
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
 .inv-item {
-    background: rgba(0,0,0,0.7);
+    background: linear-gradient(160deg, rgba(20, 34, 58, 0.88), var(--inv-card));
+    border: 1px solid var(--inv-card-border);
     border-radius: 14px;
-    padding: 14px;
+    padding: 13px 12px;
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    animation: invCardIn 0.35s ease-out both;
+}
+
+.inv-item:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 220, 140, 0.42);
 }
 
 .inv-name {
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-.inv-info {
-    font-size: 13px;
-    color: #ffd700;
-}
-
-.back-btn {
-    margin: 12px;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(180deg, #444, #222);
-    color: white;
-    cursor: pointer;
-}
-
-.inv-name {
-    font-weight: bold;
-    margin-bottom: 6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--inv-text);
+    margin-bottom: 6px;
 }
 
 .inv-count {
-    font-size: 12px;
-    background: #222;
+    font-size: 11px;
+    font-weight: 700;
+    color: #2b1a00;
+    background: linear-gradient(180deg, #ffe4a2, #ffc85f);
+    border-radius: 999px;
     padding: 2px 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.inv-info {
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--inv-muted);
+}
+
+#damage-buff,
+#gold-buff,
+#nodrop-info,
+#guarantee-info,
+#protect-info,
+#double-info,
+#fd-info,
+#ds-info,
+#fs-info,
+#cs-info,
+#anti-poison-info,
+#anti-bleed-info,
+#anti-burn-info,
+#anti-shock-info,
+#anti-frost-info {
+    color: var(--inv-accent);
+    font-weight: 700;
+}
+
+.inv-item button {
+    margin-top: 8px;
+    width: 100%;
+    padding: 9px 10px;
     border-radius: 10px;
-    color: #ffd700;
+    border: 1px solid rgba(255, 236, 178, 0.4);
+    background: linear-gradient(180deg, #ffe7aa, #ffc761);
+    color: #2a1900;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.12s ease, filter 0.12s ease;
 }
 
-/* =========================
-   배낭 스크롤 가능
-========================= */
-
-.inventory-wrapper {
-    max-width: 420px;
-    height: 100vh;
-    margin: auto;
-
-    display: flex;
-    flex-direction: column;
-
-    overflow-y: auto;   /* ⭐ 세로 스크롤 */
+.inv-item button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
 }
 
-/* 아이템 영역 */
-.inventory-body {
-    flex: 1;
-    overflow-y: auto;
-    padding-bottom: 80px;
+.inv-item button:disabled {
+    cursor: not-allowed;
+    background: linear-gradient(180deg, #7d889d, #636d81);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+    filter: none;
+    transform: none;
 }
 
-/* 스크롤 디자인 (선택) */
+.back-btn {
+    margin: 10px 12px 14px;
+    padding: 12px;
+    border-radius: 11px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: linear-gradient(180deg, #34435f, #1f2a40);
+    color: #f8fbff;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.32);
+}
+
+.back-btn:hover {
+    filter: brightness(1.08);
+}
+
 .inventory-body::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
+}
+
+.inventory-body::-webkit-scrollbar-track {
+    background: rgba(3, 8, 18, 0.5);
+    border-radius: 10px;
 }
 
 .inventory-body::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.3);
+    background: linear-gradient(180deg, rgba(255, 214, 129, 0.75), rgba(255, 173, 82, 0.72));
     border-radius: 10px;
 }
 
+@keyframes invCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

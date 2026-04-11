@@ -2,9 +2,10 @@
    전체 스테이지
 ========================= */
 #stage {
-    height: 100vh;
+    min-height: 100dvh;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* =========================

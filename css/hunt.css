@@ -2,6 +2,9 @@
     max-width: 420px;
     margin: auto;
     padding: 16px;
+    min-height: 100dvh;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .world-title {
