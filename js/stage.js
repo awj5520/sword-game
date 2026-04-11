@@ -82,6 +82,7 @@ const STATUS_EFFECT_LIBRARY = {
   burn: { label: '화상', durationMs: 10000, tickMs: 2000, damageRatio: 0.022, minDamage: 2 },
   shock: { label: '감전', durationMs: 8000, incomingDamageMul: 1.2 },
   frost: { label: '빙결', durationMs: 7000, outgoingDamageMul: 0.65 },
+  heavy: { label: '무거움', durationMs: 9000, outgoingDamageMul: 0.55, incomingDamageMul: 1.1 },
   timeStop: { label: '시간 정지', durationMs: 1000, blockPlayerAttack: true },
   chaos: { label: '혼돈', durationMs: 1000, playerHitChance: 0.5 }
 };
@@ -97,56 +98,56 @@ const STATUS_NULLIFY_POTION_MAP = {
 // 지역 기본 상태이상 확률 (필요 시 여기 숫자만 조절)
 const AREA_STATUS_EFFECT_PROFILE = {
   grass: [{ type: 'poison', chance: 0.05 }],
-  orc: [{ type: 'bleed', chance: 0.06 }],
+  orc: [{ type: 'bleed', chance: 0.06 }, { type: 'heavy', chance: 0.05 }],
   dragon: [{ type: 'burn', chance: 0.07 }],
   space: [{ type: 'shock', chance: 0.08 }, { type: 'burn', chance: 0.06 }],
-  cave: [{ type: 'bleed', chance: 0.08 }],
+  cave: [{ type: 'bleed', chance: 0.08 }, { type: 'heavy', chance: 0.06 }],
   grave: [{ type: 'poison', chance: 0.10 }, { type: 'bleed', chance: 0.08 }],
-  demon: [{ type: 'burn', chance: 0.11 }, { type: 'shock', chance: 0.08 }],
+  demon: [{ type: 'burn', chance: 0.11 }, { type: 'shock', chance: 0.08 }, { type: 'heavy', chance: 0.07 }],
   hell: [{ type: 'burn', chance: 0.14 }, { type: 'bleed', chance: 0.10 }],
   atlantis: [{ type: 'poison', chance: 0.12 }, { type: 'frost', chance: 0.07 }],
-  underworld: [{ type: 'bleed', chance: 0.14 }, { type: 'shock', chance: 0.09 }],
-  thunder: [{ type: 'shock', chance: 0.16 }, { type: 'burn', chance: 0.08 }],
+  underworld: [{ type: 'bleed', chance: 0.14 }, { type: 'shock', chance: 0.09 }, { type: 'heavy', chance: 0.09 }],
+  thunder: [{ type: 'shock', chance: 0.16 }, { type: 'burn', chance: 0.08 }, { type: 'heavy', chance: 0.05 }],
   divine: [{ type: 'frost', chance: 0.14 }, { type: 'burn', chance: 0.12 }],
-  rift: [{ type: 'poison', chance: 0.10 }, { type: 'bleed', chance: 0.10 }, { type: 'shock', chance: 0.08 }]
+  rift: [{ type: 'poison', chance: 0.10 }, { type: 'bleed', chance: 0.10 }, { type: 'shock', chance: 0.08 }, { type: 'heavy', chance: 0.08 }]
 };
 
 // 스테이지별 상태이상 확률 오버라이드 (원하는 키만 추가/수정)
 // key 예시: "1:grass:1"
 const STAGE_STATUS_EFFECT_OVERRIDES = {
-  "1:grass:5": [{ type: 'poison', chance: 0.22 }, { type: 'bleed', chance: 0.16 }],
-  "1:orc:5": [{ type: 'bleed', chance: 0.24 }, { type: 'shock', chance: 0.14 }],
-  "1:dragon:5": [{ type: 'burn', chance: 0.26 }, { type: 'bleed', chance: 0.16 }],
-  "1:space:3": [{ type: 'shock', chance: 0.28 }, { type: 'burn', chance: 0.20 }],
-  "2:cave:5": [{ type: 'bleed', chance: 0.25 }, { type: 'poison', chance: 0.18 }],
-  "2:grave:5": [{ type: 'poison', chance: 0.28 }, { type: 'bleed', chance: 0.24 }],
-  "2:demon:5": [{ type: 'burn', chance: 0.30 }, { type: 'shock', chance: 0.20 }],
-  "2:hell:3": [{ type: 'burn', chance: 0.34 }, { type: 'bleed', chance: 0.26 }],
-  "3:atlantis:5": [{ type: 'poison', chance: 0.34 }, { type: 'frost', chance: 0.24 }],
-  "3:underworld:5": [{ type: 'bleed', chance: 0.36 }, { type: 'shock', chance: 0.24 }],
-  "3:thunder:5": [{ type: 'shock', chance: 0.40 }, { type: 'burn', chance: 0.24 }],
+  "1:grass:5": [{ type: 'poison', chance: 0.22 }, { type: 'bleed', chance: 0.16 }, { type: 'heavy', chance: 0.12 }],
+  "1:orc:5": [{ type: 'bleed', chance: 0.24 }, { type: 'shock', chance: 0.14 }, { type: 'heavy', chance: 0.20 }],
+  "1:dragon:5": [{ type: 'burn', chance: 0.26 }, { type: 'bleed', chance: 0.16 }, { type: 'heavy', chance: 0.14 }],
+  "1:space:3": [{ type: 'shock', chance: 0.28 }, { type: 'burn', chance: 0.20 }, { type: 'heavy', chance: 0.12 }],
+  "2:cave:5": [{ type: 'bleed', chance: 0.25 }, { type: 'poison', chance: 0.18 }, { type: 'heavy', chance: 0.14 }],
+  "2:grave:5": [{ type: 'poison', chance: 0.28 }, { type: 'bleed', chance: 0.24 }, { type: 'heavy', chance: 0.16 }],
+  "2:demon:5": [{ type: 'burn', chance: 0.30 }, { type: 'shock', chance: 0.20 }, { type: 'heavy', chance: 0.20 }],
+  "2:hell:3": [{ type: 'burn', chance: 0.34 }, { type: 'bleed', chance: 0.26 }, { type: 'heavy', chance: 0.18 }],
+  "3:atlantis:5": [{ type: 'poison', chance: 0.34 }, { type: 'frost', chance: 0.24 }, { type: 'heavy', chance: 0.16 }],
+  "3:underworld:5": [{ type: 'bleed', chance: 0.36 }, { type: 'shock', chance: 0.24 }, { type: 'heavy', chance: 0.22 }],
+  "3:thunder:5": [{ type: 'shock', chance: 0.40 }, { type: 'burn', chance: 0.24 }, { type: 'heavy', chance: 0.18 }],
   "3:divine:1": [],
   "3:divine:2": [],
   "3:divine:3": [],
-  "3:rift:4": [{ type: 'poison', chance: 0.30 }, { type: 'bleed', chance: 0.30 }, { type: 'shock', chance: 0.26 }]
+  "3:rift:4": [{ type: 'poison', chance: 0.30 }, { type: 'bleed', chance: 0.30 }, { type: 'shock', chance: 0.26 }, { type: 'heavy', chance: 0.24 }]
 };
 
 // 보스 패턴: 각 보스 스테이지마다 독립 패턴
 const BOSS_PATTERN_TABLE = {
   "1:grass:5": [
-    { name: '점액 강타', weight: 40, damageMul: 1.35, effects: [] },
+    { name: '점액 강타', weight: 40, damageMul: 1.35, effects: [{ type: 'heavy', chance: 0.6 }] },
     { name: '산성 분출', weight: 35, damageMul: 0.95, effects: [{ type: 'poison', chance: 1 }] },
-    { name: '왕의 압착', weight: 25, damageMul: 1.75, effects: [{ type: 'bleed', chance: 1 }] }
+    { name: '왕의 압착', weight: 25, damageMul: 1.75, effects: [{ type: 'bleed', chance: 1 }, { type: 'heavy', chance: 1 }] }
   ],
   "1:orc:5": [
-    { name: '족장 내려찍기', weight: 36, damageMul: 1.4, effects: [] },
-    { name: '전장의 절개', weight: 34, damageMul: 1.1, effects: [{ type: 'bleed', chance: 1 }] },
+    { name: '족장 내려찍기', weight: 36, damageMul: 1.4, effects: [{ type: 'heavy', chance: 1 }] },
+    { name: '전장의 절개', weight: 34, damageMul: 1.1, effects: [{ type: 'bleed', chance: 1 }, { type: 'heavy', chance: 0.6 }] },
     { name: '포효 진동파', weight: 30, damageMul: 1.2, effects: [{ type: 'shock', chance: 0.7 }] }
   ],
   "1:dragon:5": [
-    { name: '용의 발톱', weight: 34, damageMul: 1.45, effects: [] },
+    { name: '용의 발톱', weight: 34, damageMul: 1.45, effects: [{ type: 'heavy', chance: 0.7 }] },
     { name: '화염 숨결', weight: 36, damageMul: 1.15, effects: [{ type: 'burn', chance: 1 }] },
-    { name: '분쇄 꼬리치기', weight: 30, damageMul: 1.8, effects: [{ type: 'bleed', chance: 0.8 }] }
+    { name: '분쇄 꼬리치기', weight: 30, damageMul: 1.8, effects: [{ type: 'bleed', chance: 0.8 }, { type: 'heavy', chance: 1 }] }
   ],
   "1:space:3": [
     { name: '중력 파동', weight: 33, damageMul: 1.5, effects: [{ type: 'frost', chance: 0.6 }] },
@@ -154,19 +155,19 @@ const BOSS_PATTERN_TABLE = {
     { name: '항성 폭발', weight: 33, damageMul: 1.9, effects: [{ type: 'burn', chance: 1 }] }
   ],
   "2:cave:5": [
-    { name: '흡혈 급습', weight: 34, damageMul: 1.35, effects: [{ type: 'bleed', chance: 0.8 }] },
+    { name: '흡혈 급습', weight: 34, damageMul: 1.35, effects: [{ type: 'bleed', chance: 0.8 }, { type: 'heavy', chance: 0.5 }] },
     { name: '암흑 박쥐 떼', weight: 36, damageMul: 1.1, effects: [{ type: 'poison', chance: 1 }] },
-    { name: '밤의 절단', weight: 30, damageMul: 1.75, effects: [{ type: 'bleed', chance: 1 }] }
+    { name: '밤의 절단', weight: 30, damageMul: 1.75, effects: [{ type: 'bleed', chance: 1 }, { type: 'heavy', chance: 0.8 }] }
   ],
   "2:grave:5": [
-    { name: '저주의 손아귀', weight: 34, damageMul: 1.3, effects: [{ type: 'frost', chance: 0.8 }] },
+    { name: '저주의 손아귀', weight: 34, damageMul: 1.3, effects: [{ type: 'frost', chance: 0.8 }, { type: 'heavy', chance: 0.8 }] },
     { name: '부패의 숨결', weight: 34, damageMul: 1.1, effects: [{ type: 'poison', chance: 1 }] },
-    { name: '뼈의 폭풍', weight: 32, damageMul: 1.85, effects: [{ type: 'bleed', chance: 1 }] }
+    { name: '뼈의 폭풍', weight: 32, damageMul: 1.85, effects: [{ type: 'bleed', chance: 1 }, { type: 'heavy', chance: 1 }] }
   ],
   "2:demon:5": [
-    { name: '지옥 난타', weight: 32, damageMul: 1.45, effects: [{ type: 'burn', chance: 0.7 }] },
+    { name: '지옥 난타', weight: 32, damageMul: 1.45, effects: [{ type: 'burn', chance: 0.7 }, { type: 'heavy', chance: 0.8 }] },
     { name: '마력 방전', weight: 34, damageMul: 1.2, effects: [{ type: 'shock', chance: 1 }] },
-    { name: '멸망의 불길', weight: 34, damageMul: 1.95, effects: [{ type: 'burn', chance: 1 }] }
+    { name: '멸망의 불길', weight: 34, damageMul: 1.95, effects: [{ type: 'burn', chance: 1 }, { type: 'heavy', chance: 0.9 }] }
   ],
   "2:hell:3": [
     { name: '분노의 징벌', weight: 30, damageMul: 1.55, effects: [{ type: 'bleed', chance: 0.8 }] },
@@ -174,19 +175,19 @@ const BOSS_PATTERN_TABLE = {
     { name: '신벌의 낙뢰', weight: 35, damageMul: 2.1, effects: [{ type: 'shock', chance: 1 }] }
   ],
   "3:atlantis:5": [
-    { name: '해왕의 창격', weight: 32, damageMul: 1.55, effects: [{ type: 'bleed', chance: 0.8 }] },
+    { name: '해왕의 창격', weight: 32, damageMul: 1.55, effects: [{ type: 'bleed', chance: 0.8 }, { type: 'heavy', chance: 0.7 }] },
     { name: '심해 독수', weight: 33, damageMul: 1.2, effects: [{ type: 'poison', chance: 1 }] },
-    { name: '파멸의 해일', weight: 35, damageMul: 2.0, effects: [{ type: 'frost', chance: 1 }] }
+    { name: '파멸의 해일', weight: 35, damageMul: 2.0, effects: [{ type: 'frost', chance: 1 }, { type: 'heavy', chance: 1 }] }
   ],
   "3:underworld:5": [
-    { name: '명계 베기', weight: 33, damageMul: 1.6, effects: [{ type: 'bleed', chance: 1 }] },
+    { name: '명계 베기', weight: 33, damageMul: 1.6, effects: [{ type: 'bleed', chance: 1 }, { type: 'heavy', chance: 0.7 }] },
     { name: '망령 침식', weight: 34, damageMul: 1.2, effects: [{ type: 'poison', chance: 1 }] },
-    { name: '죽음의 속박', weight: 33, damageMul: 2.05, effects: [{ type: 'shock', chance: 1 }] }
+    { name: '죽음의 속박', weight: 33, damageMul: 2.05, effects: [{ type: 'shock', chance: 1 }, { type: 'heavy', chance: 1 }] }
   ],
   "3:thunder:5": [
-    { name: '천둥 강타', weight: 33, damageMul: 1.6, effects: [{ type: 'shock', chance: 1 }] },
+    { name: '천둥 강타', weight: 33, damageMul: 1.6, effects: [{ type: 'shock', chance: 1 }, { type: 'heavy', chance: 0.65 }] },
     { name: '번개 사슬', weight: 34, damageMul: 1.25, effects: [{ type: 'shock', chance: 1 }, { type: 'burn', chance: 0.6 }] },
-    { name: '신의 심판', weight: 33, damageMul: 2.15, effects: [{ type: 'burn', chance: 1 }] }
+    { name: '신의 심판', weight: 33, damageMul: 2.15, effects: [{ type: 'burn', chance: 1 }, { type: 'heavy', chance: 1 }] }
   ],
   "3:divine:1": [
     { name: '시간의 낫', weight: 30, damageMul: 1.6, effects: [] },
@@ -204,9 +205,9 @@ const BOSS_PATTERN_TABLE = {
     { name: '카오스 붕괴', weight: 33, damageMul: 2.2, effects: [{ type: 'chaos', chance: 1 }] }
   ],
   "3:rift:4": [
-    { name: '확률 붕괴', weight: 33, damageMul: 1.6, effects: [{ type: 'poison', chance: 1 }] },
-    { name: '운명 절단', weight: 33, damageMul: 1.45, effects: [{ type: 'bleed', chance: 1 }] },
-    { name: '카오스 붕괴', weight: 34, damageMul: 2.2, effects: [{ type: 'shock', chance: 1 }, { type: 'burn', chance: 1 }] }
+    { name: '확률 붕괴', weight: 33, damageMul: 1.6, effects: [{ type: 'poison', chance: 1 }, { type: 'heavy', chance: 0.8 }] },
+    { name: '운명 절단', weight: 33, damageMul: 1.45, effects: [{ type: 'bleed', chance: 1 }, { type: 'heavy', chance: 0.7 }] },
+    { name: '카오스 붕괴', weight: 34, damageMul: 2.2, effects: [{ type: 'shock', chance: 1 }, { type: 'burn', chance: 1 }, { type: 'heavy', chance: 1 }] }
   ]
 };
 
@@ -387,6 +388,45 @@ const riftStages = {
   4:{ name:'🌀 심연의 분열체', monster:'rift_4.png', hp:1600000, gold:2800000, lvl:250, speed:1.7, scale:2.6, achId:'rift_4', drop:'chaos', dropRate:0.03, bg:'bg_rift_4.png' }
 };
 
+const STAGE_LEVEL_GAP = 10;
+const STAGE_HP_MULTIPLIER = 5;
+
+function applyStageLevelGapAndHp(stageMap, levelGap, hpMultiplier) {
+  const stageNums = Object.keys(stageMap)
+    .map((key) => Number(key))
+    .filter((n) => Number.isFinite(n))
+    .sort((a, b) => a - b);
+  if (!stageNums.length) return;
+
+  const baseLevel = Math.max(0, Number(stageMap[stageNums[0]]?.lvl) || 0);
+
+  stageNums.forEach((stageNum, index) => {
+    const stageData = stageMap[stageNum];
+    if (!stageData) return;
+
+    stageData.lvl = baseLevel + index * levelGap;
+    stageData.hp = Math.max(1, Math.floor((Number(stageData.hp) || 1) * hpMultiplier));
+  });
+}
+
+[
+  grassStages,
+  orcStages,
+  dragonStages,
+  spaceStages,
+  caveStages,
+  graveStages,
+  demonStages,
+  hellStages,
+  atlantisStages,
+  underworldStages,
+  thunderStages,
+  divineStages,
+  riftStages
+].forEach((stageMap) => {
+  applyStageLevelGapAndHp(stageMap, STAGE_LEVEL_GAP, STAGE_HP_MULTIPLIER);
+});
+
 /* =========================
    지역 매핑
 ========================= */
@@ -434,8 +474,6 @@ const damageText = document.getElementById('damage-text');
 const playerStatusEffectsEl = document.createElement('div');
 const playerHpBarEl = playerStatusEl ? playerStatusEl.querySelector('.hp-bar') : null;
 const patternFxTextEl = document.createElement('div');
-const bottomUiEl = document.querySelector('.bottom-ui');
-const battleStatsEl = document.createElement('div');
 
 stageEl.classList.add(area);
 
@@ -450,15 +488,6 @@ if (playerStatusEl) {
 
 patternFxTextEl.className = 'pattern-fx-text';
 stageEl.appendChild(patternFxTextEl);
-
-battleStatsEl.id = 'battle-stats';
-if (bottomUiEl) {
-  if (log && log.parentNode === bottomUiEl) {
-    bottomUiEl.insertBefore(battleStatsEl, log.nextSibling);
-  } else {
-    bottomUiEl.appendChild(battleStatsEl);
-  }
-}
 
 /* ✅ 운명의 균열은 스테이지별 배경을 JS로 직접 적용 */
 if (area === 'rift' && data.bg) {
@@ -484,7 +513,6 @@ let playerDead = false;
 let monsterAttackTimer = null;
 let statusEffectTimer = null;
 let patternEffectTimer = null;
-let battleStatsTimer = null;
 let lowHpWarned = false;
 const activeStatusEffects = {};
 const battleStats = {
@@ -503,6 +531,8 @@ const battleStats = {
   playerAttackBlockedByTimeStop: 0,
   monsterKillCount: 0
 };
+let battleSessionCommitted = false;
+let shouldPersistBattleStats = true;
 
 const DEFAULT_MONSTER_ATTACK_INTERVAL_MS = 5000;
 const LOW_HP_WARNING_RATIO = 0.2;
@@ -568,41 +598,40 @@ function updatePlayerHP() {
   }
 }
 
-function formatBattleElapsed(ms) {
-  const totalSec = Math.max(0, Math.floor(ms / 1000));
-  const min = Math.floor(totalSec / 60);
-  const sec = totalSec % 60;
-  return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+function hasBattleSessionActivity() {
+  return (
+    battleStats.playerAttackAttempts > 0 ||
+    battleStats.damageTakenTotal > 0 ||
+    battleStats.monsterKillCount > 0 ||
+    battleStats.statusAppliedCount > 0 ||
+    battleStats.statusBlockedCount > 0
+  );
+}
+
+function persistBattleStatsSession() {
+  if (battleSessionCommitted || !shouldPersistBattleStats) return;
+  if (typeof GameData.addBattleStat !== 'function' || typeof GameData.addBattleDuration !== 'function') return;
+  if (!hasBattleSessionActivity()) {
+    battleSessionCommitted = true;
+    return;
+  }
+
+  const statsKeys = Object.keys(battleStats).filter((key) => key !== 'startedAt');
+  statsKeys.forEach((key) => {
+    const value = Number(battleStats[key]) || 0;
+    if (value > 0) {
+      GameData.addBattleStat(key, value, false);
+    }
+  });
+
+  GameData.addBattleCount(false);
+  GameData.addBattleDuration(Date.now() - battleStats.startedAt, false);
+  GameData.save();
+  battleSessionCommitted = true;
 }
 
 function renderBattleStatsPanel() {
-  if (!battleStatsEl) return;
-
-  const elapsed = formatBattleElapsed(Date.now() - battleStats.startedAt);
-  battleStatsEl.innerHTML = `
-    <div class="battle-stats-title">전투 통계</div>
-    <div class="battle-stats-grid">
-      <div>진행 시간 <span>${elapsed}</span></div>
-      <div>처치 수 <span>${battleStats.monsterKillCount}</span></div>
-      <div>받은 피해(총) <span>${battleStats.damageTakenTotal}</span></div>
-      <div>상태이상 적용 <span>${battleStats.statusAppliedCount}</span></div>
-      <div>상태이상 무효화 <span>${battleStats.statusBlockedCount}</span></div>
-      <div>내 공격 적중/실패 <span>${battleStats.playerAttackHits}/${battleStats.playerAttackMisses}</span></div>
-      <div>시간정지 차단 <span>${battleStats.playerAttackBlockedByTimeStop}</span></div>
-    </div>
-  `;
-}
-
-function startBattleStatsLoop() {
-  stopBattleStatsLoop();
-  renderBattleStatsPanel();
-  battleStatsTimer = setInterval(renderBattleStatsPanel, 1000);
-}
-
-function stopBattleStatsLoop() {
-  if (!battleStatsTimer) return;
-  clearInterval(battleStatsTimer);
-  battleStatsTimer = null;
+  // 전투 화면 실시간 통계 패널 제거: 통계 페이지에서 조회
 }
 
 function getStatusRemainingSec(effectState) {
@@ -698,6 +727,9 @@ function getIncomingDamageMultiplier() {
   if (activeStatusEffects.shock) {
     mult *= STATUS_EFFECT_LIBRARY.shock.incomingDamageMul || 1;
   }
+  if (activeStatusEffects.heavy) {
+    mult *= STATUS_EFFECT_LIBRARY.heavy.incomingDamageMul || 1;
+  }
   return mult;
 }
 
@@ -705,6 +737,9 @@ function getOutgoingDamageMultiplier() {
   let mult = 1;
   if (activeStatusEffects.frost) {
     mult *= STATUS_EFFECT_LIBRARY.frost.outgoingDamageMul || 1;
+  }
+  if (activeStatusEffects.heavy) {
+    mult *= STATUS_EFFECT_LIBRARY.heavy.outgoingDamageMul || 1;
   }
   return mult;
 }
@@ -828,6 +863,7 @@ function getBossPatternVisualClass(attackPlan) {
   const effects = attackPlan.statusEffects || [];
   if (effects.includes('timeStop')) return 'pattern-fx-time-stop';
   if (effects.includes('chaos')) return 'pattern-fx-chaos';
+  if (effects.includes('heavy')) return 'pattern-fx-heavy';
   if (effects.includes('burn')) return 'pattern-fx-burn';
   if (effects.includes('shock')) return 'pattern-fx-shock';
   if (effects.includes('frost')) return 'pattern-fx-frost';
@@ -915,10 +951,11 @@ function handlePlayerDefeat() {
   if (playerDead) return;
   playerDead = true;
   dead = true;
+  shouldPersistBattleStats = false;
+  battleSessionCommitted = true;
   img.style.pointerEvents = 'none';
   stopMonsterAutoAttack();
   stopStatusEffectLoop();
-  stopBattleStatsLoop();
   clearBossPatternEffectVisual();
   clearAllStatusEffects();
   log.innerText = '사망했습니다. 데이터를 초기화합니다...';
@@ -1117,13 +1154,12 @@ renderStage();
 updateMonsterHP();
 updatePlayerHP();
 renderStatusEffects();
-startBattleStatsLoop();
 startMonsterAutoAttack();
 startStatusEffectLoop();
 
 window.addEventListener('beforeunload', () => {
+  persistBattleStatsSession();
   stopMonsterAutoAttack();
   stopStatusEffectLoop();
-  stopBattleStatsLoop();
   clearBossPatternEffectVisual();
 });

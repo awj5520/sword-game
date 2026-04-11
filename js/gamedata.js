@@ -8,6 +8,35 @@ const FATE_SUCCESS_RATE_BONUS = {
   chaos: 10,
 };
 
+const DEFAULT_BATTLE_STATS = {
+  totalBattles: 0,
+  totalBattleSeconds: 0,
+  monsterKillCount: 0,
+  damageTakenTotal: 0,
+  damageTakenByHit: 0,
+  damageTakenByDot: 0,
+  monsterHitCount: 0,
+  dotHitCount: 0,
+  statusAppliedCount: 0,
+  statusBlockedCount: 0,
+  antidoteUsedCount: 0,
+  playerAttackAttempts: 0,
+  playerAttackHits: 0,
+  playerAttackMisses: 0,
+  playerAttackBlockedByTimeStop: 0
+};
+
+function normalizeBattleStats(raw) {
+  const normalized = { ...DEFAULT_BATTLE_STATS };
+  if (!raw || typeof raw !== 'object') return normalized;
+
+  Object.keys(DEFAULT_BATTLE_STATS).forEach((key) => {
+    const value = Number(raw[key]);
+    normalized[key] = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+  });
+  return normalized;
+}
+
 const GameData = {
   /* =========================
      기본 스탯
@@ -86,6 +115,13 @@ const GameData = {
   ========================= */
   totalGold: Number(localStorage.getItem('totalGold')) || 0,
   killStats: JSON.parse(localStorage.getItem('killStats')) || {},
+  battleStats: (() => {
+    try {
+      return normalizeBattleStats(JSON.parse(localStorage.getItem('battleStats') || '{}'));
+    } catch {
+      return normalizeBattleStats();
+    }
+  })(),
 
   now() {
     return Date.now();
@@ -113,6 +149,33 @@ const GameData = {
 
   isDead() {
     return this.currentHp <= 0;
+  },
+
+  ensureBattleStats() {
+    this.battleStats = normalizeBattleStats(this.battleStats);
+    return this.battleStats;
+  },
+
+  addBattleStat(key, amount = 1, autoSave = true) {
+    if (!(key in DEFAULT_BATTLE_STATS)) return;
+    const delta = Math.max(0, Math.floor(Number(amount) || 0));
+    if (delta <= 0) return;
+
+    const stats = this.ensureBattleStats();
+    stats[key] += delta;
+    if (autoSave) this.save();
+  },
+
+  addBattleDuration(ms, autoSave = true) {
+    const sec = Math.max(0, Math.floor((Number(ms) || 0) / 1000));
+    if (sec <= 0) return;
+    this.addBattleStat('totalBattleSeconds', sec, false);
+    if (autoSave) this.save();
+  },
+
+  addBattleCount(autoSave = true) {
+    this.addBattleStat('totalBattles', 1, false);
+    if (autoSave) this.save();
   },
 
   /* =========================
@@ -206,6 +269,7 @@ const GameData = {
 
     localStorage.setItem('totalGold', this.totalGold);
     localStorage.setItem('killStats', JSON.stringify(this.killStats));
+    localStorage.setItem('battleStats', JSON.stringify(this.ensureBattleStats()));
   },
 
   resetAllProgress() {
@@ -249,7 +313,8 @@ const GameData = {
       chaosSealActive: false,
       fateScalePity: false,
       totalGold: 0,
-      killStats: {}
+      killStats: {},
+      battleStats: normalizeBattleStats()
     });
 
     localStorage.removeItem('achievements');

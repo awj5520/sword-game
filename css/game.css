@@ -236,46 +236,6 @@
     color: #fff;
 }
 
-#battle-stats {
-    width: 100%;
-    max-width: 360px;
-    margin: 0 auto 10px;
-    padding: 10px 10px 8px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(8, 14, 24, 0.65);
-    box-sizing: border-box;
-}
-
-.battle-stats-title {
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.4px;
-    color: #ffe7a0;
-    margin-bottom: 6px;
-    text-align: left;
-}
-
-.battle-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 4px 10px;
-}
-
-.battle-stats-grid div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    color: rgba(236, 243, 255, 0.88);
-}
-
-.battle-stats-grid span {
-    font-weight: 700;
-    color: #9ee2ff;
-}
-
 .info {
     display: flex;
     justify-content: space-between;
@@ -366,6 +326,7 @@
 .status-burn { background: rgba(234, 88, 12, 0.82); }
 .status-shock { background: rgba(37, 99, 235, 0.82); }
 .status-frost { background: rgba(8, 145, 178, 0.82); }
+.status-heavy { background: rgba(161, 98, 7, 0.86); }
 .status-timeStop { background: rgba(99, 102, 241, 0.86); }
 .status-chaos { background: rgba(168, 85, 247, 0.86); }
 

@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>통계</title>
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/stats.css">
+</head>
+<body>
+
+<div class="stats-wrapper">
+    <div class="title-area">
+        <div class="title">📊 통계</div>
+        <div id="stats-updated-at" class="updated-at"></div>
+    </div>
+
+    <div class="section-title">전투 누적</div>
+    <div id="battle-stats-grid" class="stats-grid"></div>
+
+    <div class="section-title">플레이어 정보</div>
+    <div id="profile-stats-grid" class="stats-grid"></div>
+
+    <div class="section-title">몬스터 처치 기록</div>
+    <div id="monster-kill-list" class="kill-list"></div>
+
+    <button class="back-btn" onclick="location.href='index.html'">
+        ↩ 돌아가기
+    </button>
+</div>
+
+<script src="js/gamedata.js"></script>
+<script src="js/stats.js"></script>
+</body>
+</html>

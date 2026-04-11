@@ -95,6 +95,28 @@
     text-shadow: 0 0 6px rgba(255,215,0,0.6);
 }
 
+.menu-shortcuts {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.menu-btn {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(180deg, #1c2530, #11181f);
+    color: #f4f8ff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.menu-btn:active {
+    transform: translateY(1px);
+}
+
 /* 버튼 */
 .btn {
     width: 100%;

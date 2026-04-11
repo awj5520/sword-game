@@ -68,7 +68,7 @@
 
 .shop-body {
     flex: 1;
-    background-image: url("../images/monsters/shop.png"); /* 👈 여기 */
+    background-image: url("../images/backgrounds/shop.png"); /* 👈 여기 */
     background-size: cover;
     background-position: center;
 
@@ -113,7 +113,7 @@
     gap: 12px;
     padding: 16px;
 
-    background-image: url("../images/monsters/shop.png");
+    background-image: url("../images/backgrounds/shop.png");
     background-size: cover;
     background-position: center;
 }
