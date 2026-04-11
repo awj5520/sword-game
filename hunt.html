@@ -22,19 +22,20 @@
 </div>
 
 <script src="js/gamedata.js"></script>
+<script src="js/item-defs.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
 const world = Number(params.get('world') || 1);
 
 /* 🔒 2세계 제한 */
-if (world === 2 && GameData.level < 100) {
-    alert('2세계는 강화 +100 이상 필요합니다!');
+if (world === 2 && GameData.level < 300) {
+    alert('2세계는 강화 +300 이상 필요합니다!');
     location.href = 'index.html';
 }
 
 /* 🔒 3세계 제한 */
-if (world === 3 && GameData.level < 200) {
-    alert('3세계는 강화 +200 이상 필요합니다!');
+if (world === 3 && GameData.level < 700) {
+    alert('3세계는 강화 +700 이상 필요합니다!');
     location.href = 'index.html';
 }
 

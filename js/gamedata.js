@@ -26,6 +26,12 @@ const DEFAULT_BATTLE_STATS = {
   playerAttackBlockedByTimeStop: 0
 };
 
+const DEFAULT_EQUIPPED_ITEMS = {
+  weapon: null,
+  armor: null,
+  rune: null
+};
+
 function normalizeBattleStats(raw) {
   const normalized = { ...DEFAULT_BATTLE_STATS };
   if (!raw || typeof raw !== 'object') return normalized;
@@ -33,6 +39,30 @@ function normalizeBattleStats(raw) {
   Object.keys(DEFAULT_BATTLE_STATS).forEach((key) => {
     const value = Number(raw[key]);
     normalized[key] = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+  });
+  return normalized;
+}
+
+function normalizeLootInventory(raw) {
+  const normalized = {};
+  if (!raw || typeof raw !== 'object') return normalized;
+
+  Object.keys(raw).forEach((id) => {
+    const count = Number(raw[id]);
+    if (Number.isFinite(count) && count > 0) {
+      normalized[id] = Math.floor(count);
+    }
+  });
+  return normalized;
+}
+
+function normalizeEquippedItems(raw) {
+  const normalized = { ...DEFAULT_EQUIPPED_ITEMS };
+  if (!raw || typeof raw !== 'object') return normalized;
+
+  Object.keys(DEFAULT_EQUIPPED_ITEMS).forEach((slot) => {
+    const value = raw[slot];
+    normalized[slot] = typeof value === 'string' && value.trim() ? value : null;
   });
   return normalized;
 }
@@ -122,9 +152,108 @@ const GameData = {
       return normalizeBattleStats();
     }
   })(),
+  lootInventory: (() => {
+    try {
+      return normalizeLootInventory(JSON.parse(localStorage.getItem('lootInventory') || '{}'));
+    } catch {
+      return normalizeLootInventory();
+    }
+  })(),
+  equippedItems: (() => {
+    try {
+      return normalizeEquippedItems(JSON.parse(localStorage.getItem('equippedItems') || '{}'));
+    } catch {
+      return normalizeEquippedItems();
+    }
+  })(),
 
   now() {
     return Date.now();
+  },
+
+  ensureLootInventory() {
+    this.lootInventory = normalizeLootInventory(this.lootInventory);
+    return this.lootInventory;
+  },
+
+  ensureEquippedItems() {
+    this.equippedItems = normalizeEquippedItems(this.equippedItems);
+    return this.equippedItems;
+  },
+
+  getItemCount(itemId) {
+    if (!itemId) return 0;
+    const inventory = this.ensureLootInventory();
+    return Number(inventory[itemId]) || 0;
+  },
+
+  addLootItem(itemId, amount = 1, autoSave = true) {
+    if (!itemId) return 0;
+    const count = Math.max(1, Math.floor(Number(amount) || 1));
+    const inventory = this.ensureLootInventory();
+    inventory[itemId] = (Number(inventory[itemId]) || 0) + count;
+    if (autoSave) this.save();
+    return inventory[itemId];
+  },
+
+  setEquippedItem(slot, itemId, autoSave = true) {
+    const equipped = this.ensureEquippedItems();
+    if (!(slot in equipped)) return false;
+
+    if (itemId == null || itemId === '') {
+      equipped[slot] = null;
+      if (autoSave) this.save();
+      return true;
+    }
+
+    if (this.getItemCount(itemId) <= 0) return false;
+
+    const itemDef = window.ItemDefs?.getById?.(itemId);
+    if (!itemDef || itemDef.slot !== slot) return false;
+
+    equipped[slot] = itemId;
+    if (autoSave) this.save();
+    return true;
+  },
+
+  getCombatBonuses() {
+    const total = {
+      damageFlat: 0,
+      hpFlat: 0,
+      damageMul: 1
+    };
+
+    const equipped = this.ensureEquippedItems();
+    Object.values(equipped).forEach((itemId) => {
+      if (!itemId) return;
+      const itemDef = window.ItemDefs?.getById?.(itemId);
+      if (!itemDef || !itemDef.bonus) return;
+
+      const bonus = itemDef.bonus;
+      if (Number.isFinite(Number(bonus.damageFlat))) {
+        total.damageFlat += Number(bonus.damageFlat);
+      }
+      if (Number.isFinite(Number(bonus.hpFlat))) {
+        total.hpFlat += Number(bonus.hpFlat);
+      }
+      if (Number.isFinite(Number(bonus.damageMul)) && Number(bonus.damageMul) > 0) {
+        total.damageMul *= Number(bonus.damageMul);
+      }
+    });
+
+    total.damageFlat = Math.floor(total.damageFlat);
+    total.hpFlat = Math.floor(total.hpFlat);
+    return total;
+  },
+
+  getEffectiveMaxHp() {
+    const bonuses = this.getCombatBonuses();
+    return Math.max(1, Math.floor((Number(this.maxHp) || 1) + bonuses.hpFlat));
+  },
+
+  clampCurrentHpToMax() {
+    const hp = Math.max(0, Number(this.currentHp) || 0);
+    this.currentHp = Math.min(hp, this.getEffectiveMaxHp());
   },
 
   /* =========================
@@ -137,13 +266,13 @@ const GameData = {
   },
 
   healFull() {
-    this.currentHp = this.maxHp;
+    this.currentHp = this.getEffectiveMaxHp();
     this.save();
   },
 
   heal(amount) {
     const value = Math.max(0, Number(amount) || 0);
-    this.currentHp = Math.min(this.maxHp, this.currentHp + value);
+    this.currentHp = Math.min(this.getEffectiveMaxHp(), this.currentHp + value);
     this.save();
   },
 
@@ -182,7 +311,9 @@ const GameData = {
      공격력 계산
   ========================= */
   getCurrentDamage() {
-    let dmg = this.damage;
+    const bonuses = this.getCombatBonuses();
+    let dmg = this.damage + bonuses.damageFlat;
+    dmg *= bonuses.damageMul;
 
     dmg *= this.achievementDamageMul;
     dmg *= this.hadesDamageMul;
@@ -218,6 +349,10 @@ const GameData = {
      저장
   ========================= */
   save() {
+    this.ensureLootInventory();
+    this.ensureEquippedItems();
+    this.clampCurrentHpToMax();
+
     localStorage.setItem('level', this.level);
     localStorage.setItem('damage', this.damage);
     localStorage.setItem('gold', this.gold);
@@ -270,6 +405,8 @@ const GameData = {
     localStorage.setItem('totalGold', this.totalGold);
     localStorage.setItem('killStats', JSON.stringify(this.killStats));
     localStorage.setItem('battleStats', JSON.stringify(this.ensureBattleStats()));
+    localStorage.setItem('lootInventory', JSON.stringify(this.lootInventory));
+    localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
   },
 
   resetAllProgress() {
@@ -314,7 +451,9 @@ const GameData = {
       fateScalePity: false,
       totalGold: 0,
       killStats: {},
-      battleStats: normalizeBattleStats()
+      battleStats: normalizeBattleStats(),
+      lootInventory: {},
+      equippedItems: normalizeEquippedItems()
     });
 
     localStorage.removeItem('achievements');

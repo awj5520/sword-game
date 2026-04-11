@@ -96,26 +96,50 @@ function buy(type) {
 
     case 'hpSmall':
       price = 700;
-      if (GameData.currentHp >= GameData.maxHp) return;
+      {
+        const maxHpForShop =
+          typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+        if (GameData.currentHp >= maxHpForShop) return;
+      }
       if (GameData.gold < price) return;
       GameData.gold -= price;
-      GameData.heal(Math.max(1, Math.floor(GameData.maxHp * 0.2)));
+      {
+        const maxHpForShop =
+          typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+        GameData.heal(Math.max(1, Math.floor(maxHpForShop * 0.2)));
+      }
       break;
 
     case 'hpMedium':
       price = 1800;
-      if (GameData.currentHp >= GameData.maxHp) return;
+      {
+        const maxHpForShop =
+          typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+        if (GameData.currentHp >= maxHpForShop) return;
+      }
       if (GameData.gold < price) return;
       GameData.gold -= price;
-      GameData.heal(Math.max(1, Math.floor(GameData.maxHp * 0.5)));
+      {
+        const maxHpForShop =
+          typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+        GameData.heal(Math.max(1, Math.floor(maxHpForShop * 0.5)));
+      }
       break;
 
     case 'hpLarge':
       price = 4000;
-      if (GameData.currentHp >= GameData.maxHp) return;
+      {
+        const maxHpForShop =
+          typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+        if (GameData.currentHp >= maxHpForShop) return;
+      }
       if (GameData.gold < price) return;
       GameData.gold -= price;
-      GameData.heal(GameData.maxHp);
+      {
+        const maxHpForShop =
+          typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+        GameData.heal(maxHpForShop);
+      }
       break;
 
     case 'antiPoison':

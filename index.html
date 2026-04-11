@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -13,7 +13,7 @@
 <div class="game-wrapper">
 
     <div class="top-bar">
-        <div class="title">⚔️ 검 강화 RPG</div>
+        <div class="title">검 강화 RPG</div>
         <div id="gold-text" class="gold">💰 0</div>
     </div>
 
@@ -40,29 +40,29 @@
             <button class="menu-btn" onclick="location.href='stats.html'">
                 📊 통계
             </button>
+            <button class="menu-btn" onclick="location.href='monster-codex.html'">
+                📘 몬스터 도감
+            </button>
         </div>
 
         <div id="message" class="message"></div>
 
         <div class="button-group">
-            <button id="btn-upgrade" class="btn upgrade">🔨 강화하기</button>
+            <button id="btn-upgrade" class="btn upgrade">⚒ 강화하기</button>
 
-            <!-- 🌍 1세계 -->
             <button class="btn hunt" onclick="goWorld(1)">
-                🗺️ 1세계 사냥터
+                🌍 1세계 사냥터
             </button>
 
-            <!-- 🌌 2세계 -->
             <button class="btn hunt" onclick="goWorld(2)">
                 🌌 2세계 사냥터
             </button>
 
-            <!-- 🌠 3세계 (✅ 추가) -->
             <button class="btn hunt" onclick="goWorld(3)">
                 🌠 3세계 사냥터
             </button>
 
-            <button class="btn shop" onclick="location.href='shop.html'">🏪 상점</button>
+            <button class="btn shop" onclick="location.href='shop.html'">🛒 상점</button>
             <button class="btn bag" onclick="location.href='inventory.html'">🎒 배낭</button>
         </div>
 
@@ -70,20 +70,22 @@
 </div>
 
 <script src="js/gamedata.js"></script>
+<script src="js/item-defs.js"></script>
 <script src="js/effects.js"></script>
 <script src="js/enhance.js"></script>
 
 <script>
 function goWorld(world) {
-    if (world === 2 && GameData.level < 100) {
-        alert('2세계는 강화 +100 이상 필요합니다!');
+    if (world === 2 && GameData.level < 300) {
+        alert('2세계는 강화 +300 이상 필요합니다!');
         return;
     }
-    // ✅ 3세계 입장 제한(원하면 숫자 바꿔도 됨)
-    if (world === 3 && GameData.level < 200) {
-        alert('3세계는 강화 +200 이상 필요합니다!');
+
+    if (world === 3 && GameData.level < 700) {
+        alert('3세계는 강화 +700 이상 필요합니다!');
         return;
     }
+
     location.href = `hunt.html?world=${world}`;
 }
 </script>

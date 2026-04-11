@@ -84,7 +84,24 @@ const STATUS_EFFECT_LIBRARY = {
   frost: { label: '빙결', durationMs: 7000, outgoingDamageMul: 0.65 },
   heavy: { label: '무거움', durationMs: 9000, outgoingDamageMul: 0.55, incomingDamageMul: 1.1 },
   timeStop: { label: '시간 정지', durationMs: 1000, blockPlayerAttack: true },
-  chaos: { label: '혼돈', durationMs: 1000, playerHitChance: 0.5 }
+  chaos: { label: '혼돈', durationMs: 1000, playerHitChance: 0.5 },
+
+  // 보스 고유 상태이상: 각 보스 strongest 패턴에서만 발동
+  boss_slime_bind: { label: '점액 구속', durationMs: 8000, outgoingDamageMul: 0.75 },
+  boss_orc_fear: { label: '전장의 공포', durationMs: 7000, playerHitChanceMul: 0.65 },
+  boss_dragon_rend: { label: '용린 파열', durationMs: 10000, tickMs: 2000, damageRatio: 0.012, minDamage: 4 },
+  boss_space_collapse: { label: '중력 붕괴', durationMs: 6000, outgoingDamageMul: 0.6, incomingDamageMul: 1.12 },
+  boss_bat_curse: { label: '흡혈 저주', durationMs: 9000, lifeStealToMonsterRatio: 0.22 },
+  boss_skeleton_fracture: { label: '골절', durationMs: 9000, incomingDamageMul: 1.25 },
+  boss_demon_brand: { label: '지옥 낙인', durationMs: 12000, tickMs: 3000, damageRatio: 0.02, minDamage: 6 },
+  boss_hell_seal: { label: '신벌 봉인', durationMs: 6500, blockPlayerAttack: true },
+  boss_poseidon_pressure: { label: '심해 수압', durationMs: 9000, outgoingDamageMul: 0.7, playerHitChanceMul: 0.85 },
+  boss_hades_shackle: { label: '망자의 굴레', durationMs: 10000, selfDamageOnAttackChance: 0.35, selfDamageOnAttackRatio: 0.08, selfDamageOnAttackMin: 5 },
+  boss_zeus_overload: { label: '과전류', durationMs: 8000, attackDelayChance: 0.4, attackDelayMs: 1200 },
+  boss_chronos_stop: { label: '절대 정지', durationMs: 1000, blockPlayerAttack: true },
+  boss_gaia_collapse: { label: '원소 붕괴', durationMs: 9000, applyExtraStatuses: ['burn', 'shock', 'frost'] },
+  boss_chaos_entropy: { label: '혼돈 왜곡', durationMs: 1000, playerHitChance: 0.5 },
+  boss_rift_inverse: { label: '확률 역전', durationMs: 7000, invertDamageChance: 0.5, invertDamageZeroChance: 0.5 }
 };
 
 const STATUS_NULLIFY_POTION_MAP = {
@@ -230,6 +247,54 @@ const BOSS_PATTERN_INTERVAL_MS = {
   "3:rift:4": 1600
 };
 
+const BOSS_UNIQUE_STATUS_BY_STAGE = {
+  "1:grass:5": "boss_slime_bind",
+  "1:orc:5": "boss_orc_fear",
+  "1:dragon:5": "boss_dragon_rend",
+  "1:space:3": "boss_space_collapse",
+  "2:cave:5": "boss_bat_curse",
+  "2:grave:5": "boss_skeleton_fracture",
+  "2:demon:5": "boss_demon_brand",
+  "2:hell:3": "boss_hell_seal",
+  "3:atlantis:5": "boss_poseidon_pressure",
+  "3:underworld:5": "boss_hades_shackle",
+  "3:thunder:5": "boss_zeus_overload",
+  "3:divine:1": "boss_chronos_stop",
+  "3:divine:2": "boss_gaia_collapse",
+  "3:divine:3": "boss_chaos_entropy",
+  "3:rift:4": "boss_rift_inverse"
+};
+
+const BOSS_UNIQUE_STATUS_TYPES = new Set(Object.values(BOSS_UNIQUE_STATUS_BY_STAGE));
+
+function injectBossUniqueStatusToStrongestPatterns(patternTable, uniqueByStage) {
+  Object.keys(uniqueByStage).forEach((stageKey) => {
+    const uniqueType = uniqueByStage[stageKey];
+    const patterns = patternTable[stageKey];
+    if (!Array.isArray(patterns) || patterns.length === 0) return;
+
+    let strongestIdx = 0;
+    let strongestDamageMul = -Infinity;
+    patterns.forEach((pattern, idx) => {
+      const dmgMul = Number(pattern.damageMul) || 0;
+      if (dmgMul > strongestDamageMul) {
+        strongestDamageMul = dmgMul;
+        strongestIdx = idx;
+      }
+    });
+
+    patterns.forEach((pattern, idx) => {
+      const currentEffects = Array.isArray(pattern.effects) ? pattern.effects : [];
+      pattern.effects = currentEffects.filter((effect) => !BOSS_UNIQUE_STATUS_TYPES.has(effect?.type));
+      if (idx === strongestIdx) {
+        pattern.effects.push({ type: uniqueType, chance: 1 });
+      }
+    });
+  });
+}
+
+injectBossUniqueStatusToStrongestPatterns(BOSS_PATTERN_TABLE, BOSS_UNIQUE_STATUS_BY_STAGE);
+
 function clampChance(value) {
   return Math.max(0, Math.min(1, Number(value) || 0));
 }
@@ -264,13 +329,13 @@ function pickWeightedPattern(patterns) {
 /* =========================
    🔒 월드 입장 제한
 ========================= */
-if (world === 2 && GameData.level < 100) {
-  alert('2세계는 강화 +100 이상 필요합니다!');
+if (world === 2 && GameData.level < 300) {
+  alert('2세계는 강화 +300 이상 필요합니다!');
   location.href = 'index.html';
 }
 
-if (world === 3 && GameData.level < 200) {
-  alert('3세계는 강화 +200 이상 필요합니다!');
+if (world === 3 && GameData.level < 700) {
+  alert('3세계는 강화 +700 이상 필요합니다!');
   location.href = 'index.html';
 }
 
@@ -533,6 +598,7 @@ const battleStats = {
 };
 let battleSessionCommitted = false;
 let shouldPersistBattleStats = true;
+let playerAttackLockUntil = 0;
 
 const DEFAULT_MONSTER_ATTACK_INTERVAL_MS = 5000;
 const LOW_HP_WARNING_RATIO = 0.2;
@@ -562,8 +628,18 @@ damageText.innerText = `공격력: ${GameData.getCurrentDamage()}`;
 
 if (GameData.currentHp <= 0) {
   GameData.healFull();
-} else if (GameData.currentHp > GameData.maxHp) {
-  GameData.currentHp = GameData.maxHp;
+} else {
+  const maxHpForBattle =
+    typeof GameData.getEffectiveMaxHp === 'function'
+      ? GameData.getEffectiveMaxHp()
+      : GameData.maxHp;
+  if (GameData.currentHp > maxHpForBattle) {
+    GameData.currentHp = maxHpForBattle;
+    GameData.save();
+  }
+}
+if (GameData.currentHp < 0) {
+  GameData.currentHp = 0;
   GameData.save();
 }
 if (GameData.protectTicket <= 0 && GameData.protectActive) {
@@ -578,9 +654,13 @@ function updateMonsterHP() {
 }
 
 function updatePlayerHP() {
-  const ratio = GameData.maxHp > 0 ? (GameData.currentHp / GameData.maxHp) * 100 : 0;
+  const maxHpForBattle =
+    typeof GameData.getEffectiveMaxHp === 'function'
+      ? GameData.getEffectiveMaxHp()
+      : GameData.maxHp;
+  const ratio = maxHpForBattle > 0 ? (GameData.currentHp / maxHpForBattle) * 100 : 0;
   playerHpFill.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
-  playerHpText.innerText = `유저 HP ${GameData.currentHp} / ${GameData.maxHp}`;
+  playerHpText.innerText = `유저 HP ${GameData.currentHp} / ${maxHpForBattle}`;
 
   const isLowHp = ratio <= LOW_HP_WARNING_RATIO;
   if (playerStatusEl) {
@@ -648,14 +728,24 @@ function renderStatusEffects() {
     return;
   }
 
+  const sortedEffects = effectKeys.sort((a, b) => {
+    const aBoss = BOSS_UNIQUE_STATUS_TYPES.has(a);
+    const bBoss = BOSS_UNIQUE_STATUS_TYPES.has(b);
+    if (aBoss !== bBoss) return aBoss ? -1 : 1;
+    return a.localeCompare(b);
+  });
+
   playerStatusEffectsEl.style.display = 'flex';
-  playerStatusEffectsEl.innerHTML = effectKeys
+  playerStatusEffectsEl.innerHTML = sortedEffects
     .map((type) => {
       const def = STATUS_EFFECT_LIBRARY[type];
       const state = activeStatusEffects[type];
       if (!def || !state) return '';
       const sec = getStatusRemainingSec(state);
-      return `<span class="status-chip status-${type}">${def.label} ${sec}s</span>`;
+      const isBossUnique = BOSS_UNIQUE_STATUS_TYPES.has(type);
+      const extraClass = isBossUnique ? ' status-boss-unique' : '';
+      const prefix = isBossUnique ? '★ ' : '';
+      return `<span class="status-chip status-${type}${extraClass}">${prefix}${def.label} ${sec}s</span>`;
     })
     .join('');
 }
@@ -697,6 +787,16 @@ function applyStatusEffect(type) {
       expiresAt: now + def.durationMs,
       nextTickAt: def.tickMs > 0 ? now + def.tickMs : 0
     };
+
+    // 일부 보스 고유 상태는 적용 시 추가 상태이상을 동시에 건다.
+    if (Array.isArray(def.applyExtraStatuses)) {
+      def.applyExtraStatuses.forEach((extraType) => {
+        if (extraType !== type) {
+          applyStatusEffect(extraType);
+        }
+      });
+    }
+
     battleStats.statusAppliedCount++;
     renderBattleStatsPanel();
     renderStatusEffects();
@@ -724,39 +824,134 @@ function removeExpiredStatusEffects() {
 
 function getIncomingDamageMultiplier() {
   let mult = 1;
-  if (activeStatusEffects.shock) {
-    mult *= STATUS_EFFECT_LIBRARY.shock.incomingDamageMul || 1;
-  }
-  if (activeStatusEffects.heavy) {
-    mult *= STATUS_EFFECT_LIBRARY.heavy.incomingDamageMul || 1;
-  }
+  Object.keys(activeStatusEffects).forEach((type) => {
+    const def = STATUS_EFFECT_LIBRARY[type];
+    if (!def) return;
+    if (Number.isFinite(def.incomingDamageMul)) {
+      mult *= Math.max(0, Number(def.incomingDamageMul));
+    }
+  });
   return mult;
 }
 
 function getOutgoingDamageMultiplier() {
   let mult = 1;
-  if (activeStatusEffects.frost) {
-    mult *= STATUS_EFFECT_LIBRARY.frost.outgoingDamageMul || 1;
-  }
-  if (activeStatusEffects.heavy) {
-    mult *= STATUS_EFFECT_LIBRARY.heavy.outgoingDamageMul || 1;
-  }
+  Object.keys(activeStatusEffects).forEach((type) => {
+    const def = STATUS_EFFECT_LIBRARY[type];
+    if (!def) return;
+    if (Number.isFinite(def.outgoingDamageMul)) {
+      mult *= Math.max(0, Number(def.outgoingDamageMul));
+    }
+  });
   return mult;
 }
 
-function isPlayerAttackBlocked() {
-  return !!activeStatusEffects.timeStop;
+function getBlockingStatusInfo() {
+  const blockingType = Object.keys(activeStatusEffects).find((type) => {
+    const def = STATUS_EFFECT_LIBRARY[type];
+    return !!def?.blockPlayerAttack;
+  });
+  if (!blockingType) return null;
+
+  return {
+    type: blockingType,
+    def: STATUS_EFFECT_LIBRARY[blockingType],
+    state: activeStatusEffects[blockingType]
+  };
 }
 
-function getPlayerChaosHitChance() {
-  if (!activeStatusEffects.chaos) return 1;
-  return clampChance(STATUS_EFFECT_LIBRARY.chaos.playerHitChance);
+function getPlayerHitChance() {
+  let chance = 1;
+  Object.keys(activeStatusEffects).forEach((type) => {
+    const def = STATUS_EFFECT_LIBRARY[type];
+    if (!def) return;
+
+    if (Number.isFinite(def.playerHitChance)) {
+      chance *= clampChance(def.playerHitChance);
+    }
+    if (Number.isFinite(def.playerHitChanceMul)) {
+      chance *= Math.max(0, Number(def.playerHitChanceMul));
+    }
+  });
+  return clampChance(chance);
+}
+
+function applyBossRiftInverseDamage(baseDamage) {
+  let damage = Math.max(0, Math.floor(baseDamage));
+  let note = '';
+
+  Object.keys(activeStatusEffects).forEach((type) => {
+    const def = STATUS_EFFECT_LIBRARY[type];
+    if (!def || !Number.isFinite(def.invertDamageChance)) return;
+
+    const invertChance = clampChance(def.invertDamageChance);
+    if (Math.random() >= invertChance) return;
+
+    const zeroChance = clampChance(Number(def.invertDamageZeroChance) || 0.5);
+    if (Math.random() < zeroChance) {
+      damage = 0;
+      note = `${def.label} 발동: 이번 공격 피해가 0이 됩니다.`;
+    } else {
+      damage = Math.max(1, Math.floor(damage * 2));
+      note = `${def.label} 발동: 이번 공격 피해가 2배가 됩니다.`;
+    }
+  });
+
+  return { damage, note };
+}
+
+function getMonsterHealFromPlayerAttack(playerDamage) {
+  let totalRatio = 0;
+  Object.keys(activeStatusEffects).forEach((type) => {
+    const def = STATUS_EFFECT_LIBRARY[type];
+    if (!def || !Number.isFinite(def.lifeStealToMonsterRatio)) return;
+    totalRatio += Math.max(0, Number(def.lifeStealToMonsterRatio));
+  });
+  const ratio = Math.max(0, Math.min(0.95, totalRatio));
+  return Math.max(0, Math.floor(playerDamage * ratio));
+}
+
+function getSelfDamageOnPlayerAttack() {
+  let totalDamage = 0;
+  Object.keys(activeStatusEffects).forEach((type) => {
+    const def = STATUS_EFFECT_LIBRARY[type];
+    if (!def) return;
+    if (!Number.isFinite(def.selfDamageOnAttackChance) || !Number.isFinite(def.selfDamageOnAttackRatio)) return;
+
+    if (Math.random() >= clampChance(def.selfDamageOnAttackChance)) return;
+    const hpForStatus =
+      typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+    const ratioDmg = Math.floor(hpForStatus * Math.max(0, Number(def.selfDamageOnAttackRatio)));
+    const minDmg = Math.max(1, Math.floor(Number(def.selfDamageOnAttackMin) || 1));
+    totalDamage += Math.max(minDmg, ratioDmg);
+  });
+  return totalDamage;
+}
+
+function applyAttackDelayFromStatus() {
+  let lockMs = 0;
+  Object.keys(activeStatusEffects).forEach((type) => {
+    const def = STATUS_EFFECT_LIBRARY[type];
+    if (!def) return;
+    if (!Number.isFinite(def.attackDelayChance) || !Number.isFinite(def.attackDelayMs)) return;
+
+    if (Math.random() < clampChance(def.attackDelayChance)) {
+      lockMs = Math.max(lockMs, Math.max(0, Math.floor(def.attackDelayMs)));
+    }
+  });
+
+  if (lockMs > 0) {
+    playerAttackLockUntil = Math.max(playerAttackLockUntil, Date.now() + lockMs);
+  }
+  return lockMs;
 }
 
 function getStatusTickDamage(type) {
   const def = STATUS_EFFECT_LIBRARY[type];
   if (!def) return 0;
-  const ratioDamage = Math.floor(GameData.maxHp * (def.damageRatio || 0));
+  const hpForStatus =
+    typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+  const ratioDamage = Math.floor(hpForStatus * (def.damageRatio || 0));
   return Math.max(def.minDamage || 1, ratioDamage);
 }
 
@@ -861,6 +1056,7 @@ function buildBossPatternAttack() {
 
 function getBossPatternVisualClass(attackPlan) {
   const effects = attackPlan.statusEffects || [];
+  if (effects.some((type) => BOSS_UNIQUE_STATUS_TYPES.has(type))) return 'pattern-fx-unique';
   if (effects.includes('timeStop')) return 'pattern-fx-time-stop';
   if (effects.includes('chaos')) return 'pattern-fx-chaos';
   if (effects.includes('heavy')) return 'pattern-fx-heavy';
@@ -877,6 +1073,7 @@ function clearBossPatternEffectVisual() {
   const classes = [
     'pattern-fx-active',
     'pattern-fx-basic',
+    'pattern-fx-unique',
     'pattern-fx-heavy',
     'pattern-fx-poison',
     'pattern-fx-bleed',
@@ -936,7 +1133,9 @@ function applyMonsterStatusEffects(effectTypes) {
 function tryUseProtectTicket() {
   if (!(GameData.protectActive && GameData.protectTicket > 0)) return false;
 
-  const recoverHp = Math.max(1, Math.floor(GameData.maxHp / 4));
+  const maxHpForBattle =
+    typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+  const recoverHp = Math.max(1, Math.floor(maxHpForBattle / 4));
   GameData.protectTicket = 0;
   GameData.protectActive = false;
   GameData.currentHp = recoverHp;
@@ -1039,6 +1238,28 @@ function tryDropRiftItem() {
   return null;
 }
 
+function tryDropEquipmentAndRuneItems() {
+  if (!window.DropTables || !window.ItemDefs) return [];
+  if (typeof GameData.addLootItem !== 'function') return [];
+
+  const droppedIds = DropTables.rollStageDrops({
+    world,
+    area,
+    stageId,
+    isBoss: !!stageBossPatterns
+  });
+  if (!Array.isArray(droppedIds) || droppedIds.length === 0) return [];
+
+  const droppedNames = [];
+  droppedIds.forEach((itemId) => {
+    const itemDef = ItemDefs.getById(itemId);
+    if (!itemDef) return;
+    GameData.addLootItem(itemId, 1, false);
+    droppedNames.push(itemDef.name);
+  });
+  return droppedNames;
+}
+
 /* =========================
    공격 처리
 ========================= */
@@ -1046,39 +1267,64 @@ img.onclick = () => {
   if (dead || playerDead) return;
   battleStats.playerAttackAttempts++;
 
-  if (isPlayerAttackBlocked()) {
+  const now = Date.now();
+  if (now < playerAttackLockUntil) {
+    const remainSec = Math.max(1, Math.ceil((playerAttackLockUntil - now) / 1000));
+    log.innerText = `⚡ 상태이상 영향으로 ${remainSec}초 동안 공격이 지연됩니다.`;
+    return;
+  }
+
+  const blockingStatus = getBlockingStatusInfo();
+  if (blockingStatus) {
     battleStats.playerAttackBlockedByTimeStop++;
     renderBattleStatsPanel();
-    const freezeSec = Math.floor((STATUS_EFFECT_LIBRARY.timeStop.durationMs || 0) / 1000);
-    log.innerText = `⏳ 시간 정지 상태입니다. ${freezeSec}초 동안 공격할 수 없습니다.`;
+    const remainSec = blockingStatus.state
+      ? getStatusRemainingSec(blockingStatus.state)
+      : Math.max(1, Math.ceil((Number(blockingStatus.def?.durationMs) || 0) / 1000));
+    log.innerText = `⏳ ${blockingStatus.def.label} 상태입니다. ${remainSec}초 동안 공격할 수 없습니다.`;
     if (typeof screenShake === 'function') {
       screenShake();
     }
     return;
   }
 
-  if (Math.random() > getPlayerChaosHitChance()) {
+  if (Math.random() > getPlayerHitChance()) {
     battleStats.playerAttackMisses++;
     renderBattleStatsPanel();
     img.classList.add('hit');
     setTimeout(() => img.classList.remove('hit'), 120);
-    log.innerText = '🌀 혼돈 상태! 공격이 빗나갔습니다.';
+    log.innerText = '🌀 상태이상 영향으로 공격이 빗나갔습니다.';
     return;
   }
 
   battleStats.playerAttackHits++;
   renderBattleStatsPanel();
 
-  const playerDamage = Math.max(
+  const basePlayerDamage = Math.max(
     1,
     Math.floor(GameData.getCurrentDamage() * getOutgoingDamageMultiplier())
   );
+  const variedDamage = applyBossRiftInverseDamage(basePlayerDamage);
+  const playerDamage = Math.max(0, Math.floor(variedDamage.damage));
+
   hp -= playerDamage;
   if (hp < 0) hp = 0;
+  const monsterHeal = hp > 0 ? getMonsterHealFromPlayerAttack(playerDamage) : 0;
+  if (monsterHeal > 0) {
+    hp = Math.min(data.hp, hp + monsterHeal);
+  }
   updateMonsterHP();
 
   img.classList.add('hit');
   setTimeout(() => img.classList.remove('hit'), 120);
+
+  const selfDamage = getSelfDamageOnPlayerAttack();
+  if (selfDamage > 0) {
+    const diedBySelfDamage = applyDamageToPlayer(selfDamage, '망자의 굴레 반동', 'dot');
+    if (diedBySelfDamage) return;
+  }
+
+  const lockMs = applyAttackDelayFromStatus();
 
   if (hp === 0) {
     dead = true;
@@ -1102,14 +1348,19 @@ img.onclick = () => {
 
     // ✅ 운명의 균열 드랍
     const dropName = tryDropRiftItem();
+    const battleLootNames = tryDropEquipmentAndRuneItems();
 
     GameData.save();
     if (window.Achievement) Achievement.checkAll();
 
-    if (dropName) {
-      log.innerText = `${data.name} 처치! +${earned}G  🎁 ${dropName} 획득!`;
-    } else {
-      log.innerText = `${data.name} 처치! +${earned}G`;
+    const rewardParts = [`${data.name} 처치! +${earned}G`];
+    if (dropName) rewardParts.push(`🎁 ${dropName}`);
+    if (battleLootNames.length > 0) {
+      rewardParts.push(`장비/룬 드랍: ${battleLootNames.join(', ')}`);
+    }
+    log.innerText = rewardParts.join(' | ');
+    if (variedDamage.note) {
+      log.innerText += ` | ${variedDamage.note}`;
     }
 
     setTimeout(() => {
@@ -1122,7 +1373,23 @@ img.onclick = () => {
 
       log.innerText = `${data.name} 등장!`;
     }, 1200);
+    return;
   }
+
+  const messageParts = [`${data.name}에게 ${playerDamage} 피해`];
+  if (monsterHeal > 0) {
+    messageParts.push(`보스 흡혈 +${monsterHeal} HP`);
+  }
+  if (selfDamage > 0) {
+    messageParts.push(`반동 -${selfDamage} HP`);
+  }
+  if (lockMs > 0) {
+    messageParts.push(`행동 지연 ${Math.max(1, Math.ceil(lockMs / 1000))}초`);
+  }
+  if (variedDamage.note) {
+    messageParts.push(variedDamage.note);
+  }
+  log.innerText = messageParts.join(' | ');
 };
 
 

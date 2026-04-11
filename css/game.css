@@ -329,6 +329,17 @@
 .status-heavy { background: rgba(161, 98, 7, 0.86); }
 .status-timeStop { background: rgba(99, 102, 241, 0.86); }
 .status-chaos { background: rgba(168, 85, 247, 0.86); }
+.status-chip[class*="status-boss_"] { background: rgba(180, 83, 9, 0.88); }
+.status-boss-unique {
+    border-color: rgba(255, 215, 120, 0.95);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.55);
+    animation: bossStatusGlow 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes bossStatusGlow {
+    from { transform: translateY(0); }
+    to { transform: translateY(-1px); }
+}
 
 @keyframes lowHpPulse {
     from { transform: scale(1); }
@@ -355,6 +366,10 @@
 
 .stage-wrapper.pattern-fx-heavy::after {
     background: radial-gradient(circle at center, rgba(255,130,70,0.6), rgba(0,0,0,0));
+}
+
+.stage-wrapper.pattern-fx-unique::after {
+    background: radial-gradient(circle at center, rgba(251,191,36,0.62), rgba(0,0,0,0));
 }
 
 .stage-wrapper.pattern-fx-poison::after {

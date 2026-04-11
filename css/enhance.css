@@ -97,12 +97,14 @@
 
 .menu-shortcuts {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 12px;
 }
 
 .menu-btn {
     flex: 1;
+    min-width: 110px;
     padding: 10px 12px;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.15);
