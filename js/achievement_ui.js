@@ -1,136 +1,141 @@
 const huntList = document.getElementById('hunt-achievement-list');
 const goldList = document.getElementById('gold-achievement-list');
 const upgradeList = document.getElementById('upgrade-achievement-list');
+const codexList = document.getElementById('codex-achievement-list');
+const achievementSummary = document.getElementById('achievement-summary');
 
-/* =========================
-   사냥 업적
-========================= */
-const HUNT_ACH = [
-  { id:'slime_slayer', title:'슬라임 슬레이어', target:20, monsters:[
-    ['slime','슬라임'],['slime_helmet','투구 슬라임'],
-    ['slime_warrior','전사 슬라임'],['slime_rage','광폭화 슬라임'],
-    ['slime_king','슬라임 왕']
-  ]},
-  { id:'orc_conquer', title:'오크 부락 점령', target:30, monsters:[
-    ['orc_1','풋내기 오크'],['orc_2','전사 오크'],
-    ['orc_3','광전사 오크'],['orc_4','주술사 오크'],
-    ['orc_king','오크 족장']
-  ]},
-  { id:'dragon_master', title:'드래곤 마스터', target:40, monsters:[
-    ['dragon_1','새끼 드레이크'],['dragon_2','불꽃 드레이크'],
-    ['dragon_3','비늘 와이번'],['dragon_4','다크 드래곤'],
-    ['dragon_king','골드 드래곤']
-  ]},
-  { id:'space_conqueror', title:'정복자', target:50, monsters:[
-    ['space_slime','갤럭시 슬라임'],
-    ['space_orc','갤럭시 오크'],
-    ['space_dragon','갤럭시 드래곤']
-  ]}
-];
+function toSafeNumber(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? Math.max(0, Math.floor(num)) : 0;
+}
 
-/* =========================
-   강화 업적 (🔥 신규)
-========================= */
-const UPGRADE_ACH = [
-  { id:'upgrade_50', title:'검 숙련자', target:50 },
-  { id:'upgrade_100', title:'강화 마스터', target:100 }
-];
+function formatNumber(value) {
+  return toSafeNumber(value).toLocaleString('ko-KR');
+}
 
-/* =========================
-   골드 업적
-========================= */
-const GOLD_ACH = [
-  { id:'gold_10m', title:'백만장자', target:10_000_000 },
-  { id:'gold_100m', title:'재벌', target:100_000_000 },
-  { id:'gold_100b', title:'신화급 부자', target:100_000_000_000 }
-];
+function getDoneCount(list) {
+  return list.reduce((sum, ach) => sum + (Achievement.unlocked[ach.id] ? 1 : 0), 0);
+}
 
-/* =========================
-   렌더링
-========================= */
-renderHunt();
-renderUpgrade();
-renderGold();
+function makeCard(title, done) {
+  const card = document.createElement('div');
+  card.className = `ach-card${done ? ' done' : ''}`;
 
-/* -------- 사냥 -------- */
-function renderHunt() {
+  const titleEl = document.createElement('div');
+  titleEl.className = 'ach-title';
+  titleEl.innerText = done ? `${title} ✅` : title;
+  card.appendChild(titleEl);
+
+  return card;
+}
+
+function addLine(card, text, subtle = false) {
+  const line = document.createElement('div');
+  line.className = `ach-progress${subtle ? ' subtle' : ''}`;
+  line.innerText = text;
+  card.appendChild(line);
+}
+
+function renderHunt(list) {
   huntList.innerHTML = '';
-  HUNT_ACH.forEach(ach=>{
-    const done = Achievement.unlocked[ach.id];
+  list.forEach((ach) => {
+    const done = Boolean(Achievement.unlocked[ach.id]);
     const card = makeCard(ach.title, done);
 
-    ach.monsters.forEach(([k,n])=>{
-      const left = Math.max(0, ach.target - (GameData.killStats[k]||0));
-      addLine(card, `${n}: ${left===0?'완료':left+'마리 남음'}`);
+    const target = toSafeNumber(ach.target);
+    ach.monsters.forEach(([monsterId, monsterName]) => {
+      const kills = toSafeNumber(GameData.killStats?.[monsterId]);
+      const left = Math.max(0, target - kills);
+      addLine(card, `${monsterName}: ${left === 0 ? '완료' : `${formatNumber(left)}마리 남음`}`);
     });
 
     huntList.appendChild(card);
   });
 }
 
-/* -------- 강화 -------- */
-function renderUpgrade() {
-  upgradeList.innerHTML = '';
-  UPGRADE_ACH.forEach(ach=>{
-    const done = Achievement.unlocked[ach.id];
-    const card = makeCard(ach.title, done);
-
-    const left = Math.max(0, ach.target - GameData.level);
-    addLine(card, left===0 ? '완료' : `+${left}강 남음`);
-
-    upgradeList.appendChild(card);
-  });
-}
-function renderHunt() {
-  huntList.innerHTML = '';
-  HUNT_ACH.forEach(ach => {
-    const done = Achievement.unlocked[ach.id];
-    const card = makeCard(ach.title, done);
-
-    // 업적을 완료했을 경우 'done' 클래스 추가
-    if (done) {
-      card.classList.add('done');
-    }
-
-    // 진행 상태 추가
-    ach.monsters.forEach(([k, n]) => {
-      const left = Math.max(0, ach.target - (GameData.killStats[k] || 0));
-      addLine(card, `${n}: ${left === 0 ? '완료' : left + '마리 남음'}`);
-    });
-
-    huntList.appendChild(card);
-  });
-}
-
-/* -------- 골드 -------- */
-function renderGold() {
+function renderGold(list) {
   goldList.innerHTML = '';
-  GOLD_ACH.forEach(ach=>{
-    const done = Achievement.unlocked[ach.id];
+  list.forEach((ach) => {
+    const done = Boolean(Achievement.unlocked[ach.id]);
     const card = makeCard(ach.title, done);
 
-    const left = Math.max(0, ach.target - GameData.totalGold);
-    addLine(card, left===0?'완료':`${left.toLocaleString()} 골드 남음`);
+    const left = Math.max(0, toSafeNumber(ach.target) - toSafeNumber(GameData.totalGold));
+    addLine(card, left === 0 ? '완료' : `${formatNumber(left)} 골드 남음`);
 
     goldList.appendChild(card);
   });
 }
 
-/* =========================
-   공용 UI
-========================= */
-function makeCard(title, done){
-  const card = document.createElement('div');
-  card.className = 'ach-card'+(done?' done':'');
-  const t = document.createElement('div');
-  t.className = 'ach-title';
-  t.innerText = title+(done?' ✅':'');
-  card.appendChild(t);
-  return card;
+function renderUpgrade(list) {
+  upgradeList.innerHTML = '';
+  list.forEach((ach) => {
+    const done = Boolean(Achievement.unlocked[ach.id]);
+    const card = makeCard(ach.title, done);
+
+    const left = Math.max(0, toSafeNumber(ach.target) - toSafeNumber(GameData.level));
+    if (left === 0) {
+      addLine(card, '완료');
+    } else if (toSafeNumber(ach.target) >= 1e12) {
+      addLine(card, `${formatNumber(left)} 강화 수치 남음`);
+    } else {
+      addLine(card, `+${formatNumber(left)}강 남음`);
+    }
+
+    if (ach.desc) {
+      addLine(card, ach.desc, true);
+    }
+
+    upgradeList.appendChild(card);
+  });
 }
-function addLine(card,text){
-  const l = document.createElement('div');
-  l.className = 'ach-progress';
-  l.innerText = text;
-  card.appendChild(l);
+
+function renderCodex(list) {
+  codexList.innerHTML = '';
+
+  const allMonsterIds = Array.isArray(Achievement.allMonsterIds) ? Achievement.allMonsterIds : [];
+  const totalMonsters = allMonsterIds.length;
+
+  list.forEach((ach) => {
+    const done = Boolean(Achievement.unlocked[ach.id]);
+    const card = makeCard(ach.title, done);
+
+    const requiredKills = toSafeNumber(ach.allMonsterMinKills);
+    const satisfied = allMonsterIds.reduce((sum, monsterId) => {
+      return sum + (toSafeNumber(GameData.killStats?.[monsterId]) >= requiredKills ? 1 : 0);
+    }, 0);
+
+    const left = Math.max(0, totalMonsters - satisfied);
+    addLine(card, `조건: 모든 몬스터 ${formatNumber(requiredKills)}회 이상`);
+    addLine(card, `진행도: ${formatNumber(satisfied)} / ${formatNumber(totalMonsters)}`);
+    addLine(card, left === 0 ? '완료' : `${formatNumber(left)}종 남음`);
+
+    if (ach.desc) {
+      addLine(card, ach.desc, true);
+    }
+
+    codexList.appendChild(card);
+  });
 }
+
+function renderSummary(allAchievements) {
+  const done = getDoneCount(allAchievements);
+  achievementSummary.innerText = `달성 ${formatNumber(done)} / ${formatNumber(allAchievements.length)}`;
+}
+
+function renderAllAchievements() {
+  Achievement.checkAll();
+
+  const all = Array.isArray(Achievement.list) ? Achievement.list : [];
+  const huntAchievements = all.filter((ach) => ach.category === 'hunt');
+  const goldAchievements = all.filter((ach) => ach.category === 'gold');
+  const upgradeAchievements = all.filter((ach) => ach.category === 'upgrade');
+  const codexAchievements = all.filter((ach) => ach.category === 'codex');
+
+  renderHunt(huntAchievements);
+  renderGold(goldAchievements);
+  renderUpgrade(upgradeAchievements);
+  renderCodex(codexAchievements);
+  renderSummary(all);
+}
+
+renderAllAchievements();

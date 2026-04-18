@@ -1,90 +1,60 @@
+:root {
+    --shop-bg-top: #1a0f06;
+    --shop-bg-mid: #2a1a0a;
+    --shop-bg-bottom: #0e0703;
+    --shop-card: rgba(30, 18, 8, 0.82);
+    --shop-card-border: rgba(255, 201, 110, 0.32);
+    --shop-title: #ffe6b0;
+    --shop-text: #fbf1d8;
+    --shop-muted: #d4b88a;
+    --shop-accent: #ffd36a;
+    --shop-accent-strong: #f6a93b;
+    --shop-gold: #ffd76a;
+}
+
 .shop-wrapper {
+    position: relative;
     max-width: 420px;
-    height: 100vh;
+    height: 100dvh;
     margin: auto;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 15% 12%, rgba(255, 184, 77, 0.18), transparent 34%),
+        radial-gradient(circle at 85% 90%, rgba(255, 120, 60, 0.14), transparent 32%),
+        linear-gradient(180deg, var(--shop-bg-top), var(--shop-bg-mid) 45%, var(--shop-bg-bottom));
 }
 
-.shop-top {
-    display: flex;
-    justify-content: space-between;
-    padding: 14px;
-    background: rgba(0,0,0,0.8);
+.shop-wrapper::before,
+.shop-wrapper::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
 }
 
-.shop-title {
-    font-size: 20px;
-    font-weight: bold;
+.shop-wrapper::before {
+    inset: -10% -20% auto auto;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 211, 106, 0.2), transparent 68%);
 }
 
-.gold {
-    color: gold;
+.shop-wrapper::after {
+    inset: auto auto -20% -25%;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 145, 70, 0.18), transparent 70%);
 }
 
-.shop-body {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    padding: 16px;
-}
-
-.shop-item {
-    background: rgba(0,0,0,0.75);
-    border-radius: 14px;
-    padding: 14px;
-    text-align: center;
-    cursor: pointer;
-}
-
-.shop-item:hover {
-    background: rgba(255,255,255,0.08);
-}
-
-.item-name {
-    font-weight: bold;
-}
-
-.item-desc {
-    font-size: 12px;
-    color: #ccc;
-    margin: 6px 0;
-}
-
-.item-price {
-    color: gold;
-    margin-top: 6px;
-}
-
+.shop-top,
+.shop-body,
 .back-btn {
-    margin: 12px;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(180deg, #444, #222);
-    color: white;
-}
-
-.shop-body {
-    flex: 1;
-    background-image: url("../images/backgrounds/shop.png"); /* 👈 여기 */
-    background-size: cover;
-    background-position: center;
-
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 16px;
-    padding: 20px;
-}
-
-.shop-wrapper {
-    max-width: 420px;
-    height: 100vh;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    z-index: 1;
 }
 
 /* 상단 */
@@ -92,111 +62,190 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px;
-    background: rgba(0,0,0,0.8);
+    padding: 14px 16px;
+    background: linear-gradient(180deg, rgba(12, 6, 2, 0.95), rgba(12, 6, 2, 0.6));
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(255, 210, 120, 0.22);
 }
 
 .shop-title {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    color: var(--shop-title);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55), 0 0 8px rgba(255, 180, 80, 0.25);
 }
 
 .gold {
-    color: gold;
+    font-size: 14px;
+    font-weight: 800;
+    color: #2a1900;
+    background: linear-gradient(180deg, #ffe4a2, #ffc85f);
+    border-radius: 999px;
+    padding: 6px 14px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 236, 178, 0.6);
 }
 
-/* 🔥 아이템 세로 리스트 */
+/* 아이템 리스트 */
 .shop-body {
     flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 14px 14px 20px;
     display: flex;
-    flex-direction: column;   /* 위 → 아래 */
+    flex-direction: column;
     gap: 12px;
-    padding: 16px;
-
-    background-image: url("../images/backgrounds/shop.png");
-    background-size: cover;
-    background-position: center;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 210, 120, 0.55) rgba(0, 0, 0, 0.35);
 }
 
-/* 🔥 가로로 쭉 늘어나는 아이템 */
+/* 아이템 카드 */
 .shop-item {
     width: 100%;
     display: flex;
-    justify-content: space-between; /* 좌/우 분리 */
+    justify-content: space-between;
     align-items: center;
+    gap: 10px;
 
-    background: rgba(0,0,0,0.75);
+    background: linear-gradient(160deg, rgba(55, 32, 12, 0.9), var(--shop-card));
+    border: 1px solid var(--shop-card-border);
     border-radius: 14px;
-    padding: 14px;
+    padding: 14px 14px;
     cursor: pointer;
+    box-shadow:
+        0 10px 22px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 220, 160, 0.1);
+    transition: transform 0.12s ease, border-color 0.12s ease, filter 0.12s ease;
+    animation: shopCardIn 0.35s ease-out both;
+    position: relative;
+    overflow: hidden;
+}
+
+.shop-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 40%, rgba(255, 220, 150, 0.08) 50%, transparent 60%);
+    pointer-events: none;
 }
 
 .shop-item:hover {
-    background: rgba(255,255,255,0.08);
+    transform: translateY(-1px);
+    border-color: rgba(255, 220, 140, 0.65);
+    filter: brightness(1.08);
+}
+
+.shop-item:active {
+    transform: translateY(1px);
 }
 
 /* 왼쪽 (이름 + 설명) */
 .item-left {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
+    min-width: 0;
+    flex: 1;
 }
 
 .item-name {
     font-size: 15px;
-    font-weight: bold;
+    font-weight: 800;
+    color: var(--shop-text);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .item-desc {
     font-size: 12px;
-    color: #ccc;
+    color: var(--shop-muted);
+    line-height: 1.35;
 }
 
 /* 오른쪽 (가격) */
 .item-right {
-    font-size: 14px;
-    color: gold;
+    flex: 0 0 auto;
+}
+
+.item-price {
+    font-size: 13px;
+    font-weight: 800;
+    color: #2a1900;
+    background: linear-gradient(180deg, #ffe4a2, #ffc85f);
+    border: 1px solid rgba(255, 236, 178, 0.6);
+    border-radius: 10px;
+    padding: 7px 11px;
     white-space: nowrap;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* 특별 상품 (200% 강화권) */
+#double-item {
+    background: linear-gradient(160deg, rgba(90, 25, 25, 0.92), rgba(50, 12, 12, 0.82));
+    border-color: rgba(255, 140, 110, 0.55);
+    box-shadow:
+        0 10px 26px rgba(180, 40, 40, 0.35),
+        inset 0 1px 0 rgba(255, 200, 180, 0.15);
+}
+
+#double-item .item-name {
+    color: #ffd6c2;
+    text-shadow: 0 0 8px rgba(255, 120, 70, 0.5);
+}
+
+#double-item .item-price {
+    background: linear-gradient(180deg, #ffb9a0, #ff7a50);
+    color: #2a0a00;
+    border-color: rgba(255, 200, 170, 0.7);
 }
 
 /* 뒤로가기 */
 .back-btn {
-    margin: 12px;
+    margin: 10px 12px 14px;
     padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(180deg, #444, #222);
-    color: white;
+    border-radius: 11px;
+    border: 1px solid rgba(255, 210, 120, 0.28);
+    background: linear-gradient(180deg, #4a3420, #231609);
+    color: var(--shop-title);
+    font-weight: 800;
+    font-size: 14px;
     cursor: pointer;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    transition: filter 0.12s ease, transform 0.12s ease;
 }
 
-/* 상점 목록 스크롤 */
-.shop-wrapper {
-    height: 100dvh;
-    overflow: hidden;
+.back-btn:hover {
+    filter: brightness(1.12);
 }
 
-.shop-body {
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.45) rgba(0, 0, 0, 0.35);
+.back-btn:active {
+    transform: translateY(1px);
 }
 
+/* 스크롤바 */
 .shop-body::-webkit-scrollbar {
     width: 8px;
 }
 
 .shop-body::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.35);
-    border-radius: 8px;
+    background: rgba(10, 5, 2, 0.5);
+    border-radius: 10px;
 }
 
 .shop-body::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.45);
-    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(255, 214, 129, 0.75), rgba(255, 153, 62, 0.72));
+    border-radius: 10px;
 }
 
-
+@keyframes shopCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

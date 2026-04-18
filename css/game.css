@@ -245,6 +245,42 @@
     max-width: 360px;
 }
 
+.battle-potions {
+    width: 100%;
+    max-width: 360px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.potion-btn {
+    padding: 10px 6px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: linear-gradient(180deg, #4c6ef5, #2b4fbf);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.potion-btn:disabled {
+    background: linear-gradient(180deg, #7f889a, #646d80);
+    cursor: not-allowed;
+    opacity: 0.82;
+}
+
+.potion-count {
+    font-size: 11px;
+    font-weight: 800;
+    color: #ffe89e;
+}
+
 .bottom-ui button {
     width: 100%;
     max-width: 360px;

@@ -149,6 +149,240 @@ const STAGE_STATUS_EFFECT_OVERRIDES = {
   "3:rift:4": [{ type: 'poison', chance: 0.30 }, { type: 'bleed', chance: 0.30 }, { type: 'shock', chance: 0.26 }, { type: 'heavy', chance: 0.24 }]
 };
 
+// 일반 몬스터 패턴(요청 반영):
+// - 1~2 스테이지: 스킬 1개
+// - 3~4 스테이지: 스킬 2개
+// - 적용 지역: 5스테이지 지역 + 3스테이지 지역(space/hell) + 균열 일반몹(rift 1~3)
+//   (divine는 이번 단계에서 제외)
+const NORMAL_PATTERN_TARGET_AREAS = [
+  'grass',
+  'orc',
+  'dragon',
+  'space',
+  'cave',
+  'grave',
+  'demon',
+  'hell',
+  'atlantis',
+  'underworld',
+  'thunder',
+  'rift'
+];
+
+const AREA_WORLD_MAP = {
+  grass: 1,
+  orc: 1,
+  dragon: 1,
+  space: 1,
+  cave: 2,
+  grave: 2,
+  demon: 2,
+  hell: 2,
+  atlantis: 3,
+  underworld: 3,
+  thunder: 3,
+  rift: 3
+};
+
+const AREA_NORMAL_PATTERN_MAX_STAGE = {
+  space: 2,
+  hell: 2,
+  rift: 3
+};
+
+const AREA_FORCE_PATTERN_COUNT = {
+  space: 3,
+  hell: 3,
+  rift: 3
+};
+
+const NORMAL_PATTERN_STAGE_NAME_MAP = {
+  grass: {
+    1: ['초원 잎날 찌르기'],
+    2: ['이끼 덩굴 감기'],
+    3: ['비옥 토양 폭발', '수액 침식 탄환'],
+    4: ['자연의 난타', '뿌리 대압착']
+  },
+  orc: {
+    1: ['풋내기 도끼 흠집'],
+    2: ['전사의 어깨치기'],
+    3: ['광전 참격', '전장의 내려찍기'],
+    4: ['붉은 포효 난사', '부족장 전진 강타']
+  },
+  dragon: {
+    1: ['새끼 용 송곳니'],
+    2: ['불꽃 비늘 절단'],
+    3: ['화염 발톱 폭주', '용린 파편 사격'],
+    4: ['다크 브레스 분출', '하늘 꼬리 후려치기']
+  },
+  space: {
+    1: ['성운 잔광 사격', '궤도 파편 산개', '성계 반동 충격'],
+    2: ['은하 반전 충돌', '플라즈마 축퇴 포격', '별무리 왜곡 낙하']
+  },
+  cave: {
+    1: ['동굴 박쥐 급습'],
+    2: ['어둠 막타 물기'],
+    3: ['흡혈 선회 베기', '초음파 균열'],
+    4: ['광폭 날개 난타', '암야 낙하 돌진']
+  },
+  grave: {
+    1: ['해골 단검 긁기'],
+    2: ['저주 화살 침투'],
+    3: ['기사의 뼈창 돌격', '망자의 균열'],
+    4: ['사령 분쇄 낫질', '관문 강제 개방']
+  },
+  demon: {
+    1: ['하수인 화염 손톱'],
+    2: ['악마 검막 찌르기'],
+    3: ['마법진 붕괴 광선', '지옥 불씨 난무'],
+    4: ['타락 군주의 강림 베기', '심연 파멸 충격']
+  },
+  hell: {
+    1: ['탐욕 망령 흡수', '공허 갈증 분출', '영혼 파편 폭식'],
+    2: ['질투 망령 왜곡', '질식의 그림자 찢기', '불신의 낙하 심판']
+  },
+  atlantis: {
+    1: ['산호 창날 찌르기'],
+    2: ['해마 창격 돌파'],
+    3: ['잠수꾼 유영 절단', '심해 압력 충돌'],
+    4: ['크라켄 촉수 난타', '대해수 굴절 파동']
+  },
+  underworld: {
+    1: ['영혼의 한기 손톱'],
+    2: ['지옥견 송곳니 폭발'],
+    3: ['사신 그림자 절개', '명계 기류 전단'],
+    4: ['스틱스 침잠 압박', '망령 사슬 수축']
+  },
+  thunder: {
+    1: ['구름 파편 타격'],
+    2: ['번개 박쥐 전류 물기'],
+    3: ['폭풍 기사 전기베기', '낙뢰 분산 사출'],
+    4: ['천둥 골렘 대지 방전', '청뢰 중력 강타']
+  },
+  rift: {
+    1: ['확률 붕괴 사격', '주사위 파열탄', '변칙 궤도 낙하'],
+    2: ['양면 절단 반전', '거울 경로 충돌', '뒤집힌 인과 강타'],
+    3: ['균형 축 붕괴', '판결 편향 탄환', '저울 역류 압쇄']
+  }
+};
+
+function buildNormalPatternTable() {
+  const table = {};
+  const clampLocal = (value) => Math.max(0, Math.min(1, Number(value) || 0));
+  const fallbackStatuses = ['heavy', 'bleed', 'burn', 'shock', 'poison', 'frost'];
+
+  NORMAL_PATTERN_TARGET_AREAS.forEach((targetArea) => {
+    const worldNo = Number(AREA_WORLD_MAP[targetArea] || 1);
+    const profile = AREA_STATUS_EFFECT_PROFILE[targetArea] || [];
+    const stageNameMap = NORMAL_PATTERN_STAGE_NAME_MAP[targetArea] || {};
+    const areaIndex = Math.max(0, NORMAL_PATTERN_TARGET_AREAS.indexOf(targetArea));
+
+    const getStatus = (offset) => {
+      if (profile.length > 0) {
+        return profile[offset % profile.length]?.type || profile[0].type;
+      }
+      return fallbackStatuses[(areaIndex + offset) % fallbackStatuses.length];
+    };
+
+    const maxNormalStage = Number(AREA_NORMAL_PATTERN_MAX_STAGE[targetArea] || 4);
+    for (let stageNo = 1; stageNo <= maxNormalStage; stageNo += 1) {
+      const stageKey = `${worldNo}:${targetArea}:${stageNo}`;
+      const forcedPatternCount = Number(AREA_FORCE_PATTERN_COUNT[targetArea] || 0);
+      const patternCount = forcedPatternCount > 0 ? forcedPatternCount : (stageNo <= 2 ? 1 : 2);
+      const stageNames = stageNameMap[stageNo] || [];
+      const patterns = [];
+
+      if (patternCount === 1) {
+        const name = stageNames[0] || `${targetArea} 단일 기술 ${stageNo}`;
+        const primary = getStatus(stageNo - 1);
+        patterns.push({
+          name,
+          weight: 100,
+          damageMul: Number((1 + stageNo * 0.09 + areaIndex * 0.01).toFixed(2)),
+          effects: [{ type: primary, chance: clampLocal(0.45 + stageNo * 0.09 + areaIndex * 0.01) }]
+        });
+      } else if (patternCount === 2) {
+        const firstName = stageNames[0] || `${targetArea} 기술 A ${stageNo}`;
+        const secondName = stageNames[1] || `${targetArea} 기술 B ${stageNo}`;
+        const primary = getStatus(stageNo - 1);
+        const secondary = getStatus(stageNo);
+        const tertiary = getStatus(stageNo + 1);
+
+        patterns.push({
+          name: firstName,
+          weight: 54 - Math.min(6, areaIndex),
+          damageMul: Number((1 + stageNo * 0.1 + areaIndex * 0.01).toFixed(2)),
+          effects: [
+            { type: primary, chance: clampLocal(0.58 + stageNo * 0.05) },
+            ...(secondary !== primary
+              ? [{ type: secondary, chance: clampLocal(0.34 + stageNo * 0.04 + areaIndex * 0.005) }]
+              : [])
+          ]
+        });
+
+        patterns.push({
+          name: secondName,
+          weight: 46 + Math.min(6, areaIndex),
+          damageMul: Number((1 + stageNo * 0.12 + areaIndex * 0.012).toFixed(2)),
+          effects: [
+            { type: tertiary, chance: clampLocal(0.63 + stageNo * 0.045) },
+            ...(stageNo >= 4 && tertiary !== 'heavy' ? [{ type: 'heavy', chance: 0.42 }] : [])
+          ]
+        });
+      } else {
+        const firstName = stageNames[0] || `${targetArea} 기술 A ${stageNo}`;
+        const secondName = stageNames[1] || `${targetArea} 기술 B ${stageNo}`;
+        const thirdName = stageNames[2] || `${targetArea} 기술 C ${stageNo}`;
+        const primary = getStatus(stageNo - 1);
+        const secondary = getStatus(stageNo);
+        const tertiary = getStatus(stageNo + 1);
+        const quaternary = getStatus(stageNo + 2);
+
+        patterns.push({
+          name: firstName,
+          weight: 36,
+          damageMul: Number((1 + stageNo * 0.1 + areaIndex * 0.01).toFixed(2)),
+          effects: [
+            { type: primary, chance: clampLocal(0.56 + stageNo * 0.05) },
+            ...(secondary !== primary
+              ? [{ type: secondary, chance: clampLocal(0.32 + stageNo * 0.04) }]
+              : [])
+          ]
+        });
+
+        patterns.push({
+          name: secondName,
+          weight: 33,
+          damageMul: Number((1 + stageNo * 0.12 + areaIndex * 0.012).toFixed(2)),
+          effects: [
+            { type: tertiary, chance: clampLocal(0.62 + stageNo * 0.04) },
+            ...(quaternary !== tertiary
+              ? [{ type: quaternary, chance: clampLocal(0.28 + stageNo * 0.04) }]
+              : [])
+          ]
+        });
+
+        patterns.push({
+          name: thirdName,
+          weight: 31,
+          damageMul: Number((1 + stageNo * 0.15 + areaIndex * 0.015).toFixed(2)),
+          effects: [
+            { type: quaternary, chance: clampLocal(0.66 + stageNo * 0.03) },
+            ...(quaternary !== 'heavy' ? [{ type: 'heavy', chance: 0.4 }] : []),
+            ...(secondary !== quaternary ? [{ type: secondary, chance: 0.26 }] : [])
+          ]
+        });
+      }
+
+      table[stageKey] = patterns;
+    }
+  });
+
+  return table;
+}
+
+const NORMAL_PATTERN_TABLE = buildNormalPatternTable();
+
 // 보스 패턴: 각 보스 스테이지마다 독립 패턴
 const BOSS_PATTERN_TABLE = {
   "1:grass:5": [
@@ -536,6 +770,12 @@ const monsterHpText = document.getElementById('monster-hp-text');
 const log = document.getElementById('log');
 const goldText = document.getElementById('gold-text');
 const damageText = document.getElementById('damage-text');
+const potionSmallBtn = document.getElementById('btn-potion-small');
+const potionMediumBtn = document.getElementById('btn-potion-medium');
+const potionLargeBtn = document.getElementById('btn-potion-large');
+const potionSmallCountEl = document.getElementById('potion-count-small');
+const potionMediumCountEl = document.getElementById('potion-count-medium');
+const potionLargeCountEl = document.getElementById('potion-count-large');
 const playerStatusEffectsEl = document.createElement('div');
 const playerHpBarEl = playerStatusEl ? playerStatusEl.querySelector('.hp-bar') : null;
 const patternFxTextEl = document.createElement('div');
@@ -602,10 +842,22 @@ let playerAttackLockUntil = 0;
 
 const DEFAULT_MONSTER_ATTACK_INTERVAL_MS = 5000;
 const LOW_HP_WARNING_RATIO = 0.2;
+const HP_POTION_MAX_STACK = 20;
+const HP_POTION_KEY_MAP = {
+  small: 'hpPotionSmall',
+  medium: 'hpPotionMedium',
+  large: 'hpPotionLarge'
+};
+const HP_POTION_HEAL_RATIO_MAP = {
+  small: 0.2,
+  medium: 0.5,
+  large: 1
+};
 const defaultMonsterAttackDamage = Math.max(1, Math.ceil((data.lvl + 1) / 40));
 const stageDamageKey = `${world}:${area}:${stageId}`;
 const stageStatusEffectPool = getStageStatusEffects(stageDamageKey, area, stageId);
 const stageBossPatterns = BOSS_PATTERN_TABLE[stageDamageKey] || null;
+const stageNormalPatterns = NORMAL_PATTERN_TABLE[stageDamageKey] || null;
 const configuredBossPatternIntervalMs = Number(BOSS_PATTERN_INTERVAL_MS[stageDamageKey]);
 const monsterAttackIntervalMs =
   stageBossPatterns && Number.isFinite(configuredBossPatternIntervalMs) && configuredBossPatternIntervalMs > 0
@@ -647,6 +899,15 @@ if (GameData.protectTicket <= 0 && GameData.protectActive) {
   GameData.save();
 }
 
+['hpPotionSmall', 'hpPotionMedium', 'hpPotionLarge'].forEach((key) => {
+  const value = Math.max(0, Math.floor(Number(GameData[key]) || 0));
+  const clamped = Math.min(HP_POTION_MAX_STACK, value);
+  if (clamped !== value) {
+    GameData[key] = clamped;
+    GameData.save();
+  }
+});
+
 function updateMonsterHP() {
   const ratio = data.hp > 0 ? (hp / data.hp) * 100 : 0;
   monsterHpFill.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
@@ -676,6 +937,75 @@ function updatePlayerHP() {
   } else if (!isLowHp) {
     lowHpWarned = false;
   }
+
+  refreshBattlePotionUI();
+}
+
+function getPotionCount(type) {
+  const key = HP_POTION_KEY_MAP[type];
+  if (!key) return 0;
+  return Math.max(0, Math.floor(Number(GameData[key]) || 0));
+}
+
+function refreshBattlePotionUI() {
+  const maxHpForBattle =
+    typeof GameData.getEffectiveMaxHp === 'function'
+      ? GameData.getEffectiveMaxHp()
+      : GameData.maxHp;
+  const hpIsFull = GameData.currentHp >= maxHpForBattle;
+  const unavailable = playerDead || dead;
+
+  const smallCount = getPotionCount('small');
+  const mediumCount = getPotionCount('medium');
+  const largeCount = getPotionCount('large');
+
+  if (potionSmallCountEl) potionSmallCountEl.innerText = `x${smallCount}`;
+  if (potionMediumCountEl) potionMediumCountEl.innerText = `x${mediumCount}`;
+  if (potionLargeCountEl) potionLargeCountEl.innerText = `x${largeCount}`;
+
+  if (potionSmallBtn) {
+    potionSmallBtn.disabled = unavailable || hpIsFull || smallCount <= 0;
+  }
+  if (potionMediumBtn) {
+    potionMediumBtn.disabled = unavailable || hpIsFull || mediumCount <= 0;
+  }
+  if (potionLargeBtn) {
+    potionLargeBtn.disabled = unavailable || hpIsFull || largeCount <= 0;
+  }
+}
+
+function useHpPotion(type) {
+  const key = HP_POTION_KEY_MAP[type];
+  const healRatio = Number(HP_POTION_HEAL_RATIO_MAP[type]);
+  if (!key || !Number.isFinite(healRatio)) return;
+  if (playerDead || dead) return;
+
+  const currentCount = getPotionCount(type);
+  if (currentCount <= 0) {
+    refreshBattlePotionUI();
+    return;
+  }
+
+  const maxHpForBattle =
+    typeof GameData.getEffectiveMaxHp === 'function'
+      ? GameData.getEffectiveMaxHp()
+      : GameData.maxHp;
+  if (GameData.currentHp >= maxHpForBattle) {
+    log.innerText = 'HP가 이미 가득합니다.';
+    refreshBattlePotionUI();
+    return;
+  }
+
+  const healAmount = Math.max(1, Math.floor(maxHpForBattle * healRatio));
+  const beforeHp = GameData.currentHp;
+  GameData[key] = Math.max(0, currentCount - 1);
+  GameData.heal(healAmount);
+  const recovered = Math.max(0, GameData.currentHp - beforeHp);
+
+  const labels = { small: 'HP 물약(소)', medium: 'HP 물약(중)', large: 'HP 물약(대)' };
+  log.innerText = `${labels[type]} 사용! +${recovered} HP`;
+
+  updatePlayerHP();
 }
 
 function hasBattleSessionActivity() {
@@ -1038,7 +1368,10 @@ function rollEffectsByChance(effectEntries) {
 }
 
 function buildBossPatternAttack() {
-  if (!Array.isArray(stageBossPatterns) || stageBossPatterns.length === 0) {
+  const hasBossPatterns = Array.isArray(stageBossPatterns) && stageBossPatterns.length > 0;
+  const hasNormalPatterns = Array.isArray(stageNormalPatterns) && stageNormalPatterns.length > 0;
+
+  if (!hasBossPatterns && !hasNormalPatterns) {
     return {
       attackName: '기본 공격',
       damageMul: 1,
@@ -1046,9 +1379,10 @@ function buildBossPatternAttack() {
     };
   }
 
-  const chosen = pickWeightedPattern(stageBossPatterns);
+  const sourcePatterns = hasBossPatterns ? stageBossPatterns : stageNormalPatterns;
+  const chosen = pickWeightedPattern(sourcePatterns);
   return {
-    attackName: chosen.name || '보스 패턴',
+    attackName: chosen.name || (hasBossPatterns ? '보스 패턴' : '특수 기술'),
     damageMul: Number(chosen.damageMul) || 1,
     statusEffects: rollEffectsByChance(chosen.effects)
   };
@@ -1094,7 +1428,9 @@ function clearBossPatternEffectVisual() {
 }
 
 function playBossPatternEffect(attackPlan) {
-  if (!stageBossPatterns || !attackPlan) return;
+  const hasBossPatterns = Array.isArray(stageBossPatterns) && stageBossPatterns.length > 0;
+  const hasNormalPatterns = Array.isArray(stageNormalPatterns) && stageNormalPatterns.length > 0;
+  if ((!hasBossPatterns && !hasNormalPatterns) || !attackPlan) return;
 
   clearBossPatternEffectVisual();
 

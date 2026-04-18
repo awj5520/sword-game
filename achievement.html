@@ -10,25 +10,34 @@
 <body>
 
 <div class="achievement-wrapper">
+    <div class="achievement-phone">
+        <div class="title">업적</div>
+        <div id="achievement-summary" class="achievement-summary"></div>
 
-    <div class="title">🏆 업적</div>
+        <section class="section-block">
+            <div class="section-title">⚔️ 사냥 업적</div>
+            <div id="hunt-achievement-list" class="ach-grid"></div>
+        </section>
 
-    <!-- ⚔️ 사냥 업적 -->
-    <div class="section-title">⚔️ 사냥 업적</div>
-    <div id="hunt-achievement-list" class="ach-grid"></div>
+        <section class="section-block">
+            <div class="section-title">💰 골드 업적</div>
+            <div id="gold-achievement-list" class="ach-grid"></div>
+        </section>
 
-    <!-- 💰 골드 업적 -->
-    <div class="section-title">💰 골드 업적</div>
-    <div id="gold-achievement-list" class="ach-grid"></div>
+        <section class="section-block">
+            <div class="section-title">🔨 강화 업적</div>
+            <div id="upgrade-achievement-list" class="ach-grid"></div>
+        </section>
 
-    <div class="section-title">🔨 강화 업적</div>
-<div id="upgrade-achievement-list" class="ach-grid"></div>
+        <section class="section-block">
+            <div class="section-title">📘 도감 업적</div>
+            <div id="codex-achievement-list" class="ach-grid"></div>
+        </section>
 
-
-    <button class="back-btn" onclick="location.href='index.html'">
-        🔙 돌아가기
-    </button>
-
+        <button class="back-btn" onclick="location.href='index.html'">
+            돌아가기
+        </button>
+    </div>
 </div>
 
 <script src="js/gamedata.js"></script>

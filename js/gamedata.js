@@ -101,6 +101,9 @@ const GameData = {
   antidoteBurn: Number(localStorage.getItem('antidoteBurn')) || 0,
   antidoteShock: Number(localStorage.getItem('antidoteShock')) || 0,
   antidoteFrost: Number(localStorage.getItem('antidoteFrost')) || 0,
+  hpPotionSmall: Number(localStorage.getItem('hpPotionSmall')) || 0,
+  hpPotionMedium: Number(localStorage.getItem('hpPotionMedium')) || 0,
+  hpPotionLarge: Number(localStorage.getItem('hpPotionLarge')) || 0,
 
   noDropActive: localStorage.getItem('noDropActive') === 'true',
   guaranteeActive: localStorage.getItem('guaranteeActive') === 'true',
@@ -352,6 +355,9 @@ const GameData = {
     this.ensureLootInventory();
     this.ensureEquippedItems();
     this.clampCurrentHpToMax();
+    this.hpPotionSmall = Math.min(20, Math.max(0, Math.floor(Number(this.hpPotionSmall) || 0)));
+    this.hpPotionMedium = Math.min(20, Math.max(0, Math.floor(Number(this.hpPotionMedium) || 0)));
+    this.hpPotionLarge = Math.min(20, Math.max(0, Math.floor(Number(this.hpPotionLarge) || 0)));
 
     localStorage.setItem('level', this.level);
     localStorage.setItem('damage', this.damage);
@@ -374,6 +380,9 @@ const GameData = {
     localStorage.setItem('antidoteBurn', this.antidoteBurn);
     localStorage.setItem('antidoteShock', this.antidoteShock);
     localStorage.setItem('antidoteFrost', this.antidoteFrost);
+    localStorage.setItem('hpPotionSmall', this.hpPotionSmall);
+    localStorage.setItem('hpPotionMedium', this.hpPotionMedium);
+    localStorage.setItem('hpPotionLarge', this.hpPotionLarge);
     localStorage.setItem('noDropActive', this.noDropActive);
     localStorage.setItem('guaranteeActive', this.guaranteeActive);
     localStorage.setItem('protectActive', this.protectActive);
@@ -428,6 +437,9 @@ const GameData = {
       antidoteBurn: 0,
       antidoteShock: 0,
       antidoteFrost: 0,
+      hpPotionSmall: 0,
+      hpPotionMedium: 0,
+      hpPotionLarge: 0,
       noDropActive: false,
       guaranteeActive: false,
       protectActive: false,
