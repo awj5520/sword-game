@@ -71,6 +71,235 @@ function ensureStatusNullifyInventoryItems() {
   });
 }
 
+function ensureSkillResetItem() {
+  if (document.getElementById('skill-reset-count')) return;
+  const body = document.querySelector('.inventory-body');
+  if (!body) return;
+
+  const item = document.createElement('div');
+  item.className = 'inv-item';
+  item.id = 'skill-reset-item';
+  item.innerHTML = `
+    <div class="inv-name">
+      스킬 초기화권
+      <span id="skill-reset-count" class="inv-count"></span>
+    </div>
+    <div class="inv-info">장착된 액티브/패시브 스킬 슬롯을 모두 초기화</div>
+    <div id="skill-reset-info" class="inv-info"></div>
+    <button id="btn-skill-reset" onclick="useSkillResetTicket()">사용</button>
+  `;
+
+  const gearPanel = document.getElementById('gear-action-panel');
+  if (gearPanel && gearPanel.parentNode) {
+    gearPanel.parentNode.insertBefore(item, gearPanel);
+  } else {
+    body.appendChild(item);
+  }
+}
+
+function ensureSkillLoadoutUI() {
+  if (document.getElementById('skill-loadout-panel')) return;
+  const body = document.querySelector('.inventory-body');
+  if (!body) return;
+
+  const panel = document.createElement('div');
+  panel.id = 'skill-loadout-panel';
+  panel.className = 'inv-item skill-loadout-panel';
+  panel.innerHTML = `
+    <div class="inv-name">스킬 세팅</div>
+    <div class="inv-info">드래그로 슬롯에 배치하세요. (액티브 3칸 / 패시브 3칸)</div>
+    <div id="skill-level-meta" class="inv-info"></div>
+    <div class="skill-loadout-grid">
+      <div class="skill-loadout-column">
+        <div class="skill-section-title">액티브 스킬</div>
+        <div id="active-slot-row" class="skill-slot-row"></div>
+        <div id="active-skill-list" class="skill-card-list"></div>
+      </div>
+      <div class="skill-loadout-column">
+        <div class="skill-section-title">패시브 스킬</div>
+        <div id="passive-slot-row" class="skill-slot-row"></div>
+        <div id="passive-skill-list" class="skill-card-list"></div>
+      </div>
+    </div>
+  `;
+  body.insertBefore(panel, body.firstChild);
+}
+
+function getSkillSlotLabel(type, index) {
+  const prefix = type === 'active' ? '액티브' : '패시브';
+  return `${prefix} ${index + 1}`;
+}
+
+function attachSkillDragEvents() {
+  const panel = document.getElementById('skill-loadout-panel');
+  if (!panel) return;
+
+  panel.querySelectorAll('.skill-card').forEach((card) => {
+    card.addEventListener('dragstart', (event) => {
+      const payload = {
+        type: card.dataset.type,
+        skillId: card.dataset.skillId
+      };
+      event.dataTransfer?.setData('text/plain', JSON.stringify(payload));
+      event.dataTransfer.effectAllowed = 'move';
+    });
+  });
+
+  panel.querySelectorAll('.skill-slot').forEach((slot) => {
+    slot.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      slot.classList.add('drag-over');
+    });
+    slot.addEventListener('dragleave', () => {
+      slot.classList.remove('drag-over');
+    });
+    slot.addEventListener('drop', (event) => {
+      event.preventDefault();
+      slot.classList.remove('drag-over');
+      const raw = event.dataTransfer?.getData('text/plain');
+      if (!raw) return;
+      let payload = null;
+      try {
+        payload = JSON.parse(raw);
+      } catch {
+        return;
+      }
+      if (!payload || !payload.type || !payload.skillId) return;
+      if (payload.type !== slot.dataset.type) return;
+      equipSkillSlot(payload.type, Number(slot.dataset.slot), payload.skillId);
+    });
+  });
+}
+
+function equipSkillSlot(type, slotIndex, skillId) {
+  if (!window.PlayerSkills) return;
+  const ok = PlayerSkills.equipSkill(type, slotIndex, skillId);
+  if (!ok) {
+    alert('해금되지 않았거나 장착할 수 없는 스킬입니다.');
+    return;
+  }
+  refreshUI();
+}
+
+function unequipSkillSlot(type, slotIndex) {
+  if (!window.PlayerSkills) return;
+  PlayerSkills.equipSkill(type, slotIndex, null);
+  refreshUI();
+}
+
+function quickEquipSkill(type, skillId) {
+  if (!window.PlayerSkills) return;
+  const slots = PlayerSkills.getEquippedSkillIds(type);
+  const emptyIndex = slots.findIndex((id) => !id);
+  const targetIndex = emptyIndex >= 0 ? emptyIndex : 0;
+  equipSkillSlot(type, targetIndex, skillId);
+}
+
+function renderSkillLoadoutUI() {
+  const activeSlotRow = document.getElementById('active-slot-row');
+  const passiveSlotRow = document.getElementById('passive-slot-row');
+  const activeList = document.getElementById('active-skill-list');
+  const passiveList = document.getElementById('passive-skill-list');
+  const levelMeta = document.getElementById('skill-level-meta');
+  if (!activeSlotRow || !passiveSlotRow || !activeList || !passiveList) return;
+
+  if (!window.PlayerSkills) {
+    activeSlotRow.innerHTML = '<div class="skill-empty">스킬 모듈을 불러오지 못했습니다.</div>';
+    passiveSlotRow.innerHTML = '';
+    activeList.innerHTML = '';
+    passiveList.innerHTML = '';
+    return;
+  }
+
+  PlayerSkills.ensureGameData();
+
+  const equippedActive = PlayerSkills.getEquippedSkillIds('active');
+  const equippedPassive = PlayerSkills.getEquippedSkillIds('passive');
+  const unlockedActive = PlayerSkills.getUnlockedSkills('active');
+  const unlockedPassive = PlayerSkills.getUnlockedSkills('passive');
+  const currentLevel = Number(GameData.level) || 0;
+
+  if (levelMeta) {
+    levelMeta.innerText = `현재 강화 +${currentLevel} | 액티브 ${unlockedActive.length}개 해금 / 패시브 ${unlockedPassive.length}개 해금`;
+  }
+
+  activeSlotRow.innerHTML = equippedActive
+    .map((skillId, index) => {
+      const skill = PlayerSkills.getSkillById('active', skillId);
+      return `
+        <div class="skill-slot" data-type="active" data-slot="${index}">
+          <div class="skill-slot-label">${getSkillSlotLabel('active', index)}</div>
+          <div class="skill-slot-name">${skill ? skill.name : '비어 있음'}</div>
+          <button class="skill-slot-clear-btn" onclick="unequipSkillSlot('active', ${index})">해제</button>
+        </div>
+      `;
+    })
+    .join('');
+
+  passiveSlotRow.innerHTML = equippedPassive
+    .map((skillId, index) => {
+      const skill = PlayerSkills.getSkillById('passive', skillId);
+      return `
+        <div class="skill-slot" data-type="passive" data-slot="${index}">
+          <div class="skill-slot-label">${getSkillSlotLabel('passive', index)}</div>
+          <div class="skill-slot-name">${skill ? skill.name : '비어 있음'}</div>
+          <button class="skill-slot-clear-btn" onclick="unequipSkillSlot('passive', ${index})">해제</button>
+        </div>
+      `;
+    })
+    .join('');
+
+  if (unlockedActive.length === 0) {
+    activeList.innerHTML = '<div class="skill-empty">강화 레벨을 올리면 액티브 스킬이 해금됩니다.</div>';
+  } else {
+    activeList.innerHTML = unlockedActive
+      .map((skill) => `
+        <div class="skill-card ${equippedActive.includes(skill.id) ? 'is-equipped' : ''}"
+             draggable="true"
+             data-type="active"
+             data-skill-id="${skill.id}"
+             onclick="quickEquipSkill('active', '${skill.id}')">
+          <div class="skill-card-title">${skill.name}</div>
+          <div class="skill-card-desc">${skill.description}</div>
+          <div class="skill-card-meta">해금 +${skill.unlockLevel} | 쿨 ${skill.cooldownSec}초</div>
+        </div>
+      `)
+      .join('');
+  }
+
+  if (unlockedPassive.length === 0) {
+    passiveList.innerHTML = '<div class="skill-empty">강화 레벨을 올리면 패시브 스킬이 해금됩니다.</div>';
+  } else {
+    passiveList.innerHTML = unlockedPassive
+      .map((skill) => `
+        <div class="skill-card ${equippedPassive.includes(skill.id) ? 'is-equipped' : ''}"
+             draggable="true"
+             data-type="passive"
+             data-skill-id="${skill.id}"
+             onclick="quickEquipSkill('passive', '${skill.id}')">
+          <div class="skill-card-title">${skill.name}</div>
+          <div class="skill-card-desc">${skill.description}</div>
+          <div class="skill-card-meta">해금 +${skill.unlockLevel}</div>
+        </div>
+      `)
+      .join('');
+  }
+
+  attachSkillDragEvents();
+}
+
+function useSkillResetTicket() {
+  if (!window.PlayerSkills) return;
+  if ((GameData.skillResetTicket || 0) <= 0) {
+    refreshUI();
+    return;
+  }
+  PlayerSkills.clearAllEquippedSkills(false);
+  GameData.skillResetTicket = Math.max(0, (GameData.skillResetTicket || 0) - 1);
+  GameData.save();
+  refreshUI();
+}
+
 function ensureGearUI() {
   const body = document.querySelector('.inventory-body');
   if (!body) return;
@@ -375,6 +604,23 @@ function refreshUI() {
     infoEl.innerText = item.value > 0 ? '보유 중 (자동 발동)' : '수량 없음';
   });
 
+  const srCount = document.getElementById('skill-reset-count');
+  const srInfo = document.getElementById('skill-reset-info');
+  const srBtn = document.getElementById('btn-skill-reset');
+  if (srCount && srInfo && srBtn) {
+    const count = Math.max(0, Math.floor(Number(GameData.skillResetTicket) || 0));
+    srCount.innerText = `x${count}`;
+    if (count > 0) {
+      srInfo.innerText = '사용 가능';
+      srBtn.innerText = '사용';
+      srBtn.disabled = false;
+    } else {
+      srInfo.innerText = '수량 없음';
+      srBtn.innerText = '사용 (불가)';
+      srBtn.disabled = true;
+    }
+  }
+
   setTextById('tok-atlantis', `x${GameData.atlantisToken || 0}`);
   setTextById('tok-underworld', `x${GameData.underworldToken || 0}`);
   setTextById('tok-thunder', `x${GameData.thunderToken || 0}`);
@@ -412,6 +658,7 @@ function refreshUI() {
 
   renderLootGrid();
   renderEquippedSummary();
+  renderSkillLoadoutUI();
 }
 
 function toggleNoDrop() {
@@ -488,5 +735,11 @@ function toggleFate(type) {
 ensureProtectInventoryItem();
 ensureStatusNullifyInventoryItems();
 ensureGearUI();
+ensureSkillResetItem();
+ensureSkillLoadoutUI();
 ensureEquipModal();
 refreshUI();
+
+window.unequipSkillSlot = unequipSkillSlot;
+window.quickEquipSkill = quickEquipSkill;
+window.useSkillResetTicket = useSkillResetTicket;

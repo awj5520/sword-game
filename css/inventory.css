@@ -365,6 +365,131 @@
     color: rgba(255, 255, 255, 0.7);
 }
 
+.skill-loadout-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skill-loadout-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.skill-loadout-column {
+    background: rgba(9, 20, 36, 0.62);
+    border: 1px solid rgba(255, 229, 164, 0.18);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.skill-section-title {
+    color: var(--inv-title);
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.skill-slot-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.skill-slot {
+    background: rgba(22, 36, 58, 0.82);
+    border: 1px dashed rgba(255, 232, 174, 0.35);
+    border-radius: 10px;
+    padding: 8px 6px;
+    min-height: 92px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+}
+
+.skill-slot.drag-over {
+    border-color: rgba(255, 213, 110, 0.95);
+    box-shadow: 0 0 0 2px rgba(255, 205, 100, 0.24);
+}
+
+.skill-slot-label {
+    font-size: 10px;
+    color: var(--inv-muted);
+    font-weight: 700;
+}
+
+.skill-slot-name {
+    font-size: 11px;
+    color: var(--inv-text);
+    font-weight: 700;
+    line-height: 1.25;
+    min-height: 28px;
+}
+
+.skill-slot-clear-btn {
+    margin-top: auto;
+    border: 1px solid rgba(255, 236, 178, 0.36);
+    border-radius: 8px;
+    background: linear-gradient(180deg, #ffe7aa, #ffc761);
+    color: #2a1900;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 4px;
+    cursor: pointer;
+}
+
+.skill-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.skill-card {
+    border: 1px solid rgba(255, 226, 152, 0.24);
+    border-radius: 10px;
+    padding: 8px;
+    background: rgba(13, 24, 42, 0.72);
+    cursor: grab;
+    user-select: none;
+}
+
+.skill-card:active {
+    cursor: grabbing;
+}
+
+.skill-card.is-equipped {
+    border-color: rgba(255, 211, 111, 0.75);
+    box-shadow: 0 0 0 1px rgba(255, 211, 111, 0.35);
+}
+
+.skill-card-title {
+    font-size: 12px;
+    color: var(--inv-text);
+    font-weight: 800;
+}
+
+.skill-card-desc {
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--inv-muted);
+}
+
+.skill-card-meta {
+    margin-top: 4px;
+    font-size: 10px;
+    color: var(--inv-accent);
+    font-weight: 700;
+}
+
+.skill-empty {
+    font-size: 12px;
+    color: var(--inv-muted);
+    padding: 6px 2px;
+}
+
 .back-btn {
     margin: 10px 12px 14px;
     padding: 12px;

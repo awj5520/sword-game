@@ -684,7 +684,7 @@ const riftStages = {
   1:{ name:'🎲 확률의 도사', monster:'rift_1.png', hp:900000, gold:1500000, lvl:230, speed:2.0, scale:4.0, achId:'rift_1', drop:'dice', dropRate:0.13, bg:'bg_rift_1.png' },
   2:{ name:'🌓 양면의 문지기', monster:'rift_2.png', hp:1100000, gold:1800000, lvl:235, speed:1.9, scale:3.5, achId:'rift_2', drop:'dual', dropRate:0.10, bg:'bg_rift_2.png' },
   3:{ name:'⚖️ 균형의 심판관', monster:'rift_3.png', hp:1300000, gold:2200000, lvl:240, speed:1.8, scale:2.4, achId:'rift_3', drop:'scale', dropRate:0.05, bg:'bg_rift_3.png' },
-  4:{ name:'🌀 심연의 분열체', monster:'rift_4.png', hp:1600000, gold:2800000, lvl:250, speed:1.7, scale:2.6, achId:'rift_4', drop:'chaos', dropRate:0.03, bg:'bg_rift_4.png' }
+  4:{ name:'🌀 심연의 분열체', monster:'rift_4.png', hp:1600000, gold:2800000, lvl:250, speed:1.7, scale:2.6, achId:'rift_4', drop:'chaos', dropRate:1.00, bg:'bg_rift_4.png' }
 };
 
 const STAGE_LEVEL_GAP = 10;
@@ -776,23 +776,34 @@ const potionLargeBtn = document.getElementById('btn-potion-large');
 const potionSmallCountEl = document.getElementById('potion-count-small');
 const potionMediumCountEl = document.getElementById('potion-count-medium');
 const potionLargeCountEl = document.getElementById('potion-count-large');
+const backBtn = document.getElementById('back-btn');
 const playerStatusEffectsEl = document.createElement('div');
+const playerPassiveEffectsEl = document.createElement('div');
 const playerHpBarEl = playerStatusEl ? playerStatusEl.querySelector('.hp-bar') : null;
 const patternFxTextEl = document.createElement('div');
+const activeSkillBarEl = document.createElement('div');
 
 stageEl.classList.add(area);
 
 playerStatusEffectsEl.className = 'status-effects';
+playerPassiveEffectsEl.className = 'passive-effects';
 if (playerStatusEl) {
   if (playerHpBarEl) {
     playerStatusEl.insertBefore(playerStatusEffectsEl, playerHpBarEl);
+    playerStatusEl.insertBefore(playerPassiveEffectsEl, playerHpBarEl.nextSibling);
   } else {
     playerStatusEl.appendChild(playerStatusEffectsEl);
+    playerStatusEl.appendChild(playerPassiveEffectsEl);
   }
 }
 
 patternFxTextEl.className = 'pattern-fx-text';
 stageEl.appendChild(patternFxTextEl);
+
+activeSkillBarEl.className = 'active-skill-bar';
+if (backBtn && backBtn.parentNode) {
+  backBtn.parentNode.insertBefore(activeSkillBarEl, backBtn);
+}
 
 /* ✅ 운명의 균열은 스테이지별 배경을 JS로 직접 적용 */
 if (area === 'rift' && data.bg) {
@@ -853,6 +864,43 @@ const HP_POTION_HEAL_RATIO_MAP = {
   medium: 0.5,
   large: 1
 };
+const ACTIVE_SKILL_SLOT_COUNT = 3;
+const activeSkillCooldownUntil = Array.from({ length: ACTIVE_SKILL_SLOT_COUNT }, () => 0);
+
+if (window.PlayerSkills?.ensureGameData) {
+  PlayerSkills.ensureGameData();
+}
+
+function getEquippedPassiveSkills() {
+  if (!window.PlayerSkills) return [];
+  return PlayerSkills.getEquippedSkills('passive');
+}
+
+let passiveSkillTotals = window.PlayerSkills
+  ? PlayerSkills.getPassiveTotals(getEquippedPassiveSkills())
+  : {
+      damageMul: 1,
+      skillDamageMul: 1,
+      maxHpMul: 1,
+      statusResistChance: 0,
+      dotDamageTakenMul: 1,
+      cooldownReduction: 0
+    };
+
+function refreshPassiveSkillTotals() {
+  if (!window.PlayerSkills) return passiveSkillTotals;
+  passiveSkillTotals = PlayerSkills.getPassiveTotals(getEquippedPassiveSkills());
+  return passiveSkillTotals;
+}
+
+function getBattleMaxHp() {
+  const baseMax =
+    typeof GameData.getEffectiveMaxHp === 'function'
+      ? GameData.getEffectiveMaxHp()
+      : GameData.maxHp;
+  const mul = Number(passiveSkillTotals.maxHpMul) || 1;
+  return Math.max(1, Math.floor(baseMax * mul));
+}
 const defaultMonsterAttackDamage = Math.max(1, Math.ceil((data.lvl + 1) / 40));
 const stageDamageKey = `${world}:${area}:${stageId}`;
 const stageStatusEffectPool = getStageStatusEffects(stageDamageKey, area, stageId);
@@ -876,15 +924,14 @@ const monsterAttackDamage =
 ========================= */
 log.innerText = `${data.name} 등장!`;
 goldText.innerText = `💰 ${GameData.gold}`;
-damageText.innerText = `공격력: ${GameData.getCurrentDamage()}`;
+refreshPassiveSkillTotals();
+damageText.innerText = `공격력: ${Math.max(1, Math.floor(GameData.getCurrentDamage() * (Number(passiveSkillTotals.damageMul) || 1)))}`;
 
 if (GameData.currentHp <= 0) {
-  GameData.healFull();
+  GameData.currentHp = getBattleMaxHp();
+  GameData.save();
 } else {
-  const maxHpForBattle =
-    typeof GameData.getEffectiveMaxHp === 'function'
-      ? GameData.getEffectiveMaxHp()
-      : GameData.maxHp;
+  const maxHpForBattle = getBattleMaxHp();
   if (GameData.currentHp > maxHpForBattle) {
     GameData.currentHp = maxHpForBattle;
     GameData.save();
@@ -915,10 +962,7 @@ function updateMonsterHP() {
 }
 
 function updatePlayerHP() {
-  const maxHpForBattle =
-    typeof GameData.getEffectiveMaxHp === 'function'
-      ? GameData.getEffectiveMaxHp()
-      : GameData.maxHp;
+  const maxHpForBattle = getBattleMaxHp();
   const ratio = maxHpForBattle > 0 ? (GameData.currentHp / maxHpForBattle) * 100 : 0;
   playerHpFill.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
   playerHpText.innerText = `유저 HP ${GameData.currentHp} / ${maxHpForBattle}`;
@@ -939,6 +983,8 @@ function updatePlayerHP() {
   }
 
   refreshBattlePotionUI();
+  renderPassiveSkillEffects();
+  renderActiveSkillBar();
 }
 
 function getPotionCount(type) {
@@ -948,10 +994,7 @@ function getPotionCount(type) {
 }
 
 function refreshBattlePotionUI() {
-  const maxHpForBattle =
-    typeof GameData.getEffectiveMaxHp === 'function'
-      ? GameData.getEffectiveMaxHp()
-      : GameData.maxHp;
+  const maxHpForBattle = getBattleMaxHp();
   const hpIsFull = GameData.currentHp >= maxHpForBattle;
   const unavailable = playerDead || dead;
 
@@ -986,10 +1029,7 @@ function useHpPotion(type) {
     return;
   }
 
-  const maxHpForBattle =
-    typeof GameData.getEffectiveMaxHp === 'function'
-      ? GameData.getEffectiveMaxHp()
-      : GameData.maxHp;
+  const maxHpForBattle = getBattleMaxHp();
   if (GameData.currentHp >= maxHpForBattle) {
     log.innerText = 'HP가 이미 가득합니다.';
     refreshBattlePotionUI();
@@ -999,7 +1039,8 @@ function useHpPotion(type) {
   const healAmount = Math.max(1, Math.floor(maxHpForBattle * healRatio));
   const beforeHp = GameData.currentHp;
   GameData[key] = Math.max(0, currentCount - 1);
-  GameData.heal(healAmount);
+  GameData.currentHp = Math.min(maxHpForBattle, GameData.currentHp + healAmount);
+  GameData.save();
   const recovered = Math.max(0, GameData.currentHp - beforeHp);
 
   const labels = { small: 'HP 물약(소)', medium: 'HP 물약(중)', large: 'HP 물약(대)' };
@@ -1080,6 +1121,27 @@ function renderStatusEffects() {
     .join('');
 }
 
+function renderPassiveSkillEffects() {
+  if (!playerPassiveEffectsEl) return;
+  if (!window.PlayerSkills) {
+    playerPassiveEffectsEl.innerHTML = '';
+    playerPassiveEffectsEl.style.display = 'none';
+    return;
+  }
+
+  const passiveSkills = PlayerSkills.getEquippedSkills('passive');
+  if (!passiveSkills.length) {
+    playerPassiveEffectsEl.innerHTML = '';
+    playerPassiveEffectsEl.style.display = 'none';
+    return;
+  }
+
+  playerPassiveEffectsEl.style.display = 'flex';
+  playerPassiveEffectsEl.innerHTML = passiveSkills
+    .map((skill) => `<span class="passive-chip">${skill.name}</span>`)
+    .join('');
+}
+
 function clearAllStatusEffects() {
   Object.keys(activeStatusEffects).forEach((type) => {
     delete activeStatusEffects[type];
@@ -1094,6 +1156,10 @@ function applyStatusEffect(type) {
   const now = Date.now();
   const current = activeStatusEffects[type];
   const potionKey = STATUS_NULLIFY_POTION_MAP[type];
+  const resistChance = Math.max(
+    0,
+    Math.min(0.75, Number(passiveSkillTotals.statusResistChance) || 0)
+  );
 
   if (!current && potionKey && (GameData[potionKey] || 0) > 0) {
     GameData[potionKey]--;
@@ -1102,6 +1168,12 @@ function applyStatusEffect(type) {
     battleStats.antidoteUsedCount++;
     renderBattleStatsPanel();
     return 'blocked';
+  }
+
+  if (!current && resistChance > 0 && Math.random() < resistChance) {
+    battleStats.statusBlockedCount++;
+    renderBattleStatsPanel();
+    return 'resisted';
   }
 
   if (current) {
@@ -1280,9 +1352,11 @@ function getStatusTickDamage(type) {
   const def = STATUS_EFFECT_LIBRARY[type];
   if (!def) return 0;
   const hpForStatus =
-    typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+    typeof GameData.getEffectiveMaxHp === 'function' ? getBattleMaxHp() : GameData.maxHp;
   const ratioDamage = Math.floor(hpForStatus * (def.damageRatio || 0));
-  return Math.max(def.minDamage || 1, ratioDamage);
+  const baseTickDamage = Math.max(def.minDamage || 1, ratioDamage);
+  const dotTakenMul = Number(passiveSkillTotals.dotDamageTakenMul) || 1;
+  return Math.max(1, Math.floor(baseTickDamage * dotTakenMul));
 }
 
 function applyDamageToPlayer(amount, reasonText, sourceType = 'hit') {
@@ -1341,6 +1415,7 @@ function processStatusEffectTicks() {
 
   removeExpiredStatusEffects();
   renderStatusEffects();
+  renderActiveSkillBar();
 }
 
 function stopStatusEffectLoop() {
@@ -1449,28 +1524,30 @@ function playBossPatternEffect(attackPlan) {
 
 function applyMonsterStatusEffects(effectTypes) {
   if (!Array.isArray(effectTypes) || effectTypes.length === 0) {
-    return { applied: [], blocked: [] };
+    return { applied: [], blocked: [], resisted: [] };
   }
 
   const unique = Array.from(new Set(effectTypes));
   const applied = [];
   const blocked = [];
+  const resisted = [];
   unique.forEach((type) => {
     const result = applyStatusEffect(type);
     if (result === 'new') {
       applied.push(STATUS_EFFECT_LIBRARY[type].label);
     } else if (result === 'blocked') {
       blocked.push(STATUS_EFFECT_LIBRARY[type].label);
+    } else if (result === 'resisted') {
+      resisted.push(STATUS_EFFECT_LIBRARY[type].label);
     }
   });
-  return { applied, blocked };
+  return { applied, blocked, resisted };
 }
 
 function tryUseProtectTicket() {
   if (!(GameData.protectActive && GameData.protectTicket > 0)) return false;
 
-  const maxHpForBattle =
-    typeof GameData.getEffectiveMaxHp === 'function' ? GameData.getEffectiveMaxHp() : GameData.maxHp;
+  const maxHpForBattle = getBattleMaxHp();
   const recoverHp = Math.max(1, Math.floor(maxHpForBattle / 4));
   GameData.protectTicket = 0;
   GameData.protectActive = false;
@@ -1534,6 +1611,9 @@ function runMonsterAutoAttack() {
   }
   if (statusResult.blocked.length > 0) {
     messageParts.push(`무효화: ${statusResult.blocked.join(', ')}`);
+  }
+  if (statusResult.resisted.length > 0) {
+    messageParts.push(`저항: ${statusResult.resisted.join(', ')}`);
   }
   log.innerText = messageParts.join(' | ');
 }
@@ -1599,15 +1679,108 @@ function tryDropEquipmentAndRuneItems() {
 /* =========================
    공격 처리
 ========================= */
-img.onclick = () => {
-  if (dead || playerDead) return;
+function getActiveSkillCooldownMs(skillDef) {
+  const baseMs = Math.max(1000, Math.floor((Number(skillDef?.cooldownSec) || 5) * 1000));
+  const reduction = Math.max(0, Math.min(0.6, Number(passiveSkillTotals.cooldownReduction) || 0));
+  return Math.max(1000, Math.floor(baseMs * (1 - reduction)));
+}
+
+function getEquippedActiveSkill(slotIndex) {
+  if (!window.PlayerSkills) return null;
+  const ids = PlayerSkills.getEquippedSkillIds('active');
+  const skillId = ids[slotIndex] || null;
+  return PlayerSkills.getSkillById('active', skillId);
+}
+
+function renderActiveSkillBar() {
+  if (!activeSkillBarEl) return;
+  if (!window.PlayerSkills) {
+    activeSkillBarEl.style.display = 'none';
+    return;
+  }
+
+  const now = Date.now();
+  activeSkillBarEl.style.display = 'grid';
+  activeSkillBarEl.innerHTML = Array.from({ length: ACTIVE_SKILL_SLOT_COUNT })
+    .map((_, index) => {
+      const skill = getEquippedActiveSkill(index);
+      if (!skill) {
+        return `
+          <button class="active-skill-btn is-empty" disabled>
+            슬롯 ${index + 1}<span class="active-skill-meta">비어 있음</span>
+          </button>
+        `;
+      }
+
+      const remainMs = Math.max(0, (activeSkillCooldownUntil[index] || 0) - now);
+      const inCooldown = remainMs > 0;
+      const locked = playerDead || dead || inCooldown;
+      const cooldownText = inCooldown ? `${Math.ceil(remainMs / 1000)}초` : '사용 가능';
+
+      return `
+        <button class="active-skill-btn${inCooldown ? ' is-cooldown' : ''}"
+                onclick="useActiveSkill(${index})"
+                ${locked ? 'disabled' : ''}>
+          ${skill.name}
+          <span class="active-skill-meta">x${skill.hitCount || 1} | ${cooldownText}</span>
+        </button>
+      `;
+    })
+    .join('');
+}
+
+function handleMonsterDefeat(extraNote = '') {
+  dead = true;
+  battleStats.monsterKillCount++;
+  renderBattleStatsPanel();
+  clearBossPatternEffectVisual();
+
+  img.style.pointerEvents = 'none';
+  img.style.opacity = '0.3';
+
+  const earned = GameData.earnGold(data.gold);
+  goldText.innerText = `💰 ${GameData.gold}`;
+
+  GameData.killStats[data.achId] = (GameData.killStats[data.achId] || 0) + 1;
+
+  if (typeof GameData.onBossKilled === 'function') {
+    GameData.onBossKilled(data.achId);
+  }
+
+  const dropName = tryDropRiftItem();
+  const battleLootNames = tryDropEquipmentAndRuneItems();
+
+  GameData.save();
+  if (window.Achievement) Achievement.checkAll();
+
+  const rewardParts = [`${data.name} 처치! +${earned}G`];
+  if (dropName) rewardParts.push(`🎁 ${dropName}`);
+  if (battleLootNames.length > 0) {
+    rewardParts.push(`장비/룬 드랍: ${battleLootNames.join(', ')}`);
+  }
+  if (extraNote) rewardParts.push(extraNote);
+  log.innerText = rewardParts.join(' | ');
+
+  setTimeout(() => {
+    hp = data.hp;
+    updateMonsterHP();
+    dead = false;
+    img.style.opacity = '1';
+    img.style.pointerEvents = 'auto';
+    log.innerText = `${data.name} 등장!`;
+    renderActiveSkillBar();
+  }, 1200);
+}
+
+function performPlayerAttack(skillDef = null) {
+  if (dead || playerDead) return { performed: false, consumed: false };
   battleStats.playerAttackAttempts++;
 
   const now = Date.now();
   if (now < playerAttackLockUntil) {
     const remainSec = Math.max(1, Math.ceil((playerAttackLockUntil - now) / 1000));
     log.innerText = `⚡ 상태이상 영향으로 ${remainSec}초 동안 공격이 지연됩니다.`;
-    return;
+    return { performed: false, consumed: false };
   }
 
   const blockingStatus = getBlockingStatusInfo();
@@ -1621,7 +1794,7 @@ img.onclick = () => {
     if (typeof screenShake === 'function') {
       screenShake();
     }
-    return;
+    return { performed: false, consumed: false };
   }
 
   if (Math.random() > getPlayerHitChance()) {
@@ -1629,8 +1802,10 @@ img.onclick = () => {
     renderBattleStatsPanel();
     img.classList.add('hit');
     setTimeout(() => img.classList.remove('hit'), 120);
-    log.innerText = '🌀 상태이상 영향으로 공격이 빗나갔습니다.';
-    return;
+    log.innerText = skillDef
+      ? `${skillDef.name} 사용! 하지만 상태이상 영향으로 빗나갔습니다.`
+      : '🌀 상태이상 영향으로 공격이 빗나갔습니다.';
+    return { performed: true, consumed: true };
   }
 
   battleStats.playerAttackHits++;
@@ -1638,9 +1813,19 @@ img.onclick = () => {
 
   const basePlayerDamage = Math.max(
     1,
-    Math.floor(GameData.getCurrentDamage() * getOutgoingDamageMultiplier())
+    Math.floor(
+      GameData.getCurrentDamage() *
+      getOutgoingDamageMultiplier() *
+      (Number(passiveSkillTotals.damageMul) || 1)
+    )
   );
-  const variedDamage = applyBossRiftInverseDamage(basePlayerDamage);
+
+  const hitCount = Math.max(1, Math.floor(Number(skillDef?.hitCount) || 1));
+  const skillMultiplier = skillDef
+    ? (Number(skillDef.damageMultiplier) || 1) * (Number(passiveSkillTotals.skillDamageMul) || 1)
+    : 1;
+  const rawDamage = Math.max(1, Math.floor(basePlayerDamage * skillMultiplier * hitCount));
+  const variedDamage = applyBossRiftInverseDamage(rawDamage);
   const playerDamage = Math.max(0, Math.floor(variedDamage.damage));
 
   hp -= playerDamage;
@@ -1657,62 +1842,18 @@ img.onclick = () => {
   const selfDamage = getSelfDamageOnPlayerAttack();
   if (selfDamage > 0) {
     const diedBySelfDamage = applyDamageToPlayer(selfDamage, '망자의 굴레 반동', 'dot');
-    if (diedBySelfDamage) return;
+    if (diedBySelfDamage) return { performed: true, consumed: true };
   }
 
   const lockMs = applyAttackDelayFromStatus();
-
   if (hp === 0) {
-    dead = true;
-    battleStats.monsterKillCount++;
-    renderBattleStatsPanel();
-    clearBossPatternEffectVisual();
-
-    img.style.pointerEvents = 'none';
-    img.style.opacity = '0.3';
-
-    const earned = GameData.earnGold(data.gold);
-    goldText.innerText = `💰 ${GameData.gold}`;
-
-    // ✅ 킬 카운트 누적
-    GameData.killStats[data.achId] = (GameData.killStats[data.achId] || 0) + 1;
-
-    // ✅ 월드3 보스 보상
-    if (typeof GameData.onBossKilled === 'function') {
-      GameData.onBossKilled(data.achId);
-    }
-
-    // ✅ 운명의 균열 드랍
-    const dropName = tryDropRiftItem();
-    const battleLootNames = tryDropEquipmentAndRuneItems();
-
-    GameData.save();
-    if (window.Achievement) Achievement.checkAll();
-
-    const rewardParts = [`${data.name} 처치! +${earned}G`];
-    if (dropName) rewardParts.push(`🎁 ${dropName}`);
-    if (battleLootNames.length > 0) {
-      rewardParts.push(`장비/룬 드랍: ${battleLootNames.join(', ')}`);
-    }
-    log.innerText = rewardParts.join(' | ');
-    if (variedDamage.note) {
-      log.innerText += ` | ${variedDamage.note}`;
-    }
-
-    setTimeout(() => {
-      hp = data.hp;
-      updateMonsterHP();
-      dead = false;
-
-      img.style.opacity = '1';
-      img.style.pointerEvents = 'auto';
-
-      log.innerText = `${data.name} 등장!`;
-    }, 1200);
-    return;
+    handleMonsterDefeat(variedDamage.note || '');
+    return { performed: true, consumed: true };
   }
 
-  const messageParts = [`${data.name}에게 ${playerDamage} 피해`];
+  const messageParts = [
+    skillDef ? `${skillDef.name} 사용! ${data.name}에게 ${playerDamage} 피해` : `${data.name}에게 ${playerDamage} 피해`
+  ];
   if (monsterHeal > 0) {
     messageParts.push(`보스 흡혈 +${monsterHeal} HP`);
   }
@@ -1726,6 +1867,41 @@ img.onclick = () => {
     messageParts.push(variedDamage.note);
   }
   log.innerText = messageParts.join(' | ');
+  return { performed: true, consumed: true };
+}
+
+function useActiveSkill(slotIndex) {
+  if (dead || playerDead) return;
+  const index = Number(slotIndex);
+  if (!Number.isInteger(index) || index < 0 || index >= ACTIVE_SKILL_SLOT_COUNT) return;
+
+  const skillDef = getEquippedActiveSkill(index);
+  if (!skillDef) {
+    renderActiveSkillBar();
+    return;
+  }
+
+  if (!window.PlayerSkills?.isUnlocked(skillDef)) {
+    log.innerText = `${skillDef.name} 스킬은 아직 해금되지 않았습니다.`;
+    return;
+  }
+
+  const now = Date.now();
+  if ((activeSkillCooldownUntil[index] || 0) > now) {
+    renderActiveSkillBar();
+    return;
+  }
+
+  const result = performPlayerAttack(skillDef);
+  if (result.consumed) {
+    activeSkillCooldownUntil[index] = now + getActiveSkillCooldownMs(skillDef);
+  }
+  renderActiveSkillBar();
+}
+
+window.useActiveSkill = useActiveSkill;
+img.onclick = () => {
+  performPlayerAttack(null);
 };
 
 
@@ -1754,9 +1930,12 @@ function renderStage() {
 }
 
 renderStage();
+refreshPassiveSkillTotals();
 updateMonsterHP();
 updatePlayerHP();
 renderStatusEffects();
+renderPassiveSkillEffects();
+renderActiveSkillBar();
 startMonsterAutoAttack();
 startStatusEffectLoop();
 

@@ -1,5 +1,6 @@
 const goldText = document.getElementById('gold-text');
 const MAX_HP_POTION_STACK = 20;
+const MAX_SKILL_RESET_TICKET_STACK = 99;
 
 function createShopItem(type, name, desc, price) {
   const item = document.createElement('div');
@@ -32,7 +33,8 @@ function ensureShopItems() {
     { type: 'antiBleed', name: '출혈 무효화 물약', desc: '출혈 상태이상 1회 무효화 (자동 발동)', price: 1300 },
     { type: 'antiBurn', name: '화상 무효화 물약', desc: '화상 상태이상 1회 무효화 (자동 발동)', price: 1300 },
     { type: 'antiShock', name: '감전 무효화 물약', desc: '감전 상태이상 1회 무효화 (자동 발동)', price: 1400 },
-    { type: 'antiFrost', name: '빙결 무효화 물약', desc: '빙결 상태이상 1회 무효화 (자동 발동)', price: 1400 }
+    { type: 'antiFrost', name: '빙결 무효화 물약', desc: '빙결 상태이상 1회 무효화 (자동 발동)', price: 1400 },
+    { type: 'skillReset', name: '스킬 초기화권', desc: '배낭에서 장착한 액티브/패시브 스킬 슬롯 초기화', price: 25000 }
   ];
 
   items.forEach((data) => {
@@ -161,6 +163,20 @@ function buy(type) {
       if (GameData.gold < price) return;
       GameData.gold -= price;
       GameData.antidoteFrost++;
+      break;
+
+    case 'skillReset':
+      price = 25000;
+      if ((GameData.skillResetTicket || 0) >= MAX_SKILL_RESET_TICKET_STACK) {
+        alert('스킬 초기화권은 최대 99개까지 보유할 수 있습니다.');
+        return;
+      }
+      if (GameData.gold < price) return;
+      GameData.gold -= price;
+      GameData.skillResetTicket = Math.min(
+        MAX_SKILL_RESET_TICKET_STACK,
+        (GameData.skillResetTicket || 0) + 1
+      );
       break;
 
     /* ✅ 200% 강화권 (제우스 100회 해금) */

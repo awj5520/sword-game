@@ -254,6 +254,55 @@
     margin-bottom: 10px;
 }
 
+.active-skill-bar {
+    width: 100%;
+    max-width: 360px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.active-skill-btn {
+    min-height: 56px;
+    padding: 9px 6px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: linear-gradient(180deg, #ffd772, #d89b1f);
+    color: #2a1900;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.active-skill-meta {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(42, 25, 0, 0.9);
+}
+
+.active-skill-btn.is-cooldown,
+.active-skill-btn:disabled {
+    background: linear-gradient(180deg, #7f889a, #646d80);
+    color: rgba(255, 255, 255, 0.88);
+    border-color: rgba(255, 255, 255, 0.18);
+    cursor: not-allowed;
+}
+
+.active-skill-btn.is-cooldown .active-skill-meta,
+.active-skill-btn:disabled .active-skill-meta {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.active-skill-btn.is-empty {
+    background: rgba(48, 55, 70, 0.76);
+}
+
 .potion-btn {
     padding: 10px 6px;
     border-radius: 10px;
@@ -291,6 +340,23 @@
     color: #fff;
     font-weight: bold;
     cursor: pointer;
+}
+
+.bottom-ui .active-skill-btn {
+    width: auto;
+    max-width: none;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: linear-gradient(180deg, #ffd772, #d89b1f);
+    color: #2a1900;
+    font-weight: 800;
+    padding: 9px 6px;
+}
+
+.bottom-ui .active-skill-btn.is-cooldown,
+.bottom-ui .active-skill-btn:disabled {
+    background: linear-gradient(180deg, #7f889a, #646d80);
+    color: rgba(255, 255, 255, 0.88);
+    border-color: rgba(255, 255, 255, 0.18);
 }
 /* HP layout overrides */
 .status-box {
@@ -340,6 +406,25 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+}
+
+.passive-effects {
+    margin-top: 8px;
+    margin-bottom: 2px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.passive-chip {
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(16, 185, 129, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
 }
 
 .status-empty {

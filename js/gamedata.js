@@ -32,6 +32,8 @@ const DEFAULT_EQUIPPED_ITEMS = {
   rune: null
 };
 
+const DEFAULT_SKILL_SLOTS = [null, null, null];
+
 function normalizeBattleStats(raw) {
   const normalized = { ...DEFAULT_BATTLE_STATS };
   if (!raw || typeof raw !== 'object') return normalized;
@@ -65,6 +67,12 @@ function normalizeEquippedItems(raw) {
     normalized[slot] = typeof value === 'string' && value.trim() ? value : null;
   });
   return normalized;
+}
+
+function normalizeSkillSlots(raw) {
+  const base = Array.isArray(raw) ? raw.slice(0, DEFAULT_SKILL_SLOTS.length) : [];
+  while (base.length < DEFAULT_SKILL_SLOTS.length) base.push(null);
+  return base.map((value) => (typeof value === 'string' && value.trim() ? value : null));
 }
 
 const GameData = {
@@ -169,6 +177,21 @@ const GameData = {
       return normalizeEquippedItems();
     }
   })(),
+  equippedActiveSkills: (() => {
+    try {
+      return normalizeSkillSlots(JSON.parse(localStorage.getItem('equippedActiveSkills') || '[]'));
+    } catch {
+      return normalizeSkillSlots();
+    }
+  })(),
+  equippedPassiveSkills: (() => {
+    try {
+      return normalizeSkillSlots(JSON.parse(localStorage.getItem('equippedPassiveSkills') || '[]'));
+    } catch {
+      return normalizeSkillSlots();
+    }
+  })(),
+  skillResetTicket: Number(localStorage.getItem('skillResetTicket')) || 0,
 
   now() {
     return Date.now();
@@ -182,6 +205,16 @@ const GameData = {
   ensureEquippedItems() {
     this.equippedItems = normalizeEquippedItems(this.equippedItems);
     return this.equippedItems;
+  },
+
+  ensureSkillLoadout() {
+    this.equippedActiveSkills = normalizeSkillSlots(this.equippedActiveSkills);
+    this.equippedPassiveSkills = normalizeSkillSlots(this.equippedPassiveSkills);
+    this.skillResetTicket = Math.max(0, Math.floor(Number(this.skillResetTicket) || 0));
+    return {
+      active: this.equippedActiveSkills,
+      passive: this.equippedPassiveSkills
+    };
   },
 
   getItemCount(itemId) {
@@ -354,6 +387,7 @@ const GameData = {
   save() {
     this.ensureLootInventory();
     this.ensureEquippedItems();
+    this.ensureSkillLoadout();
     this.clampCurrentHpToMax();
     this.hpPotionSmall = Math.min(20, Math.max(0, Math.floor(Number(this.hpPotionSmall) || 0)));
     this.hpPotionMedium = Math.min(20, Math.max(0, Math.floor(Number(this.hpPotionMedium) || 0)));
@@ -416,6 +450,9 @@ const GameData = {
     localStorage.setItem('battleStats', JSON.stringify(this.ensureBattleStats()));
     localStorage.setItem('lootInventory', JSON.stringify(this.lootInventory));
     localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
+    localStorage.setItem('equippedActiveSkills', JSON.stringify(this.equippedActiveSkills));
+    localStorage.setItem('equippedPassiveSkills', JSON.stringify(this.equippedPassiveSkills));
+    localStorage.setItem('skillResetTicket', this.skillResetTicket);
   },
 
   resetAllProgress() {
@@ -465,7 +502,10 @@ const GameData = {
       killStats: {},
       battleStats: normalizeBattleStats(),
       lootInventory: {},
-      equippedItems: normalizeEquippedItems()
+      equippedItems: normalizeEquippedItems(),
+      equippedActiveSkills: normalizeSkillSlots(),
+      equippedPassiveSkills: normalizeSkillSlots(),
+      skillResetTicket: 0
     });
 
     localStorage.removeItem('achievements');
@@ -670,3 +710,7 @@ const GameData = {
     this.save();
   }
 };
+
+if (typeof window !== 'undefined') {
+  window.GameData = GameData;
+}
