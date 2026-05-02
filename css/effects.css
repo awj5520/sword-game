@@ -165,25 +165,59 @@
   100% { opacity: 0; }
 }
 
-/* ===== 강화 성공 불꽃 파티클 ===== */
+/* ===== 폭죽 파티클 (성공) ===== */
+.firework-particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform-origin: center center;
+    animation: fireworkFly var(--dur, 700ms) ease-out forwards;
+}
+
+@keyframes fireworkFly {
+    0%   { transform: translate(0, 0) scale(1);
+           opacity: 1; }
+    /* 위로 솟구친 뒤 중력으로 낙하 — vy 초반에 음수(위)였다가 gravity 만큼 추가 */
+    60%  { transform: translate(var(--vx), var(--vy)) scale(0.9);
+           opacity: 0.9; }
+    100% { transform: translate(var(--vx), calc(var(--vy) + var(--gravity))) scale(0.3);
+           opacity: 0; }
+}
+
+/* ===== 칼 파편 파티클 (실패) ===== */
+.shard-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform-origin: center center;
+    clip-path: polygon(50% 0%, 80% 100%, 20% 100%); /* 삼각 파편 */
+    animation: shardFly var(--dur, 650ms) ease-in forwards;
+}
+
+@keyframes shardFly {
+    0%   { transform: translate(0, 0) rotate(0deg) scale(1);
+           opacity: 1; }
+    50%  { transform: translate(calc(var(--vx) * 0.6), calc(var(--vy) * 0.6)) rotate(calc(var(--spin) * 0.5)) scale(0.9);
+           opacity: 0.85; }
+    100% { transform: translate(var(--vx), calc(var(--vy) + var(--gravity))) rotate(var(--spin)) scale(0.4);
+           opacity: 0; }
+}
+
+/* ===== 기존 fire-particle (하위 호환) ===== */
 .fire-particle {
-    position: absolute;
+    position: fixed;
     width: 6px;
     height: 6px;
     background: radial-gradient(circle, #ffd700, #ff4500);
     border-radius: 50%;
     pointer-events: none;
+    z-index: 9999;
     animation: fireBurst 0.6s ease-out forwards;
 }
 
 @keyframes fireBurst {
-    0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(var(--x), var(--y)) scale(0.2);
-        opacity: 0;
-    }
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--x), var(--y)) scale(0.2); opacity: 0; }
 }
 
