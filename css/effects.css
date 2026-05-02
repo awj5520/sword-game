@@ -97,13 +97,13 @@
 }
 
 @keyframes circleSuccess {
-  0%   { transform: scale(1)    rotate(0deg);   border-color: #4da6ff; box-shadow: 0 0 20px rgba(77,166,255,0.6),   inset 0 0 25px rgba(0,0,0,0.8); }
-  16%  { transform: scale(1.06) rotate(60deg);  border-color: #f0c000; box-shadow: 0 0 40px rgba(240,192,0,0.85),  inset 0 0 25px rgba(240,192,0,0.2); }
-  33%  { transform: scale(1.1)  rotate(130deg); border-color: #ffd84d; box-shadow: 0 0 70px rgba(240,192,0,1.0),   inset 0 0 32px rgba(240,192,0,0.38); }
-  50%  { transform: scale(1.12) rotate(210deg); border-color: #ffd84d; box-shadow: 0 0 80px rgba(240,192,0,1.0),   inset 0 0 36px rgba(240,192,0,0.4); }
-  66%  { transform: scale(1.06) rotate(290deg); border-color: #f0c000; box-shadow: 0 0 45px rgba(240,192,0,0.7),   inset 0 0 25px rgba(240,192,0,0.15); }
-  83%  { transform: scale(1.02) rotate(340deg); border-color: #b08800; box-shadow: 0 0 24px rgba(240,192,0,0.35),  inset 0 0 25px rgba(0,0,0,0.8); }
-  100% { transform: scale(1)    rotate(360deg); border-color: #4da6ff; box-shadow: 0 0 20px rgba(77,166,255,0.6),  inset 0 0 25px rgba(0,0,0,0.8); }
+  0%   { transform: scale(1);    border-color: #4da6ff; box-shadow: 0 0 20px rgba(77,166,255,0.6),   inset 0 0 25px rgba(0,0,0,0.8); }
+  16%  { transform: scale(1.06); border-color: #f0c000; box-shadow: 0 0 40px rgba(240,192,0,0.85),  inset 0 0 25px rgba(240,192,0,0.2); }
+  33%  { transform: scale(1.1);  border-color: #ffd84d; box-shadow: 0 0 70px rgba(240,192,0,1.0),   inset 0 0 32px rgba(240,192,0,0.38); }
+  50%  { transform: scale(1.12); border-color: #ffd84d; box-shadow: 0 0 80px rgba(240,192,0,1.0),   inset 0 0 36px rgba(240,192,0,0.4); }
+  66%  { transform: scale(1.06); border-color: #f0c000; box-shadow: 0 0 45px rgba(240,192,0,0.7),   inset 0 0 25px rgba(240,192,0,0.15); }
+  83%  { transform: scale(1.02); border-color: #b08800; box-shadow: 0 0 24px rgba(240,192,0,0.35),  inset 0 0 25px rgba(0,0,0,0.8); }
+  100% { transform: scale(1);    border-color: #4da6ff; box-shadow: 0 0 20px rgba(77,166,255,0.6),  inset 0 0 25px rgba(0,0,0,0.8); }
 }
 
 /* ===== 강화 실패 서클 모션 ===== */
