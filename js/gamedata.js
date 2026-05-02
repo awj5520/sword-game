@@ -612,6 +612,8 @@ const GameData = {
     }
 
     if (fateType) {
+      let fateNextLevel = startLevel;
+
       if (success) {
         if (isDouble) {
           this.damage += 10;
@@ -636,7 +638,7 @@ const GameData = {
       }
 
       if (fateType === 'dice') {
-        this.level = success ? startLevel * 2 : Math.floor(startLevel / 2);
+        fateNextLevel = success ? startLevel * 2 : Math.floor(startLevel / 2);
         this.fateDiceTicket--;
         if (this.fateDiceTicket <= 0) {
           this.fateDiceTicket = 0;
@@ -645,7 +647,7 @@ const GameData = {
       }
 
       if (fateType === 'dual') {
-        this.level = success
+        fateNextLevel = success
           ? startLevel * 2
           : Math.max(Math.floor(startLevel / 2), Math.floor(startLevel * 0.7));
         this.dualSealTicket--;
@@ -656,7 +658,7 @@ const GameData = {
       }
 
       if (fateType === 'scale') {
-        this.level = success ? startLevel * 2 : Math.floor(startLevel / 2);
+        fateNextLevel = success ? startLevel * 2 : Math.floor(startLevel / 2);
         if (!success) {
           this.fateScalePity = true;
         }
@@ -668,13 +670,24 @@ const GameData = {
       }
 
       if (fateType === 'chaos') {
-        this.level = success ? startLevel * 3 : Math.floor(startLevel / 3);
+        fateNextLevel = success ? startLevel * 3 : Math.floor(startLevel / 3);
         this.chaosSealTicket--;
         if (this.chaosSealTicket <= 0) {
           this.chaosSealTicket = 0;
           this.chaosSealActive = false;
         }
       }
+
+      const normalizedNextLevel = Math.max(0, Math.floor(Number(fateNextLevel) || 0));
+      const levelDelta = normalizedNextLevel - startLevel;
+      const expectedStatDelta = levelDelta * 5;
+      const alreadyAppliedDamageDelta = success ? (isDouble ? 10 : 5) : 0;
+      const alreadyAppliedHpDelta = success ? 5 : 0;
+
+      this.level = normalizedNextLevel;
+      this.damage = Math.max(1, this.damage + (expectedStatDelta - alreadyAppliedDamageDelta));
+      this.maxHp = Math.max(1, this.maxHp + (expectedStatDelta - alreadyAppliedHpDelta));
+      this.currentHp = Math.max(0, this.currentHp + (expectedStatDelta - alreadyAppliedHpDelta));
     }
 
     this.save();

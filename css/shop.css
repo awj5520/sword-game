@@ -1,251 +1,508 @@
+/* =============================================
+   SHOP.CSS — 픽셀 RPG 대장장이 상점
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+/* ── 픽셀 RPG 변수 ── */
 :root {
-    --shop-bg-top: #1a0f06;
-    --shop-bg-mid: #2a1a0a;
-    --shop-bg-bottom: #0e0703;
-    --shop-card: rgba(30, 18, 8, 0.82);
-    --shop-card-border: rgba(255, 201, 110, 0.32);
-    --shop-title: #ffe6b0;
-    --shop-text: #fbf1d8;
-    --shop-muted: #d4b88a;
-    --shop-accent: #ffd36a;
-    --shop-accent-strong: #f6a93b;
-    --shop-gold: #ffd76a;
+  --px-bg:       #08080f;
+  --px-bg2:      #0f0f1e;
+  --px-bg3:      #14142a;
+  --px-panel:    #0c0c1c;
+  --px-border:   #3030a0;
+  --px-border2:  #5050c8;
+  --px-gold:     #f0c000;
+  --px-gold2:    #ffd84d;
+  --px-gold3:    #7a5800;
+  --px-rare:     #4488ff;
+  --px-epic:     #cc44ff;
+  --px-legend:   #ffcc00;
+  --px-myth:     #ff5500;
+  --px-text:     #c8c8e0;
+  --px-text2:    #7070a0;
+  --px-white:    #eeeeff;
+  --px-green:    #00cc44;
+  --px-font:     'Press Start 2P', monospace;
+  --px-font-kr:  'Noto Sans KR', sans-serif;
 }
 
+/* ── 리셋 ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── 픽셀 커서 ── */
+* { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect x='0' y='0' width='4' height='4' fill='white'/%3E%3Crect x='4' y='4' width='4' height='4' fill='white'/%3E%3Crect x='8' y='8' width='4' height='4' fill='white'/%3E%3Crect x='4' y='8' width='4' height='4' fill='white'/%3E%3Crect x='8' y='4' width='4' height='4' fill='white'/%3E%3C/svg%3E") 0 0, auto; }
+
+/* ── body ── */
+body {
+  background-color: var(--px-bg);
+  color: var(--px-text);
+  font-family: var(--px-font-kr);
+  min-height: 100dvh;
+  overflow-x: hidden;
+
+  /* 스캔라인 */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 30, 0.25) 3px,
+      rgba(0, 0, 30, 0.25) 4px
+    );
+}
+
+/* ── 메인 래퍼 ── */
 .shop-wrapper {
-    position: relative;
-    max-width: 420px;
-    height: 100dvh;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background:
-        radial-gradient(circle at 15% 12%, rgba(255, 184, 77, 0.18), transparent 34%),
-        radial-gradient(circle at 85% 90%, rgba(255, 120, 60, 0.14), transparent 32%),
-        linear-gradient(180deg, var(--shop-bg-top), var(--shop-bg-mid) 45%, var(--shop-bg-bottom));
+  position: relative;
+  max-width: 430px;
+  height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  isolation: isolate;
+
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(80, 80, 200, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(200, 80, 0, 0.06) 0%, transparent 50%),
+    var(--px-bg2);
 }
 
-.shop-wrapper::before,
-.shop-wrapper::after {
-    content: "";
-    position: absolute;
-    pointer-events: none;
-    z-index: 0;
-}
-
+/* 배경 그리드 패턴 */
 .shop-wrapper::before {
-    inset: -10% -20% auto auto;
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 211, 106, 0.2), transparent 68%);
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(48, 48, 160, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(48, 48, 160, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.shop-wrapper::after {
-    inset: auto auto -20% -25%;
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 145, 70, 0.18), transparent 70%);
-}
+/* forge-glow / forge-smoke 숨김 (픽셀 스타일에선 불필요) */
+.forge-glow,
+.forge-smoke { display: none; }
 
-.shop-top,
-.shop-body,
-.back-btn {
-    position: relative;
-    z-index: 1;
-}
-
-/* 상단 */
+/* ── 상단 헤더 ── */
 .shop-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    background: linear-gradient(180deg, rgba(12, 6, 2, 0.95), rgba(12, 6, 2, 0.6));
-    backdrop-filter: blur(6px);
-    border-bottom: 1px solid rgba(255, 210, 120, 0.22);
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 12px;
+
+  background: var(--px-bg);
+  border-bottom: 4px solid var(--px-border);
+
+  /* 픽셀 하단 이중선 */
+  box-shadow:
+    0 4px 0 0 var(--px-border2),
+    0 0 32px rgba(48, 48, 160, 0.4);
+}
+
+/* 헤더 상단에 픽셀 장식선 */
+.shop-top::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--px-border2) 20%,
+    var(--px-gold) 50%,
+    var(--px-border2) 80%,
+    transparent 100%
+  );
+}
+
+.shop-title-wrap {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .shop-title {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: 0.6px;
-    color: var(--shop-title);
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55), 0 0 8px rgba(255, 180, 80, 0.25);
+  font-family: var(--px-font-kr);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--px-gold);
+  letter-spacing: 0.04em;
+  text-shadow:
+    3px 3px 0 var(--px-gold3),
+    0 0 20px rgba(240, 192, 0, 0.5);
+
+  /* 픽셀 느낌의 텍스트 렌더링 */
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
 }
 
+.shop-title::before {
+  content: '🏪 ';
+  font-style: normal;
+}
+
+.shop-subtitle {
+  font-family: var(--px-font-kr);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--px-text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* 픽셀 점선 스타일 */
+  border-left: 3px solid var(--px-border2);
+  padding-left: 8px;
+}
+
+/* 골드 표시 */
 .gold {
-    font-size: 14px;
-    font-weight: 800;
-    color: #2a1900;
-    background: linear-gradient(180deg, #ffe4a2, #ffc85f);
-    border-radius: 999px;
-    padding: 6px 14px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(255, 236, 178, 0.6);
+  flex: 0 0 auto;
+  font-family: var(--px-font);
+  font-size: 10px;
+  color: var(--px-bg);
+  padding: 8px 12px;
+  line-height: 1;
+
+  background: var(--px-gold);
+
+  /* 픽셀 버튼 효과 */
+  box-shadow:
+    0 4px 0 0 var(--px-gold3),
+    inset 0 2px 0 rgba(255,255,255,0.4),
+    inset 0 -2px 0 rgba(0,0,0,0.2);
+
+  /* 잘린 모서리 (픽셀 다이아몬드 스타일) */
+  clip-path: polygon(
+    0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 0 calc(100% - 4px)
+  );
+
+  animation: gold-pulse 2s ease-in-out infinite;
 }
 
-/* 아이템 리스트 */
+@keyframes gold-pulse {
+  0%, 100% { box-shadow: 0 4px 0 0 var(--px-gold3), inset 0 2px 0 rgba(255,255,255,0.4), 0 0 12px rgba(240,192,0,0.3); }
+  50% { box-shadow: 0 4px 0 0 var(--px-gold3), inset 0 2px 0 rgba(255,255,255,0.4), 0 0 24px rgba(240,192,0,0.7); }
+}
+
+/* ── 아이템 목록 ── */
 .shop-body {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    padding: 14px 14px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 210, 120, 0.55) rgba(0, 0, 0, 0.35);
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--px-border2) var(--px-bg);
 }
 
-/* 아이템 카드 */
+.shop-body::-webkit-scrollbar { width: 8px; }
+.shop-body::-webkit-scrollbar-track { background: var(--px-bg); }
+.shop-body::-webkit-scrollbar-thumb {
+  background: var(--px-border2);
+  box-shadow: inset 0 0 0 2px var(--px-bg);
+}
+
+/* ── 아이템 카드 ── */
 .shop-item {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 12px 12px 12px 10px;
 
-    background: linear-gradient(160deg, rgba(55, 32, 12, 0.9), var(--shop-card));
-    border: 1px solid var(--shop-card-border);
-    border-radius: 14px;
-    padding: 14px 14px;
-    cursor: pointer;
-    box-shadow:
-        0 10px 22px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 220, 160, 0.1);
-    transition: transform 0.12s ease, border-color 0.12s ease, filter 0.12s ease;
-    animation: shopCardIn 0.35s ease-out both;
-    position: relative;
-    overflow: hidden;
+  background: var(--px-panel);
+  border: 2px solid var(--px-border);
+
+  /* 픽셀 잘린 모서리 */
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+
+  cursor: pointer;
+  transform: translateZ(0);
+  transition: transform 0.08s steps(2), filter 0.1s;
+
+  animation: card-in 0.3s steps(4) both;
 }
 
-.shop-item::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(120deg, transparent 40%, rgba(255, 220, 150, 0.08) 50%, transparent 60%);
-    pointer-events: none;
+/* 카드 좌측 픽셀 강조선 */
+.shop-item::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 8px; bottom: 8px;
+  width: 4px;
+  background: var(--px-border2);
+  transition: background 0.1s;
 }
 
 .shop-item:hover {
-    transform: translateY(-1px);
-    border-color: rgba(255, 220, 140, 0.65);
-    filter: brightness(1.08);
+  filter: brightness(1.15);
+  transform: translateX(4px);
+}
+.shop-item:hover::after {
+  background: var(--px-gold);
 }
 
 .shop-item:active {
-    transform: translateY(1px);
+  transform: translateX(2px) translateY(2px);
+  filter: brightness(0.9);
 }
 
-/* 왼쪽 (이름 + 설명) */
+/* ── 레어도 스타일 ── */
+.rarity-rare {
+  border-color: var(--px-rare);
+  background: color-mix(in srgb, var(--px-rare) 6%, var(--px-panel));
+}
+.rarity-rare::after { background: var(--px-rare); }
+
+.rarity-epic {
+  border-color: var(--px-epic);
+  background: color-mix(in srgb, var(--px-epic) 6%, var(--px-panel));
+}
+.rarity-epic::after { background: var(--px-epic); }
+
+.rarity-legend {
+  border-color: var(--px-legend);
+  background: color-mix(in srgb, var(--px-legend) 6%, var(--px-panel));
+  box-shadow: inset 0 0 20px rgba(255, 204, 0, 0.05), 0 0 10px rgba(255, 204, 0, 0.15);
+}
+.rarity-legend::after {
+  background: var(--px-legend);
+  box-shadow: 0 0 8px var(--px-legend);
+}
+
+.rarity-myth {
+  border-color: var(--px-myth);
+  background: color-mix(in srgb, var(--px-myth) 8%, var(--px-panel));
+  box-shadow: inset 0 0 20px rgba(255, 85, 0, 0.08), 0 0 14px rgba(255, 85, 0, 0.2);
+  animation: card-in 0.3s steps(4) both, myth-glow 3s ease-in-out infinite;
+}
+.rarity-myth::after {
+  background: var(--px-myth);
+  box-shadow: 0 0 8px var(--px-myth);
+}
+
+@keyframes myth-glow {
+  0%, 100% { box-shadow: inset 0 0 20px rgba(255, 85, 0, 0.08), 0 0 14px rgba(255, 85, 0, 0.2); }
+  50% { box-shadow: inset 0 0 30px rgba(255, 85, 0, 0.16), 0 0 24px rgba(255, 85, 0, 0.45); }
+}
+
+/* ── 아이콘 ── */
+.item-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+
+  background: var(--px-bg);
+  border: 2px solid var(--px-border2);
+
+  /* 픽셀 안쪽 하이라이트 */
+  box-shadow:
+    inset 2px 2px 0 rgba(255,255,255,0.08),
+    inset -2px -2px 0 rgba(0,0,0,0.5);
+
+  clip-path: polygon(
+    0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 0 calc(100% - 4px)
+  );
+}
+
+/* ── 아이템 텍스트 ── */
 .item-left {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    min-width: 0;
-    flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .item-name {
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--shop-text);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--px-white);
+  line-height: 1.2;
+  -webkit-font-smoothing: none;
 }
 
 .item-desc {
-    font-size: 12px;
-    color: var(--shop-muted);
-    line-height: 1.35;
+  font-family: var(--px-font-kr);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--px-text2);
+  line-height: 1.4;
 }
 
-/* 오른쪽 (가격) */
+/* 레어도 뱃지 */
+.item-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  font-family: var(--px-font);
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  line-height: 1.8;
+  color: var(--px-bg);
+
+  background: var(--px-text2);
+  clip-path: polygon(
+    0 3px, 3px 0, calc(100% - 3px) 0, 100% 3px,
+    100% calc(100% - 3px), calc(100% - 3px) 100%,
+    3px 100%, 0 calc(100% - 3px)
+  );
+}
+
+.rarity-rare   .item-tag { background: var(--px-rare); }
+.rarity-epic   .item-tag { background: var(--px-epic); }
+.rarity-legend .item-tag { background: var(--px-legend); color: #000; }
+.rarity-myth   .item-tag {
+  background: var(--px-myth);
+  animation: blink-tag 1.4s steps(1) infinite;
+}
+
+@keyframes blink-tag {
+  0%, 60%  { opacity: 1; }
+  61%, 100% { opacity: 0.4; }
+}
+
+/* ── 가격 버튼 ── */
 .item-right {
-    flex: 0 0 auto;
+  display: flex;
+  align-items: center;
 }
 
 .item-price {
-    font-size: 13px;
-    font-weight: 800;
-    color: #2a1900;
-    background: linear-gradient(180deg, #ffe4a2, #ffc85f);
-    border: 1px solid rgba(255, 236, 178, 0.6);
-    border-radius: 10px;
-    padding: 7px 11px;
-    white-space: nowrap;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  font-family: var(--px-font);
+  font-size: 8px;
+  line-height: 1;
+  color: var(--px-bg);
+  white-space: nowrap;
+  padding: 8px 10px;
+
+  background: var(--px-gold);
+
+  /* 픽셀 버튼 3D 효과 */
+  box-shadow:
+    0 4px 0 0 var(--px-gold3),
+    inset 0 2px 0 rgba(255,255,255,0.45),
+    inset 0 -2px 0 rgba(0,0,0,0.2);
+
+  clip-path: polygon(
+    0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 0 calc(100% - 4px)
+  );
+
+  transition: box-shadow 0.06s, transform 0.06s;
 }
 
-/* 특별 상품 (200% 강화권) */
-#double-item {
-    background: linear-gradient(160deg, rgba(90, 25, 25, 0.92), rgba(50, 12, 12, 0.82));
-    border-color: rgba(255, 140, 110, 0.55);
-    box-shadow:
-        0 10px 26px rgba(180, 40, 40, 0.35),
-        inset 0 1px 0 rgba(255, 200, 180, 0.15);
+.shop-item:active .item-price {
+  box-shadow:
+    0 2px 0 0 var(--px-gold3),
+    inset 0 2px 0 rgba(0,0,0,0.2);
+  transform: translateY(2px);
 }
 
-#double-item .item-name {
-    color: #ffd6c2;
-    text-shadow: 0 0 8px rgba(255, 120, 70, 0.5);
-}
-
-#double-item .item-price {
-    background: linear-gradient(180deg, #ffb9a0, #ff7a50);
-    color: #2a0a00;
-    border-color: rgba(255, 200, 170, 0.7);
-}
-
-/* 뒤로가기 */
+/* ── 돌아가기 버튼 ── */
 .back-btn {
-    margin: 10px 12px 14px;
-    padding: 12px;
-    border-radius: 11px;
-    border: 1px solid rgba(255, 210, 120, 0.28);
-    background: linear-gradient(180deg, #4a3420, #231609);
-    color: var(--shop-title);
-    font-weight: 800;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-    transition: filter 0.12s ease, transform 0.12s ease;
+  position: relative;
+  z-index: 2;
+  margin: 8px 12px 12px;
+  padding: 14px 0;
+  width: calc(100% - 24px);
+
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: var(--px-text);
+
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border);
+
+  /* 픽셀 버튼 3D */
+  box-shadow:
+    0 4px 0 0 rgba(0,0,0,0.8),
+    inset 0 2px 0 rgba(255,255,255,0.06),
+    inset 0 -2px 0 rgba(0,0,0,0.4);
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+
+  cursor: pointer;
+  transition: filter 0.1s, transform 0.08s steps(1), box-shadow 0.08s;
 }
 
 .back-btn:hover {
-    filter: brightness(1.12);
+  border-color: var(--px-border2);
+  filter: brightness(1.2);
+  color: var(--px-white);
 }
 
 .back-btn:active {
-    transform: translateY(1px);
+  transform: translateY(4px);
+  box-shadow:
+    0 0 0 0 rgba(0,0,0,0.8),
+    inset 0 2px 0 rgba(0,0,0,0.4);
 }
 
-/* 스크롤바 */
-.shop-body::-webkit-scrollbar {
-    width: 8px;
+/* ── 카드 등장 애니메이션 ── */
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.shop-body::-webkit-scrollbar-track {
-    background: rgba(10, 5, 2, 0.5);
-    border-radius: 10px;
-}
+/* 아이템 순서별 딜레이 */
+.shop-item:nth-child(1)  { animation-delay: 0.05s; }
+.shop-item:nth-child(2)  { animation-delay: 0.10s; }
+.shop-item:nth-child(3)  { animation-delay: 0.15s; }
+.shop-item:nth-child(4)  { animation-delay: 0.20s; }
+.shop-item:nth-child(5)  { animation-delay: 0.25s; }
+.shop-item:nth-child(6)  { animation-delay: 0.30s; }
+.shop-item:nth-child(7)  { animation-delay: 0.35s; }
+.shop-item:nth-child(8)  { animation-delay: 0.40s; }
+.shop-item:nth-child(9)  { animation-delay: 0.45s; }
+.shop-item:nth-child(10) { animation-delay: 0.50s; }
+.shop-item:nth-child(11) { animation-delay: 0.55s; }
+.shop-item:nth-child(12) { animation-delay: 0.60s; }
 
-.shop-body::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgba(255, 214, 129, 0.75), rgba(255, 153, 62, 0.72));
-    border-radius: 10px;
-}
-
-@keyframes shopCardIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* ── 반응형 ── */
+@media (max-width: 360px) {
+  .shop-title  { font-size: 17px; }
+  .item-name   { font-size: 13px; }
+  .item-price  { font-size: 7px; padding: 7px 8px; }
+  .item-icon   { width: 38px; height: 38px; font-size: 19px; }
+  .shop-item   { grid-template-columns: 42px minmax(0,1fr) auto; padding: 10px 10px 10px 8px; }
 }

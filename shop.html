@@ -2,7 +2,12 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상점</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/shop.css">
@@ -10,71 +15,180 @@
 <body>
 
 <div class="shop-wrapper">
+    <div class="forge-glow"></div>
+    <div class="forge-smoke"></div>
 
     <div class="shop-top">
-        <div class="shop-title">🏪 상점</div>
+        <div class="shop-title-wrap">
+            <div class="shop-title">대장장이 상점</div>
+            <div class="shop-subtitle">모험가를 위한 전투 소모품과 강화 부적</div>
+        </div>
         <div id="gold-text" class="gold">💰 0</div>
     </div>
 
     <div class="shop-body">
 
-        <div class="shop-item" onclick="buy('damage')">
+        <!-- BUFF -->
+        <div class="shop-item rarity-rare" data-item="damage" onclick="buy('damage')">
+            <div class="item-icon">⚔</div>
             <div class="item-left">
-                <div class="item-name">⚔️ 데미지 2배 물약</div>
-                <div class="item-desc">10분 동안 데미지 2배</div>
+                <div class="item-name">공격력 2배 물약</div>
+                <div class="item-desc">10분 동안 공격력이 2배로 상승합니다.</div>
+                <div class="item-tag">BUFF</div>
             </div>
-            <div class="item-right">
-                <div class="item-price">💰 500</div>
-            </div>
+            <div class="item-right"><div class="item-price">💰 500</div></div>
         </div>
 
-        <div class="shop-item" onclick="buy('gold')">
+        <div class="shop-item rarity-rare" data-item="gold" onclick="buy('gold')">
+            <div class="item-icon">🪙</div>
             <div class="item-left">
-                <div class="item-name">💰 골드 2배 물약</div>
-                <div class="item-desc">10분 동안 골드 2배</div>
+                <div class="item-name">골드 2배 물약</div>
+                <div class="item-desc">10분 동안 획득 골드가 2배가 됩니다.</div>
+                <div class="item-tag">BUFF</div>
             </div>
-            <div class="item-right">
-                <div class="item-price">💰 500</div>
-            </div>
+            <div class="item-right"><div class="item-price">💰 500</div></div>
         </div>
 
-        <div class="shop-item" onclick="buy('nodrop')">
+        <!-- POTION -->
+        <div class="shop-item rarity-rare" data-item="hpSmall" onclick="buy('hpSmall')">
+            <div class="item-icon">🧪</div>
             <div class="item-left">
-                <div class="item-name">🛡️ 하락 방지권</div>
-                <div class="item-desc">강화 실패 시 단계 하락 방지</div>
+                <div class="item-name">HP 회복 물약 (소)</div>
+                <div class="item-desc">전투 중 수동 사용 / 최대 20개</div>
+                <div class="item-tag">POTION</div>
             </div>
-            <div class="item-right">
-                <div class="item-price">💰 800</div>
-            </div>
+            <div class="item-right"><div class="item-price">💰 700</div></div>
         </div>
 
-        <div class="shop-item" onclick="buy('guarantee')">
+        <div class="shop-item rarity-rare" data-item="hpMedium" onclick="buy('hpMedium')">
+            <div class="item-icon">🧫</div>
             <div class="item-left">
-                <div class="item-name">⭐ 100% 강화권</div>
-                <div class="item-desc">다음 강화 무조건 성공</div>
+                <div class="item-name">HP 회복 물약 (중)</div>
+                <div class="item-desc">전투 중 수동 사용 / 최대 20개</div>
+                <div class="item-tag">POTION</div>
             </div>
-            <div class="item-right">
-                <div class="item-price">💰 1200</div>
-            </div>
+            <div class="item-right"><div class="item-price">💰 1,800</div></div>
         </div>
 
-        <!-- ✅ 제우스 100회 보상으로 해금되는 상품 -->
-        <div id="double-item" class="shop-item" onclick="buy('double')" style="display:none;">
+        <div class="shop-item rarity-epic" data-item="hpLarge" onclick="buy('hpLarge')">
+            <div class="item-icon">⚗</div>
             <div class="item-left">
-                <div class="item-name">💥 200% 강화권</div>
-                <div class="item-desc">다음 강화 100% 성공 + 한 번에 2강</div>
+                <div class="item-name">HP 회복 물약 (대)</div>
+                <div class="item-desc">전투 중 수동 사용 / 최대 20개</div>
+                <div class="item-tag">POTION</div>
             </div>
-            <div class="item-right">
-                <div class="item-price">💰 500000</div>
+            <div class="item-right"><div class="item-price">💰 4,000</div></div>
+        </div>
+
+        <!-- CURE — 무효화 물약 5종 -->
+        <div class="shop-item rarity-rare" data-item="antiPoison" onclick="buy('antiPoison')">
+            <div class="item-icon">☠️</div>
+            <div class="item-left">
+                <div class="item-name">중독 무효화 물약</div>
+                <div class="item-desc">중독 상태이상 1회 무효화 (자동 발동)</div>
+                <div class="item-tag">CURE</div>
             </div>
+            <div class="item-right"><div class="item-price">💰 1,200</div></div>
+        </div>
+
+        <div class="shop-item rarity-rare" data-item="antiBleed" onclick="buy('antiBleed')">
+            <div class="item-icon">🩸</div>
+            <div class="item-left">
+                <div class="item-name">출혈 무효화 물약</div>
+                <div class="item-desc">출혈 상태이상 1회 무효화 (자동 발동)</div>
+                <div class="item-tag">CURE</div>
+            </div>
+            <div class="item-right"><div class="item-price">💰 1,300</div></div>
+        </div>
+
+        <div class="shop-item rarity-rare" data-item="antiBurn" onclick="buy('antiBurn')">
+            <div class="item-icon">🔥</div>
+            <div class="item-left">
+                <div class="item-name">화상 무효화 물약</div>
+                <div class="item-desc">화상 상태이상 1회 무효화 (자동 발동)</div>
+                <div class="item-tag">CURE</div>
+            </div>
+            <div class="item-right"><div class="item-price">💰 1,300</div></div>
+        </div>
+
+        <div class="shop-item rarity-rare" data-item="antiShock" onclick="buy('antiShock')">
+            <div class="item-icon">⚡</div>
+            <div class="item-left">
+                <div class="item-name">감전 무효화 물약</div>
+                <div class="item-desc">감전 상태이상 1회 무효화 (자동 발동)</div>
+                <div class="item-tag">CURE</div>
+            </div>
+            <div class="item-right"><div class="item-price">💰 1,400</div></div>
+        </div>
+
+        <div class="shop-item rarity-rare" data-item="antiFrost" onclick="buy('antiFrost')">
+            <div class="item-icon">❄️</div>
+            <div class="item-left">
+                <div class="item-name">빙결 무효화 물약</div>
+                <div class="item-desc">빙결 상태이상 1회 무효화 (자동 발동)</div>
+                <div class="item-tag">CURE</div>
+            </div>
+            <div class="item-right"><div class="item-price">💰 1,400</div></div>
+        </div>
+
+        <!-- DEFENSE -->
+        <div class="shop-item rarity-epic" data-item="nodrop" onclick="buy('nodrop')">
+            <div class="item-icon">🛡</div>
+            <div class="item-left">
+                <div class="item-name">강화 하락 방지권</div>
+                <div class="item-desc">강화 실패 시 레벨 하락을 1회 방지합니다.</div>
+                <div class="item-tag">DEFENSE</div>
+            </div>
+            <div class="item-right"><div class="item-price">💰 800</div></div>
+        </div>
+
+        <div class="shop-item rarity-epic" data-item="protect" onclick="buy('protect')">
+            <div class="item-icon">🛡</div>
+            <div class="item-left">
+                <div class="item-name">1회 보호권</div>
+                <div class="item-desc">사망 직전 1회 발동, HP 1/4로 복귀 (최대 1개 보유)</div>
+                <div class="item-tag">DEFENSE</div>
+            </div>
+            <div class="item-right"><div class="item-price">💰 6,000</div></div>
+        </div>
+
+        <!-- LEGEND -->
+        <div class="shop-item rarity-legend" data-item="guarantee" onclick="buy('guarantee')">
+            <div class="item-icon">🌟</div>
+            <div class="item-left">
+                <div class="item-name">100% 강화권</div>
+                <div class="item-desc">다음 강화는 반드시 성공합니다.</div>
+                <div class="item-tag">LEGEND</div>
+            </div>
+            <div class="item-right"><div class="item-price">💰 1,200</div></div>
+        </div>
+
+        <div class="shop-item rarity-legend" data-item="skillReset" onclick="buy('skillReset')">
+            <div class="item-icon">📜</div>
+            <div class="item-left">
+                <div class="item-name">스킬 초기화권</div>
+                <div class="item-desc">배낭에서 장착된 액티브/패시브 스킬 슬롯 초기화</div>
+                <div class="item-tag">UTILITY</div>
+            </div>
+            <div class="item-right"><div class="item-price">💰 25,000</div></div>
+        </div>
+
+        <!-- MYTH (잠금) -->
+        <div id="double-item" class="shop-item rarity-myth" data-item="double" onclick="buy('double')" style="display:none;">
+            <div class="item-icon">🜂</div>
+            <div class="item-left">
+                <div class="item-name">200% 강화권</div>
+                <div class="item-desc">다음 강화 100% 성공 + 한 번에 2레벨 상승</div>
+                <div class="item-tag">MYTH</div>
+            </div>
+            <div class="item-right"><div class="item-price">💰 500,000</div></div>
         </div>
 
     </div>
 
     <button class="back-btn" onclick="location.href='index.html'">
-        🔙 돌아가기
+        ↩ 돌아가기
     </button>
-
 </div>
 
 <script src="js/gamedata.js"></script>
@@ -82,8 +196,7 @@
 <script src="js/player-skills.js"></script>
 <script src="js/shop.js"></script>
 <script>
-    document.getElementById('gold-text').innerText = `💰 ${GameData.gold}`;
-    // ✅ 해금되면 표시
+    document.getElementById('gold-text').innerText = `💰 ${GameData.gold.toLocaleString('ko-KR')}`;
     if (GameData.unlockDoubleGuarantee) {
         document.getElementById('double-item').style.display = 'flex';
     }

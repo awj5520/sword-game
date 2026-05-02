@@ -2,18 +2,39 @@ const goldText = document.getElementById('gold-text');
 const MAX_HP_POTION_STACK = 20;
 const MAX_SKILL_RESET_TICKET_STACK = 99;
 
+const SHOP_ITEM_META = {
+  damage: { icon: '⚔', rarity: 'rarity-rare', tag: 'BUFF' },
+  gold: { icon: '🪙', rarity: 'rarity-rare', tag: 'BUFF' },
+  nodrop: { icon: '🛡', rarity: 'rarity-epic', tag: 'DEFENSE' },
+  guarantee: { icon: '🌟', rarity: 'rarity-legend', tag: 'LEGEND' },
+  double: { icon: '🜂', rarity: 'rarity-myth', tag: 'MYTH' },
+  protect: { icon: '🛡', rarity: 'rarity-epic', tag: 'DEFENSE' },
+  hpSmall: { icon: '🧪', rarity: 'rarity-rare', tag: 'POTION' },
+  hpMedium: { icon: '🧫', rarity: 'rarity-rare', tag: 'POTION' },
+  hpLarge: { icon: '⚗', rarity: 'rarity-epic', tag: 'POTION' },
+  antiPoison: { icon: '☠', rarity: 'rarity-rare', tag: 'CURE' },
+  antiBleed: { icon: '🩸', rarity: 'rarity-rare', tag: 'CURE' },
+  antiBurn: { icon: '🔥', rarity: 'rarity-rare', tag: 'CURE' },
+  antiShock: { icon: '⚡', rarity: 'rarity-rare', tag: 'CURE' },
+  antiFrost: { icon: '❄', rarity: 'rarity-rare', tag: 'CURE' },
+  skillReset: { icon: '📜', rarity: 'rarity-legend', tag: 'UTILITY' }
+};
+
 function createShopItem(type, name, desc, price) {
+  const meta = SHOP_ITEM_META[type] || { icon: '🧰', rarity: 'rarity-rare', tag: 'ITEM' };
   const item = document.createElement('div');
-  item.className = 'shop-item';
+  item.className = `shop-item ${meta.rarity}`;
   item.dataset.item = type;
   item.onclick = () => buy(type);
   item.innerHTML = `
+    <div class="item-icon">${meta.icon}</div>
     <div class="item-left">
       <div class="item-name">${name}</div>
       <div class="item-desc">${desc}</div>
+      <div class="item-tag">${meta.tag}</div>
     </div>
     <div class="item-right">
-      <div class="item-price">💰 ${price}</div>
+      <div class="item-price">💰 ${Number(price).toLocaleString('ko-KR')}</div>
     </div>
   `;
   return item;
@@ -25,7 +46,7 @@ function ensureShopItems() {
 
   const anchor = document.getElementById('double-item');
   const items = [
-    { type: 'protect', name: '1회 보호권', desc: '사망 시 1회 발동, HP 1/4로 복귀 (최대 1개 보유)', price: 6000 },
+    { type: 'protect', name: '1회 보호권', desc: '사망 직전 1회 발동, HP 1/4로 복귀 (최대 1개 보유)', price: 6000 },
     { type: 'hpSmall', name: 'HP 회복 물약 (소)', desc: '전투 중 수동 사용 / 최대 20개', price: 700 },
     { type: 'hpMedium', name: 'HP 회복 물약 (중)', desc: '전투 중 수동 사용 / 최대 20개', price: 1800 },
     { type: 'hpLarge', name: 'HP 회복 물약 (대)', desc: '전투 중 수동 사용 / 최대 20개', price: 4000 },
@@ -34,7 +55,7 @@ function ensureShopItems() {
     { type: 'antiBurn', name: '화상 무효화 물약', desc: '화상 상태이상 1회 무효화 (자동 발동)', price: 1300 },
     { type: 'antiShock', name: '감전 무효화 물약', desc: '감전 상태이상 1회 무효화 (자동 발동)', price: 1400 },
     { type: 'antiFrost', name: '빙결 무효화 물약', desc: '빙결 상태이상 1회 무효화 (자동 발동)', price: 1400 },
-    { type: 'skillReset', name: '스킬 초기화권', desc: '배낭에서 장착한 액티브/패시브 스킬 슬롯 초기화', price: 25000 }
+    { type: 'skillReset', name: '스킬 초기화권', desc: '배낭에서 장착된 액티브/패시브 스킬 슬롯 초기화', price: 25000 }
   ];
 
   items.forEach((data) => {
@@ -52,7 +73,7 @@ ensureShopItems();
 updateGold();
 
 function updateGold() {
-  goldText.innerText = `💰 ${GameData.gold}`;
+  goldText.innerText = `💰 ${GameData.gold.toLocaleString('ko-KR')}`;
 }
 
 function buy(type) {
@@ -179,10 +200,9 @@ function buy(type) {
       );
       break;
 
-    /* ✅ 200% 강화권 (제우스 100회 해금) */
     case 'double':
       if (!GameData.unlockDoubleGuarantee) return;
-      price = 500000; // 원하면 가격 바꾸면 됨
+      price = 500000;
       if (GameData.gold < price) return;
       GameData.gold -= price;
       GameData.doubleGuaranteeTicket++;
