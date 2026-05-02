@@ -59,6 +59,7 @@ btnUpgrade.onclick = () => {
         elMsg.innerText = '💥 강화 실패';
         circle.classList.add('circle-fail');
         elLevel.classList.add('level-down-anim');
+        shatterEffect(circle);
         flashScreen('fail');
     }
 
