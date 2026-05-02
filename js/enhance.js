@@ -24,10 +24,19 @@ function updateUI() {
     }
 }
 
+/* 화면 플래시 */
+function flashScreen(type) {
+    const el = document.createElement('div');
+    el.className = `screen-flash ${type}`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 600);
+}
+
 /* 강화 버튼 */
 btnUpgrade.onclick = () => {
-    // 회전 리셋
-    circle.classList.remove('spin');
+    // 이전 애니메이션 제거 후 리플로우
+    circle.classList.remove('spin', 'circle-success', 'circle-fail');
+    elLevel.classList.remove('level-up-anim', 'level-down-anim');
     void circle.offsetWidth;
 
     const result = GameData.upgrade();
@@ -38,16 +47,26 @@ btnUpgrade.onclick = () => {
     }
 
     Sound.playUpgrade(result);
-    circle.classList.add('spin');
+    updateUI(); // 숫자 먼저 갱신
 
     if (result === true) {
         elMsg.innerText = '🔥 강화 성공!';
-        fireEffect(circle);          // 🔥 불꽃 이펙트
+        circle.classList.add('circle-success');
+        elLevel.classList.add('level-up-anim');
+        fireEffect(circle);
+        flashScreen('success');
     } else {
         elMsg.innerText = '💥 강화 실패';
+        circle.classList.add('circle-fail');
+        elLevel.classList.add('level-down-anim');
+        flashScreen('fail');
     }
 
-    updateUI();
+    // 애니메이션 종료 후 클래스 정리
+    setTimeout(() => {
+        circle.classList.remove('circle-success', 'circle-fail');
+        elLevel.classList.remove('level-up-anim', 'level-down-anim');
+    }, 850);
 };
 
 updateUI();
