@@ -1,134 +1,280 @@
-﻿.stats-wrapper {
-    max-width: 900px;
-    margin: auto;
-    padding: 16px;
-    min-height: 100dvh;
-    box-sizing: border-box;
-    overflow-y: auto;
+/* =============================================
+   STATS.CSS — 픽셀 RPG 전투 통계 화면
+   ============================================= */
+
+/* ── 메인 래퍼 ── */
+.stats-wrapper {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 0 24px;
+  min-height: 100dvh;
+  overflow-y: auto;
+
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(80, 80, 200, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 100%, rgba(68, 136, 255, 0.06) 0%, transparent 50%),
+    var(--px-bg2);
 }
 
+/* 배경 그리드 */
+.stats-wrapper::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(48, 48, 160, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(48, 48, 160, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 제목 영역 ── */
 .title-area {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 12px;
-    margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  margin-bottom: 16px;
+
+  background: var(--px-bg);
+  border-bottom: 4px solid var(--px-border);
+  box-shadow:
+    0 4px 0 0 var(--px-border2),
+    0 0 32px rgba(48, 48, 160, 0.4);
+}
+
+.title-area::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--px-border2) 20%,
+    var(--px-gold) 50%,
+    var(--px-border2) 80%,
+    transparent 100%
+  );
 }
 
 .title {
-    font-size: 24px;
-    font-weight: 800;
+  font-family: var(--px-font-kr);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--px-gold);
+  text-shadow:
+    3px 3px 0 var(--px-gold3),
+    0 0 20px rgba(240, 192, 0, 0.5);
+  -webkit-font-smoothing: none;
 }
 
 .updated-at {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.72);
+  font-family: var(--px-font);
+  font-size: 7px;
+  color: var(--px-text2);
+  line-height: 1.6;
 }
 
+/* ── 섹션 제목 ── */
 .section-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 20px 0 10px;
+  position: relative;
+  z-index: 1;
+  font-family: var(--px-font-kr);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--px-rare);
+  text-shadow: 0 0 10px rgba(68, 136, 255, 0.4);
+  -webkit-font-smoothing: none;
+  margin: 20px 14px 10px;
+  padding-left: 12px;
+  border-left: 4px solid var(--px-rare);
 }
 
+/* ── 스탯 그리드 ── */
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  padding: 0 12px;
 }
 
 .stat-card {
-    background: rgba(0, 0, 0, 0.62);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 12px;
-    padding: 12px;
+  background: var(--px-panel);
+  border: 2px solid var(--px-border);
+  padding: 12px;
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+
+  animation: statCardIn 0.3s steps(4) both;
+  transition: filter 0.1s;
 }
 
+.stat-card:hover { filter: brightness(1.1); }
+
 .stat-label {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 6px;
+  font-family: var(--px-font-kr);
+  font-size: 12px;
+  color: var(--px-text2);
+  margin-bottom: 6px;
 }
 
 .stat-value {
-    font-size: 22px;
-    font-weight: 800;
-    color: #8fd3ff;
+  font-family: var(--px-font-kr);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--px-rare);
+  text-shadow: 0 0 8px rgba(68, 136, 255, 0.5);
+  -webkit-font-smoothing: none;
 }
 
+/* ── 킬 목록 ── */
 .kill-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 12px;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  padding: 0 12px;
 }
 
 .kill-group {
-    background: rgba(0, 0, 0, 0.56);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 12px;
-    padding: 12px;
+  background: var(--px-panel);
+  border: 2px solid var(--px-border);
+  padding: 12px;
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
 }
 
 .kill-group-title {
-    font-size: 14px;
-    font-weight: 800;
-    color: #8fd3ff;
-    margin-bottom: 10px;
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--px-rare);
+  margin-bottom: 10px;
+  padding-left: 8px;
+  border-left: 3px solid var(--px-rare);
+  -webkit-font-smoothing: none;
 }
 
 .kill-group-rows {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .kill-group-total {
-    margin-top: 10px;
-    text-align: right;
-    font-size: 12px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.75);
+  margin-top: 10px;
+  text-align: right;
+  font-family: var(--px-font);
+  font-size: 8px;
+  color: var(--px-text2);
 }
 
 .kill-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--px-bg);
+  border: 2px solid var(--px-border);
+
+  clip-path: polygon(
+    0 3px, 3px 0, calc(100% - 3px) 0, 100% 3px,
+    100% calc(100% - 3px), calc(100% - 3px) 100%,
+    3px 100%, 0 calc(100% - 3px)
+  );
 }
 
 .kill-left {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .kill-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.92);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-family: var(--px-font-kr);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--px-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kill-count {
-    font-size: 15px;
-    font-weight: 800;
-    color: #ffe08a;
+  font-family: var(--px-font);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--px-gold);
 }
 
+/* ── 뒤로가기 버튼 ── */
 .back-btn {
-    width: 100%;
-    margin-top: 24px;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    background: linear-gradient(180deg, #444, #222);
-    color: #fff;
-    cursor: pointer;
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: calc(100% - 24px);
+  margin: 24px 12px 12px;
+  padding: 14px 0;
+  text-align: center;
+
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--px-text);
+
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border);
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+
+  box-shadow:
+    0 4px 0 0 rgba(0,0,0,0.8),
+    inset 0 2px 0 rgba(255,255,255,0.06);
+
+  cursor: pointer;
+  transition: filter 0.1s, transform 0.08s steps(1), box-shadow 0.08s;
 }
+
+.back-btn:hover {
+  border-color: var(--px-border2);
+  filter: brightness(1.2);
+  color: var(--px-white);
+}
+
+.back-btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+@keyframes statCardIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.stat-card:nth-child(1)  { animation-delay: 0.05s; }
+.stat-card:nth-child(2)  { animation-delay: 0.10s; }
+.stat-card:nth-child(3)  { animation-delay: 0.15s; }
+.stat-card:nth-child(4)  { animation-delay: 0.20s; }
+.stat-card:nth-child(5)  { animation-delay: 0.25s; }
+.stat-card:nth-child(6)  { animation-delay: 0.30s; }

@@ -1,221 +1,351 @@
+/* =============================================
+   MONSTER-CODEX.CSS — 픽셀 RPG 몬스터 도감
+   ============================================= */
+
+/* ── 메인 래퍼 ── */
 .codex-wrapper {
-    max-width: 980px;
-    margin: auto;
-    padding: 16px;
-    min-height: 100dvh;
-    box-sizing: border-box;
-    overflow-y: auto;
+  position: relative;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 0 24px;
+  min-height: 100dvh;
+  overflow-y: auto;
+
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(80, 80, 200, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(157, 215, 255, 0.05) 0%, transparent 50%),
+    var(--px-bg2);
 }
 
+/* 배경 그리드 */
+.codex-wrapper::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(48, 48, 160, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(48, 48, 160, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 헤더 ── */
 .codex-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 12px;
-    margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  margin-bottom: 14px;
+
+  background: var(--px-bg);
+  border-bottom: 4px solid var(--px-border);
+  box-shadow:
+    0 4px 0 0 var(--px-border2),
+    0 0 32px rgba(48, 48, 160, 0.4);
+}
+
+.codex-top::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--px-border2) 20%,
+    var(--px-gold) 50%,
+    var(--px-border2) 80%,
+    transparent 100%
+  );
 }
 
 .codex-title {
-    font-size: 26px;
-    font-weight: 800;
+  font-family: var(--px-font-kr);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--px-gold);
+  text-shadow:
+    3px 3px 0 var(--px-gold3),
+    0 0 20px rgba(240, 192, 0, 0.5);
+  -webkit-font-smoothing: none;
 }
 
 .codex-summary {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.82);
+  font-family: var(--px-font);
+  font-size: 8px;
+  color: var(--px-text2);
+  line-height: 1.8;
 }
 
+/* ── 그룹 목록 ── */
 .codex-group-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-    gap: 14px;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  padding: 0 12px;
 }
 
+/* ── 그룹 박스 ── */
 .codex-group {
-    background: rgba(0, 0, 0, 0.58);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 14px;
-    padding: 12px;
+  background: var(--px-panel);
+  border: 2px solid var(--px-border);
+  padding: 12px;
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
 }
 
 .codex-group-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .codex-group-title {
-    font-size: 14px;
-    font-weight: 800;
-    color: #9dd7ff;
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--px-rare);
+  -webkit-font-smoothing: none;
 }
 
 .codex-group-progress {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.8);
+  font-family: var(--px-font);
+  font-size: 8px;
+  color: var(--px-text2);
 }
 
+/* ── 카드 목록 ── */
 .codex-card-list {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
 }
 
+/* ── 몬스터 카드 ── */
 .codex-card {
-    display: grid;
-    grid-template-columns: 56px 1fr auto;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: var(--px-bg);
+  border: 2px solid var(--px-border);
+
+  clip-path: polygon(
+    0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 0 calc(100% - 4px)
+  );
+
+  transition: filter 0.08s;
 }
+
+.codex-card:hover { filter: brightness(1.1); }
 
 .codex-card.detail-open {
-    border-color: rgba(157, 215, 255, 0.52);
-    background: rgba(157, 215, 255, 0.08);
+  border-color: var(--px-rare);
+  background: color-mix(in srgb, var(--px-rare) 6%, var(--px-bg));
 }
 
-.codex-card.locked {
-    opacity: 0.82;
-}
+.codex-card.locked { opacity: 0.55; }
 
+/* ── 몬스터 썸네일 ── */
 .codex-thumb {
-    width: 56px;
-    height: 56px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    object-fit: contain;
-    background: rgba(0, 0, 0, 0.35);
-    padding: 4px;
-    box-sizing: border-box;
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--px-border2);
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 4px;
+  box-sizing: border-box;
+  image-rendering: pixelated;
+
+  clip-path: polygon(
+    0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 0 calc(100% - 4px)
+  );
 }
 
 .codex-thumb.clickable {
-    cursor: pointer;
-    transition: transform 120ms ease, border-color 120ms ease;
+  cursor: pointer;
+  transition: filter 0.08s, border-color 0.08s;
 }
 
 .codex-thumb.clickable:hover {
-    transform: translateY(-1px);
-    border-color: rgba(157, 215, 255, 0.7);
+  filter: brightness(1.25);
+  border-color: var(--px-rare);
 }
 
 .codex-thumb.clickable:focus-visible {
-    outline: 2px solid #9dd7ff;
-    outline-offset: 2px;
+  outline: 2px solid var(--px-rare);
+  outline-offset: 2px;
 }
 
 .codex-card.locked .codex-thumb {
-    filter: grayscale(1) brightness(0.28) blur(0.8px);
+  filter: grayscale(1) brightness(0.28) blur(0.8px);
 }
 
-.codex-main {
-    min-width: 0;
-}
+/* ── 몬스터 정보 ── */
+.codex-main { min-width: 0; }
 
 .codex-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: #f5f9ff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-family: var(--px-font-kr);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--px-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .codex-meta {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.75);
-    margin-top: 3px;
+  font-family: var(--px-font-kr);
+  font-size: 11px;
+  color: var(--px-text2);
+  margin-top: 3px;
 }
 
 .codex-meta-sub {
-    font-size: 11px;
-    color: rgba(157, 215, 255, 0.9);
+  font-family: var(--px-font);
+  font-size: 7px;
+  color: var(--px-rare);
+  margin-top: 2px;
 }
 
-.codex-right {
-    text-align: right;
-}
+/* ── 우측 킬 카운트 ── */
+.codex-right { text-align: right; }
 
 .codex-boss {
-    font-size: 11px;
-    font-weight: 800;
-    color: #ffd36b;
-    margin-bottom: 3px;
+  font-family: var(--px-font);
+  font-size: 7px;
+  font-weight: 800;
+  color: var(--px-gold);
+  margin-bottom: 3px;
 }
 
 .codex-kill {
-    font-size: 13px;
-    font-weight: 800;
-    color: #92d5ff;
+  font-family: var(--px-font);
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--px-rare);
 }
 
-.codex-card.locked .codex-kill {
-    color: rgba(255, 255, 255, 0.58);
-}
+.codex-card.locked .codex-kill { color: var(--px-text2); }
 
+/* ── 상세 패널 ── */
 .codex-detail {
-    grid-column: 1 / -1;
-    margin-top: 6px;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(0, 0, 0, 0.28);
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  padding: 10px;
+  border: 2px solid var(--px-border2);
+  background: var(--px-panel);
+
+  clip-path: polygon(
+    0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 0 calc(100% - 4px)
+  );
 }
 
-.codex-detail-inner {
-    display: grid;
-    gap: 7px;
-}
+.codex-detail-inner { display: grid; gap: 7px; }
 
 .codex-detail-title {
-    font-size: 12px;
-    font-weight: 800;
-    color: #c8e9ff;
+  font-family: var(--px-font-kr);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--px-rare);
 }
 
 .codex-detail-list {
-    margin: 0;
-    padding-left: 18px;
-    display: grid;
-    gap: 5px;
-    font-size: 12px;
-    color: rgba(245, 249, 255, 0.94);
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 5px;
+  font-family: var(--px-font-kr);
+  font-size: 12px;
+  color: var(--px-text);
 }
 
+/* ── 상태이상 칩 ── */
 .codex-status-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .codex-status-chip {
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 999px;
-    color: #f8fcff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(50, 114, 160, 0.5);
+  font-family: var(--px-font);
+  font-size: 7px;
+  font-weight: 700;
+  padding: 4px 8px;
+  color: var(--px-white);
+  background: var(--px-border2);
+
+  clip-path: polygon(
+    0 3px, 3px 0, calc(100% - 3px) 0, 100% 3px,
+    100% calc(100% - 3px), calc(100% - 3px) 100%,
+    3px 100%, 0 calc(100% - 3px)
+  );
 }
 
 .codex-detail-lock,
 .codex-detail-empty {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.85);
+  font-family: var(--px-font-kr);
+  font-size: 12px;
+  color: var(--px-text2);
 }
 
+/* ── 뒤로가기 버튼 ── */
 .back-btn {
-    width: 100%;
-    margin-top: 22px;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    background: linear-gradient(180deg, #444, #222);
-    color: #fff;
-    cursor: pointer;
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: calc(100% - 24px);
+  margin: 22px 12px 12px;
+  padding: 14px 0;
+  text-align: center;
+
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--px-text);
+
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border);
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+
+  box-shadow:
+    0 4px 0 0 rgba(0,0,0,0.8),
+    inset 0 2px 0 rgba(255,255,255,0.06);
+
+  cursor: pointer;
+  transition: filter 0.1s, transform 0.08s steps(1), box-shadow 0.08s;
+}
+
+.back-btn:hover {
+  border-color: var(--px-border2);
+  filter: brightness(1.2);
+  color: var(--px-white);
+}
+
+.back-btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
 }
