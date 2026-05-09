@@ -198,6 +198,93 @@
 .stat.rate.low span   { color: var(--px-red); }
 .stat.rate.mid span   { color: var(--px-gold); }
 
+/* ── 공격력 세부 래퍼 ── */
+.damage-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.stat.clickable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.1s, filter 0.1s;
+}
+
+.stat.clickable:hover {
+  border-color: var(--px-border2);
+  filter: brightness(1.15);
+}
+
+.stat-arrow {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--px-text2);
+  transition: transform 0.15s;
+}
+
+.stat.open .stat-arrow {
+  transform: rotate(180deg);
+}
+
+/* ── 공격력 세부 패널 ── */
+.damage-breakdown {
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border);
+  border-top: none;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--px-font-kr);
+  font-size: 12px;
+  color: var(--px-text2);
+}
+
+.breakdown-row .bd-label {
+  color: var(--px-text2);
+}
+
+.breakdown-row .bd-value {
+  font-weight: 900;
+  color: var(--px-text);
+}
+
+.breakdown-row.bd-base .bd-value   { color: var(--px-white); }
+.breakdown-row.bd-equip .bd-value  { color: var(--px-green); }
+.breakdown-row.bd-achiev .bd-value { color: var(--px-gold); }
+.breakdown-row.bd-hades .bd-value  { color: var(--px-epic); }
+.breakdown-row.bd-boss .bd-value   { color: var(--px-myth); }
+.breakdown-row.bd-buff .bd-value   { color: var(--px-rare); }
+
+.breakdown-divider {
+  height: 1px;
+  background: var(--px-border);
+  margin: 2px 0;
+}
+
+.breakdown-row.bd-total {
+  font-size: 13px;
+}
+
+.breakdown-row.bd-total .bd-label { color: var(--px-text); font-weight: 700; }
+.breakdown-row.bd-total .bd-value { color: var(--px-red); font-size: 15px; }
+
+.bd-raw {
+  font-size: 10px;
+  color: var(--px-text2);
+  font-weight: 400;
+}
+
 /* ── 메시지 ── */
 .message {
   height: 24px;
@@ -300,6 +387,32 @@
 }
 
 /* 상점 버튼 */
+/* 일일 퀘스트 버튼 */
+.btn.quest {
+  background: #1a3a80;
+  color: var(--px-white);
+  border: 2px solid var(--px-rare);
+  box-shadow:
+    0 6px 0 0 #0a1a50,
+    inset 0 2px 0 rgba(255,255,255,0.15);
+}
+.btn.quest:active {
+  box-shadow: 0 2px 0 0 #0a1a50;
+}
+
+/* 웨이브 던전 버튼 */
+.btn.dungeon {
+  background: #5a1010;
+  color: var(--px-white);
+  border: 2px solid var(--px-red);
+  box-shadow:
+    0 6px 0 0 #2a0808,
+    inset 0 2px 0 rgba(255,255,255,0.15);
+}
+.btn.dungeon:active {
+  box-shadow: 0 2px 0 0 #2a0808;
+}
+
 .btn.shop {
   background: #7030c0;
   color: var(--px-white);

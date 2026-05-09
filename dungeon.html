@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"><title>웨이브 던전</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/dungeon.css">
+</head>
+<body>
+<div class="dungeon-wrapper">
+
+  <!-- 상단 HUD -->
+  <div class="dungeon-top">
+    <div class="d-wave-badge" id="d-wave-badge">WAVE 0 / 10</div>
+    <div class="d-hp-block">
+      <div class="d-hp-label">플레이어 HP</div>
+      <div class="d-hp-bar"><div id="d-hp-fill" class="d-hp-fill"></div></div>
+      <div id="d-hp-text" class="d-hp-text">0 / 0</div>
+    </div>
+  </div>
+
+  <!-- 전투 필드 -->
+  <div class="dungeon-field" id="dungeon-field">
+
+    <!-- 배경 이미지 (전투 중에만 표시) -->
+    <div class="d-bg-wrap" id="d-bg-wrap">
+      <img id="d-bg-img" class="d-bg-img" src="images/dungeon/bg.png" alt="" draggable="false">
+    </div>
+
+    <!-- 시작 전 화면 -->
+    <div id="d-start-screen" class="d-panel">
+      <div class="d-panel-title">⚔️ 웨이브 던전</div>
+      <div class="d-panel-desc">10층의 몬스터를 처치하라!<br>층마다 보상을 획득하고<br>최종 보스를 쓰러뜨려라.</div>
+      <div id="d-best-wave" class="d-best"></div>
+      <button id="d-start-btn" class="d-action-btn">던전 입장</button>
+    </div>
+
+    <!-- 전투 화면 -->
+    <div id="d-battle-screen" class="d-panel" style="display:none">
+      <div id="d-monster-name" class="d-monster-name"></div>
+      <div class="d-monster-hp-bar-wrap">
+        <div class="d-monster-hp-bar"><div id="d-monster-hp-fill" class="d-monster-hp-fill"></div></div>
+        <div id="d-monster-hp-text" class="d-monster-hp-text">0 / 0</div>
+      </div>
+
+      <!-- 몬스터 이미지 -->
+      <div class="d-monster-img-wrap">
+        <img id="d-monster-img" class="d-monster-img" src="" alt="" draggable="false">
+      </div>
+
+      <div id="d-log" class="d-log">전투 준비 중...</div>
+      <button id="d-manual-attack" class="d-action-btn d-attack-btn">⚔ 공격</button>
+    </div>
+
+    <!-- 웨이브 클리어 화면 -->
+    <div id="d-wave-clear-screen" class="d-panel" style="display:none">
+      <div class="d-clear-title" id="d-clear-title">WAVE CLEAR!</div>
+      <div id="d-clear-reward" class="d-clear-reward"></div>
+      <div id="d-heal-info" class="d-heal-info"></div>
+      <button id="d-next-wave-btn" class="d-action-btn">다음 층 →</button>
+    </div>
+
+    <!-- 실패 화면 -->
+    <div id="d-fail-screen" class="d-panel" style="display:none">
+      <div class="d-fail-title">💀 전멸</div>
+      <div id="d-fail-info" class="d-fail-info"></div>
+      <button id="d-retry-btn" class="d-action-btn">다시 도전</button>
+    </div>
+
+    <!-- 완전 클리어 화면 -->
+    <div id="d-complete-screen" class="d-panel" style="display:none">
+      <div class="d-complete-title">🏆 던전 정복!</div>
+      <div id="d-complete-info" class="d-complete-info"></div>
+      <button id="d-done-btn" class="d-action-btn">완료</button>
+    </div>
+  </div>
+
+  <!-- 포션 버튼 -->
+  <div class="dungeon-potions" id="dungeon-potions">
+    <button class="d-potion-btn" onclick="dungeonUsePotion('small')">HP 소 <span id="dp-small">x0</span></button>
+    <button class="d-potion-btn" onclick="dungeonUsePotion('medium')">HP 중 <span id="dp-medium">x0</span></button>
+    <button class="d-potion-btn" onclick="dungeonUsePotion('large')">HP 대 <span id="dp-large">x0</span></button>
+  </div>
+
+  <button class="back-btn" onclick="location.href='index.html'">← 메인으로</button>
+</div>
+
+<script src="js/gamedata.js"></script>
+<script src="js/item-defs.js"></script>
+<script src="js/daily-quest.js"></script>
+<script src="js/dungeon.js"></script>
+</body>
+</html>

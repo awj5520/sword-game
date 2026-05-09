@@ -10,7 +10,7 @@ function toSafeNumber(value) {
 }
 
 function formatNumber(value) {
-  return toSafeNumber(value).toLocaleString('ko-KR');
+  return (typeof fmtNum === 'function') ? fmtNum(toSafeNumber(value)) : toSafeNumber(value).toLocaleString('ko-KR');
 }
 
 function getDoneCount(list) {

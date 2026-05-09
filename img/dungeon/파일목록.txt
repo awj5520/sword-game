@@ -1,0 +1,20 @@
+== 웨이브 던전 이미지 목록 ==
+
+[ 배경 ]
+bg.png               — 던전 배경 전체 (권장: 480×320px 이상, 픽셀아트)
+
+[ 몬스터 (웨이브 순서) ]
+monster_1.png        — 1층  동굴 임프
+monster_2.png        — 2층  어둠의 골렘
+monster_3.png        — 3층  독충 군집
+monster_4.png        — 4층  망령 기사
+monster_5.png        — 5층  👑 어비스 감시자 (중간 보스)
+monster_6.png        — 6층  화염 마귀
+monster_7.png        — 7층  얼음 거인
+monster_8.png        — 8층  번개 정령
+monster_9.png        — 9층  심연의 그림자
+monster_10.png       — 10층 👑 던전 군주 (최종 보스)
+
+[ 권장 크기 ]
+몬스터: 160×160px (픽셀아트, 배경 투명 PNG)
+배경:   480×320px 이상

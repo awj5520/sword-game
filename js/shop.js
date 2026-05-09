@@ -46,10 +46,10 @@ function ensureShopItems() {
 
   const anchor = document.getElementById('double-item');
   const items = [
-    { type: 'protect', name: '1회 보호권', desc: '사망 직전 1회 발동, HP 1/4로 복귀 (최대 1개 보유)', price: 6000 },
-    { type: 'hpSmall', name: 'HP 회복 물약 (소)', desc: '전투 중 수동 사용 / 최대 20개', price: 700 },
-    { type: 'hpMedium', name: 'HP 회복 물약 (중)', desc: '전투 중 수동 사용 / 최대 20개', price: 1800 },
-    { type: 'hpLarge', name: 'HP 회복 물약 (대)', desc: '전투 중 수동 사용 / 최대 20개', price: 4000 },
+    { type: 'protect', name: '1회 보호권', desc: '사망 직전 1회 발동, HP 25%로 복귀 (최대 1개 보유)', price: 6000 },
+    { type: 'hpSmall', name: 'HP 회복 물약 (소)', desc: '전투 중 수동 사용 / 최대 HP의 8% 회복 / 최대 20개', price: 700 },
+    { type: 'hpMedium', name: 'HP 회복 물약 (중)', desc: '전투 중 수동 사용 / 최대 HP의 20% 회복 / 최대 20개', price: 1800 },
+    { type: 'hpLarge', name: 'HP 회복 물약 (대)', desc: '전투 중 수동 사용 / 최대 HP의 40% 회복 / 최대 20개', price: 4000 },
     { type: 'antiPoison', name: '중독 무효화 물약', desc: '중독 상태이상 1회 무효화 (자동 발동)', price: 1200 },
     { type: 'antiBleed', name: '출혈 무효화 물약', desc: '출혈 상태이상 1회 무효화 (자동 발동)', price: 1300 },
     { type: 'antiBurn', name: '화상 무효화 물약', desc: '화상 상태이상 1회 무효화 (자동 발동)', price: 1300 },

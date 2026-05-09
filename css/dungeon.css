@@ -1,0 +1,476 @@
+/* =============================================
+   DUNGEON.CSS — 픽셀 RPG 웨이브 던전 화면
+   ============================================= */
+
+/* ── 래퍼 ── */
+.dungeon-wrapper {
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  background-image:
+    linear-gradient(rgba(48, 48, 160, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(48, 48, 160, 0.08) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 0%, rgba(80, 80, 200, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(200, 60, 60, 0.07) 0%, transparent 50%);
+  background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+  background-color: var(--px-bg2);
+  background-attachment: fixed, fixed, fixed, fixed;
+}
+
+/* ── 상단 HUD ── */
+.dungeon-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+
+  background: var(--px-bg);
+  border-bottom: 4px solid var(--px-border);
+  box-shadow:
+    0 4px 0 0 var(--px-border2),
+    0 0 24px rgba(48, 48, 160, 0.35);
+}
+
+.dungeon-top::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--px-border2) 20%,
+    var(--px-red) 50%,
+    var(--px-border2) 80%,
+    transparent 100%
+  );
+}
+
+/* ── 웨이브 배지 ── */
+.d-wave-badge {
+  font-family: var(--px-font);
+  font-size: 10px;
+  color: var(--px-gold);
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+/* ── HP 블록 ── */
+.d-hp-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.d-hp-label {
+  font-family: var(--px-font-kr);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--px-text2);
+}
+
+.d-hp-bar {
+  width: 100%;
+  height: 10px;
+  background: var(--px-bg3);
+  border: 1px solid var(--px-border);
+  overflow: hidden;
+
+  clip-path: polygon(
+    0 2px, 2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%,
+    2px 100%, 0 calc(100% - 2px)
+  );
+}
+
+.d-hp-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--px-green);
+  transition: width 0.2s ease, background 0.3s;
+}
+
+.d-hp-text {
+  font-family: var(--px-font);
+  font-size: 7px;
+  color: var(--px-text2);
+}
+
+/* ── 전투 필드 ── */
+.dungeon-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── 배경 이미지 ── */
+.d-bg-wrap {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.d-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  image-rendering: pixelated;
+  opacity: 0.55;          /* 너무 강하면 UI가 묻힘 — 필요시 조절 */
+}
+
+/* ── 몬스터 이미지 ── */
+.d-monster-img-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+}
+
+.d-monster-img {
+  width: 400px;
+  height: 400px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 12px rgba(255, 60, 60, 0.45));
+  transition: filter 0.15s;
+}
+
+/* 피격 시 흔들림 + 빨간 플래시 */
+@keyframes monsterHit {
+  0%   { transform: translateX(0);    filter: drop-shadow(0 4px 12px rgba(255,60,60,0.45)) brightness(1); }
+  15%  { transform: translateX(-8px); filter: drop-shadow(0 0 16px rgba(255,80,80,1))      brightness(2.2); }
+  35%  { transform: translateX( 7px); filter: drop-shadow(0 0 16px rgba(255,80,80,0.9))    brightness(1.8); }
+  55%  { transform: translateX(-5px); filter: drop-shadow(0 0 10px rgba(255,80,80,0.6))    brightness(1.4); }
+  75%  { transform: translateX( 3px); filter: drop-shadow(0 4px 12px rgba(255,60,60,0.5))  brightness(1.1); }
+  100% { transform: translateX(0);    filter: drop-shadow(0 4px 12px rgba(255,60,60,0.45)) brightness(1); }
+}
+
+.d-monster-img--hit {
+  animation: monsterHit 0.32s steps(2) forwards;
+}
+
+/* ── 패널 ── */
+.d-panel {
+  display: grid;
+  gap: 16px;
+  text-align: center;
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── 시작 화면 ── */
+.d-panel-title {
+  font-family: var(--px-font-kr);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--px-gold);
+  text-shadow:
+    2px 2px 0 var(--px-gold3),
+    0 0 16px rgba(240, 192, 0, 0.5);
+  -webkit-font-smoothing: none;
+}
+
+.d-panel-desc {
+  font-family: var(--px-font-kr);
+  font-size: 13px;
+  color: var(--px-text);
+  line-height: 1.7;
+}
+
+.d-best {
+  font-family: var(--px-font-kr);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--px-rare);
+}
+
+/* ── 몬스터 이름 ── */
+.d-monster-name {
+  font-family: var(--px-font-kr);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--px-white);
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
+  -webkit-font-smoothing: none;
+}
+
+/* ── 몬스터 HP 바 ── */
+.d-monster-hp-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.d-monster-hp-bar {
+  width: 100%;
+  height: 14px;
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border);
+  overflow: hidden;
+
+  clip-path: polygon(
+    0 3px, 3px 0, calc(100% - 3px) 0, 100% 3px,
+    100% calc(100% - 3px), calc(100% - 3px) 100%,
+    3px 100%, 0 calc(100% - 3px)
+  );
+}
+
+.d-monster-hp-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--px-red);
+  box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+  transition: width 0.15s ease;
+}
+
+.d-monster-hp-text {
+  font-family: var(--px-font);
+  font-size: 8px;
+  color: var(--px-text2);
+  text-align: right;
+}
+
+/* ── 전투 로그 ── */
+.d-log {
+  font-family: var(--px-font-kr);
+  font-size: 13px;
+  color: var(--px-text2);
+  height: 2.6em;
+  overflow: hidden;
+  line-height: 1.4;
+  background: var(--px-bg);
+  border: 1px solid var(--px-border);
+  padding: 6px 10px;
+
+  clip-path: polygon(
+    0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 0 calc(100% - 4px)
+  );
+}
+
+/* ── 액션 버튼 공통 ── */
+.d-action-btn {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  text-align: center;
+
+  font-family: var(--px-font-kr);
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--px-white);
+
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border2);
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+
+  box-shadow:
+    0 4px 0 0 rgba(0, 0, 0, 0.8),
+    inset 0 2px 0 rgba(255, 255, 255, 0.06);
+
+  cursor: pointer;
+  transition: transform 0.08s steps(1), box-shadow 0.08s, filter 0.1s;
+}
+
+.d-action-btn:hover {
+  filter: brightness(1.2);
+}
+
+.d-action-btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* ── 공격 버튼 (빨강 테두리) ── */
+.d-attack-btn {
+  border-color: var(--px-red);
+  box-shadow:
+    0 4px 0 0 rgba(0, 0, 0, 0.8),
+    0 0 12px rgba(255, 68, 68, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.06);
+}
+
+.d-attack-btn:hover {
+  border-color: #ff6666;
+}
+
+/* ── 클리어 화면 ── */
+.d-clear-title {
+  font-family: var(--px-font-kr);
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--px-rare);
+  text-shadow: 0 0 16px rgba(68, 136, 255, 0.6);
+  -webkit-font-smoothing: none;
+}
+
+.d-clear-reward {
+  font-family: var(--px-font-kr);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--px-gold);
+}
+
+.d-heal-info {
+  font-family: var(--px-font-kr);
+  font-size: 13px;
+  color: var(--px-green);
+}
+
+/* ── 실패 화면 ── */
+.d-fail-title {
+  font-family: var(--px-font-kr);
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--px-red);
+  text-shadow: 0 0 16px rgba(255, 68, 68, 0.6);
+  -webkit-font-smoothing: none;
+}
+
+.d-fail-info {
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  color: var(--px-text);
+  line-height: 1.7;
+}
+
+/* ── 완전 클리어 화면 ── */
+.d-complete-title {
+  font-family: var(--px-font-kr);
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--px-gold);
+  text-shadow:
+    2px 2px 0 var(--px-gold3),
+    0 0 20px rgba(240, 192, 0, 0.7);
+  -webkit-font-smoothing: none;
+}
+
+.d-complete-info {
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  color: var(--px-text);
+  line-height: 1.7;
+}
+
+/* ── 포션 영역 ── */
+.dungeon-potions {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  justify-content: center;
+}
+
+/* ── 포션 버튼 ── */
+.d-potion-btn {
+  flex: 1;
+  padding: 9px 4px;
+  text-align: center;
+
+  font-family: var(--px-font-kr);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--px-text);
+
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border);
+
+  clip-path: polygon(
+    0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 0 calc(100% - 4px)
+  );
+
+  box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  transition: transform 0.08s steps(1), box-shadow 0.08s, filter 0.1s;
+}
+
+.d-potion-btn:hover {
+  border-color: var(--px-green);
+  filter: brightness(1.2);
+  color: var(--px-white);
+}
+
+.d-potion-btn:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.d-potion-btn span {
+  color: var(--px-green);
+  font-weight: 900;
+}
+
+/* ── 뒤로가기 버튼 ── */
+.back-btn {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 4px 12px 0;
+  padding: 13px;
+  text-align: center;
+
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--px-text);
+
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border);
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+
+  box-shadow:
+    0 4px 0 0 rgba(0, 0, 0, 0.8),
+    inset 0 2px 0 rgba(255, 255, 255, 0.06);
+
+  cursor: pointer;
+  transition: filter 0.1s, transform 0.08s steps(1), box-shadow 0.08s;
+}
+
+.back-btn:hover {
+  border-color: var(--px-border2);
+  filter: brightness(1.2);
+  color: var(--px-white);
+}
+
+.back-btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 400px) {
+  .dungeon-wrapper { padding-bottom: 12px; }
+  .dungeon-potions { gap: 4px; padding: 6px 8px; }
+  .d-potion-btn    { font-size: 11px; padding: 8px 2px; }
+}

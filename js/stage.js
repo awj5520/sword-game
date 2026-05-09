@@ -94,7 +94,7 @@ const STATUS_EFFECT_LIBRARY = {
   boss_bat_curse: { label: '흡혈 저주', durationMs: 9000, lifeStealToMonsterRatio: 0.22 },
   boss_skeleton_fracture: { label: '골절', durationMs: 9000, incomingDamageMul: 1.25 },
   boss_demon_brand: { label: '지옥 낙인', durationMs: 12000, tickMs: 3000, damageRatio: 0.02, minDamage: 6 },
-  boss_hell_seal: { label: '신벌 봉인', durationMs: 6500, blockPlayerAttack: true },
+  boss_hell_seal: { label: '신벌 봉인', durationMs: 500, blockPlayerAttack: true },
   boss_poseidon_pressure: { label: '심해 수압', durationMs: 9000, outgoingDamageMul: 0.7, playerHitChanceMul: 0.85 },
   boss_hades_shackle: { label: '망자의 굴레', durationMs: 10000, selfDamageOnAttackChance: 0.35, selfDamageOnAttackRatio: 0.08, selfDamageOnAttackMin: 5 },
   boss_zeus_overload: { label: '과전류', durationMs: 8000, attackDelayChance: 0.4, attackDelayMs: 1200 },
@@ -578,98 +578,98 @@ if (world === 3 && GameData.level < 700) {
 ========================= */
 const grassStages = {
   1:{ name:'슬라임', monster:'slime_grass_1.png', hp:100, gold:50, lvl:0, speed:4, achId:'slime' },
-  2:{ name:'투구 슬라임', monster:'slime_grass_2.png', hp:130, gold:70, lvl:3, speed:3, achId:'slime_helmet' },
-  3:{ name:'전사 슬라임', monster:'slime_grass_3.png', hp:180, gold:100, lvl:6, speed:2.5, achId:'slime_warrior' },
-  4:{ name:'광폭화 슬라임', monster:'slime_grass_4.png', hp:260, gold:140, lvl:9, speed:1.8, achId:'slime_rage' },
-  5:{ name:'슬라임 왕', monster:'slime_grass_5.png', hp:420, gold:300, lvl:12, speed:2, scale:1.4, achId:'slime_king' }
+  2:{ name:'투구 슬라임', monster:'slime_grass_2.png', hp:130, gold:70, lvl:10, speed:3, achId:'slime_helmet' },
+  3:{ name:'전사 슬라임', monster:'slime_grass_3.png', hp:180, gold:100, lvl:20, speed:2.5, achId:'slime_warrior' },
+  4:{ name:'광폭화 슬라임', monster:'slime_grass_4.png', hp:260, gold:140, lvl:30, speed:1.8, achId:'slime_rage' },
+  5:{ name:'슬라임 왕', monster:'slime_grass_5.png', hp:420, gold:300, lvl:40, speed:2, scale:1.4, achId:'slime_king' }
 };
 
 const orcStages = {
-  1:{ name:'풋내기 오크', monster:'orc_1.png', hp:520, gold:380, lvl:14, speed:3.2, scale:1.3, offsetY:80, achId:'orc_1' },
-  2:{ name:'전사 오크', monster:'orc_2.png', hp:650, gold:420, lvl:16, speed:2.8, achId:'orc_2' },
-  3:{ name:'광전사 오크', monster:'orc_3.png', hp:820, gold:500, lvl:18, speed:2.4, achId:'orc_3' },
-  4:{ name:'주술사 오크', monster:'orc_4.png', hp:1000, gold:650, lvl:20, speed:2.0, achId:'orc_4' },
-  5:{ name:'오크 족장', monster:'orc_5.png', hp:1600, gold:1200, lvl:25, speed:2.6, scale:1.6, achId:'orc_king' }
+  1:{ name:'풋내기 오크', monster:'orc_1.png', hp:520, gold:380, lvl:50, speed:3.2, scale:1.3, offsetY:80, achId:'orc_1' },
+  2:{ name:'전사 오크', monster:'orc_2.png', hp:650, gold:420, lvl:60, speed:2.8, achId:'orc_2' },
+  3:{ name:'광전사 오크', monster:'orc_3.png', hp:820, gold:500, lvl:70, speed:2.4, achId:'orc_3' },
+  4:{ name:'주술사 오크', monster:'orc_4.png', hp:1000, gold:650, lvl:80, speed:2.0, achId:'orc_4' },
+  5:{ name:'오크 족장', monster:'orc_5.png', hp:1600, gold:1200, lvl:90, speed:2.6, scale:1.6, achId:'orc_king' }
 };
 
 const dragonStages = {
-  1:{ name:'새끼 드레이크', monster:'dragon_1.png', hp:2200, gold:1800, lvl:28, speed:3.0, scale:1.2, offsetY:-40, achId:'dragon_1' },
-  2:{ name:'불꽃 드레이크', monster:'dragon_2.png', hp:2600, gold:2200, lvl:30, speed:2.6, scale:1.3, offsetY:-60, achId:'dragon_2' },
-  3:{ name:'비늘 와이번', monster:'dragon_3.png', hp:3200, gold:2800, lvl:33, speed:2.2, scale:1.4, offsetY:-80, achId:'dragon_3' },
-  4:{ name:'다크 드래곤', monster:'dragon_4.png', hp:4000, gold:3600, lvl:36, speed:1.9, scale:1.6, offsetY:-100, achId:'dragon_4' },
-  5:{ name:'골드 드래곤', monster:'dragon_5.png', hp:6500, gold:7000, lvl:40, speed:1.5, scale:1.9, offsetY:-120, achId:'dragon_king' }
+  1:{ name:'새끼 드레이크', monster:'dragon_1.png', hp:2200, gold:1800, lvl:100, speed:3.0, scale:1.2, offsetY:-40, achId:'dragon_1' },
+  2:{ name:'불꽃 드레이크', monster:'dragon_2.png', hp:2600, gold:2200, lvl:110, speed:2.6, scale:1.3, offsetY:-60, achId:'dragon_2' },
+  3:{ name:'비늘 와이번', monster:'dragon_3.png', hp:3200, gold:2800, lvl:120, speed:2.2, scale:1.4, offsetY:-80, achId:'dragon_3' },
+  4:{ name:'다크 드래곤', monster:'dragon_4.png', hp:4000, gold:3600, lvl:130, speed:1.9, scale:1.6, offsetY:-100, achId:'dragon_4' },
+  5:{ name:'골드 드래곤', monster:'dragon_5.png', hp:6500, gold:7000, lvl:140, speed:1.5, scale:1.9, offsetY:-120, achId:'dragon_king' }
 };
 
 const spaceStages = {
-  1:{ name:'갤럭시 슬라임', monster:'galaxy_slime.png', hp:9000, gold:9000, lvl:45, speed:2.4, scale:2.2, offsetY:-80, achId:'space_slime' },
-  2:{ name:'갤럭시 오크', monster:'galaxy_orc.png', hp:13000, gold:15000, lvl:48, speed:2.0, scale:2.5, offsetY:-100, achId:'space_orc' },
-  3:{ name:'갤럭시 드래곤', monster:'galaxy_dragon.png', hp:22000, gold:30000, lvl:52, speed:1.6, scale:3.0, offsetY:-140, achId:'space_dragon' }
+  1:{ name:'갤럭시 슬라임', monster:'galaxy_slime.png', hp:9000, gold:9000, lvl:150, speed:2.4, scale:2.2, offsetY:-80, achId:'space_slime' },
+  2:{ name:'갤럭시 오크', monster:'galaxy_orc.png', hp:13000, gold:15000, lvl:160, speed:2.0, scale:2.5, offsetY:-100, achId:'space_orc' },
+  3:{ name:'갤럭시 드래곤', monster:'galaxy_dragon.png', hp:22000, gold:30000, lvl:170, speed:1.6, scale:3.0, offsetY:-140, achId:'space_dragon' }
 };
 
 /* =========================
    🌌 2세계 스테이지 데이터
 ========================= */
 const caveStages = {
-  1:{ name:'동굴 박쥐', monster:'bat_1.png', hp:25000, gold:35000, lvl:100, speed:3.5, achId:'bat_1' },
-  2:{ name:'어둠 박쥐', monster:'bat_2.png', hp:28000, gold:38000, lvl:102, speed:3.2, achId:'bat_2' },
-  3:{ name:'흡혈 박쥐', monster:'bat_3.png', hp:32000, gold:42000, lvl:104, speed:3.0, achId:'bat_3', scale:1.5 },
-  4:{ name:'광폭 박쥐', monster:'bat_4.png', hp:36000, gold:46000, lvl:106, speed:2.6, achId:'bat_4', scale:1.7 },
-  5:{ name:'박쥐 군주', monster:'bat_boss.png', hp:42000, gold:52000, lvl:108, speed:2.4, scale:2.0, achId:'bat_king' }
+  1:{ name:'동굴 박쥐', monster:'bat_1.png', hp:25000, gold:35000, lvl:300, speed:3.5, achId:'bat_1' },
+  2:{ name:'어둠 박쥐', monster:'bat_2.png', hp:28000, gold:38000, lvl:310, speed:3.2, achId:'bat_2' },
+  3:{ name:'흡혈 박쥐', monster:'bat_3.png', hp:32000, gold:42000, lvl:320, speed:3.0, achId:'bat_3', scale:1.5 },
+  4:{ name:'광폭 박쥐', monster:'bat_4.png', hp:36000, gold:46000, lvl:330, speed:2.6, achId:'bat_4', scale:1.7 },
+  5:{ name:'박쥐 군주', monster:'bat_boss.png', hp:42000, gold:52000, lvl:340, speed:2.4, scale:2.0, achId:'bat_king' }
 };
 
 const graveStages = {
-  1:{ name:'해골 병사', monster:'skeleton_1.png', hp:45000, gold:60000, lvl:110, speed:2.4, achId:'skeleton_1' , scale:1.7 },
-  2:{ name:'해골 궁수', monster:'skeleton_2.png', hp:50000, gold:65000, lvl:112, speed:2.2, achId:'skeleton_2' , scale:1.7},
-  3:{ name:'해골 기사', monster:'skeleton_3.png', hp:56000, gold:72000, lvl:114, speed:2.0, achId:'skeleton_3' , scale:1.7},
-  4:{ name:'저주받은 해골', monster:'skeleton_4.png', hp:62000, gold:80000, lvl:116, speed:1.8, achId:'skeleton_4' , scale:1.7},
-  5:{ name:'해골 군주', monster:'skeleton_boss.png', hp:70000, gold:90000, lvl:118, speed:1.6, scale:2.0, achId:'skeleton_king' }
+  1:{ name:'해골 병사', monster:'skeleton_1.png', hp:45000, gold:60000, lvl:350, speed:2.4, achId:'skeleton_1' , scale:1.7 },
+  2:{ name:'해골 궁수', monster:'skeleton_2.png', hp:50000, gold:65000, lvl:360, speed:2.2, achId:'skeleton_2' , scale:1.7},
+  3:{ name:'해골 기사', monster:'skeleton_3.png', hp:56000, gold:72000, lvl:370, speed:2.0, achId:'skeleton_3' , scale:1.7},
+  4:{ name:'저주받은 해골', monster:'skeleton_4.png', hp:62000, gold:80000, lvl:380, speed:1.8, achId:'skeleton_4' , scale:1.7},
+  5:{ name:'해골 군주', monster:'skeleton_boss.png', hp:70000, gold:90000, lvl:390, speed:1.6, scale:2.0, achId:'skeleton_king' }
 };
 
 const demonStages = {
-  1:{ name:'악마 하수인', monster:'demon_1.png', hp:80000, gold:100000, lvl:120, speed:2.2, achId:'demon_1' , scale:1.7 },
-  2:{ name:'악마 기사', monster:'demon_2.png', hp:90000, gold:120000, lvl:122, speed:2.0, achId:'demon_2' , scale:1.7},
-  3:{ name:'지옥 마법사', monster:'demon_3.png', hp:105000, gold:140000, lvl:124, speed:1.8, achId:'demon_3' , scale:2.0},
-  4:{ name:'타락한 군주', monster:'demon_4.png', hp:120000, gold:160000, lvl:126, speed:1.6, achId:'demon_4' , scale:2.1},
-  5:{ name:'마왕', monster:'demon_boss.png', hp:150000, gold:200000, lvl:128, speed:1.4, scale:2.4, achId:'demon_king' }
+  1:{ name:'악마 하수인', monster:'demon_1.png', hp:80000, gold:100000, lvl:400, speed:2.2, achId:'demon_1' , scale:1.7 },
+  2:{ name:'악마 기사', monster:'demon_2.png', hp:90000, gold:120000, lvl:410, speed:2.0, achId:'demon_2' , scale:1.7},
+  3:{ name:'지옥 마법사', monster:'demon_3.png', hp:105000, gold:140000, lvl:420, speed:1.8, achId:'demon_3' , scale:2.0},
+  4:{ name:'타락한 군주', monster:'demon_4.png', hp:120000, gold:160000, lvl:430, speed:1.6, achId:'demon_4' , scale:2.1},
+  5:{ name:'마왕', monster:'demon_boss.png', hp:150000, gold:200000, lvl:440, speed:1.4, scale:2.4, achId:'demon_king' }
 };
 
 const hellStages = {
-  1:{ name:'탐욕의 망령', monster:'sin_greed.png', hp:200000, gold:260000, lvl:130, speed:1.8, scale:2.4, achId:'sin_greed' },
-  2:{ name:'질투의 망령', monster:'sin_envy.png', hp:260000, gold:340000, lvl:132, speed:1.7, scale:2.9, achId:'sin_envy' },
-  3:{ name:'👑 분노의 신', monster:'sin_god.png', hp:350000, gold:500000, lvl:140, speed:1.3, scale:2.5, achId:'sin_god' }
+  1:{ name:'탐욕의 망령', monster:'sin_greed.png', hp:200000, gold:260000, lvl:450, speed:1.8, scale:2.4, achId:'sin_greed' },
+  2:{ name:'질투의 망령', monster:'sin_envy.png', hp:260000, gold:340000, lvl:460, speed:1.7, scale:2.9, achId:'sin_envy' },
+  3:{ name:'👑 분노의 신', monster:'sin_god.png', hp:350000, gold:500000, lvl:470, speed:1.3, scale:2.5, achId:'sin_god' }
 };
 
 /* =========================
    🌠 3세계 스테이지 데이터
 ========================= */
 const atlantisStages = {
-  1:{ name:'산호 슬라임', monster:'w3_atlantis_1.png', hp:520000,  gold:650000,  lvl:200, speed:2.6, achId:'w3_atlantis_1' },
-  2:{ name:'심해 해마 기사', monster:'w3_atlantis_2.png', hp:620000,  gold:780000,  lvl:205, speed:2.4, scale:1.7, achId:'w3_atlantis_2' },
-  3:{ name:'잠수꾼 망령', monster:'w3_atlantis_3.png', hp:760000,  gold:950000,  lvl:210, speed:2.2, scale:1.8, achId:'w3_atlantis_3' },
-  4:{ name:'크라켄', monster:'w3_atlantis_4.png', hp:980000,  gold:1250000, lvl:215, speed:2.0, scale:2.6, achId:'w3_atlantis_4' },
-  5:{ name:'👑 포세이돈', monster:'w3_atlantis_5_poseidon.png', hp:1450000, gold:2000000, lvl:220, speed:1.5, scale:2.4, achId:'w3_poseidon' }
+  1:{ name:'산호 슬라임', monster:'w3_atlantis_1.png', hp:520000,  gold:650000,  lvl:700, speed:2.6, achId:'w3_atlantis_1' },
+  2:{ name:'심해 해마 기사', monster:'w3_atlantis_2.png', hp:620000,  gold:780000,  lvl:710, speed:2.4, scale:1.7, achId:'w3_atlantis_2' },
+  3:{ name:'잠수꾼 망령', monster:'w3_atlantis_3.png', hp:760000,  gold:950000,  lvl:720, speed:2.2, scale:1.8, achId:'w3_atlantis_3' },
+  4:{ name:'크라켄', monster:'w3_atlantis_4.png', hp:980000,  gold:1250000, lvl:730, speed:2.0, scale:2.6, achId:'w3_atlantis_4' },
+  5:{ name:'👑 포세이돈', monster:'w3_atlantis_5_poseidon.png', hp:1450000, gold:2000000, lvl:740, speed:1.5, scale:2.4, achId:'w3_poseidon' }
 };
 
 const underworldStages = {
-  1:{ name:'길잃은 영혼', monster:'w3_underworld_1.png', hp:540000,  gold:680000,  lvl:200, speed:3.0, scale:1.6, achId:'w3_underworld_1' },
-  2:{ name:'지옥 사냥개', monster:'w3_underworld_2.png', hp:670000,  gold:820000,  lvl:206, speed:2.4, scale:2.6, achId:'w3_underworld_2' },
-  3:{ name:'사신의 그림자', monster:'w3_underworld_3.png', hp:820000,  gold:1050000, lvl:212, speed:2.1, scale:2.0, achId:'w3_underworld_3' },
-  4:{ name:'스틱스 망령', monster:'w3_underworld_4.png', hp:1050000, gold:1350000, lvl:218, speed:1.9, scale:2.9, achId:'w3_underworld_4' },
-  5:{ name:'👑 하데스', monster:'w3_underworld_5_hades.png', hp:1550000, gold:2200000, lvl:225, speed:1.7, scale:1.8, achId:'w3_hades' }
+  1:{ name:'길잃은 영혼', monster:'w3_underworld_1.png', hp:540000,  gold:680000,  lvl:750, speed:3.0, scale:1.6, achId:'w3_underworld_1' },
+  2:{ name:'지옥 사냥개', monster:'w3_underworld_2.png', hp:670000,  gold:820000,  lvl:760, speed:2.4, scale:2.6, achId:'w3_underworld_2' },
+  3:{ name:'사신의 그림자', monster:'w3_underworld_3.png', hp:820000,  gold:1050000, lvl:770, speed:2.1, scale:2.0, achId:'w3_underworld_3' },
+  4:{ name:'스틱스 망령', monster:'w3_underworld_4.png', hp:1050000, gold:1350000, lvl:780, speed:1.9, scale:2.9, achId:'w3_underworld_4' },
+  5:{ name:'👑 하데스', monster:'w3_underworld_5_hades.png', hp:1550000, gold:2200000, lvl:790, speed:1.7, scale:1.8, achId:'w3_hades' }
 };
 
 const thunderStages = {
-  1:{ name:'구름 정령', monster:'w3_thunder_1.png', hp:560000,  gold:700000,  lvl:200, speed:2.6, achId:'w3_thunder_1' },
-  2:{ name:'번개 박쥐', monster:'w3_thunder_2.png', hp:700000,  gold:860000,  lvl:207, speed:2.3, achId:'w3_thunder_2' },
-  3:{ name:'스톰 나이트', monster:'w3_thunder_3.png', hp:860000,  gold:1100000, lvl:214, speed:2.1, scale:2.4, achId:'w3_thunder_3' },
-  4:{ name:'천둥 골렘', monster:'w3_thunder_4.png', hp:1100000, gold:1450000, lvl:221, speed:1.85, scale:2.7, achId:'w3_thunder_4' },
-  5:{ name:'👑 제우스', monster:'w3_thunder_5_zeus.png', hp:1650000, gold:2400000, lvl:230, speed:1.65, scale:2.5, achId:'w3_zeus' }
+  1:{ name:'구름 정령', monster:'w3_thunder_1.png', hp:560000,  gold:700000,  lvl:800, speed:2.6, achId:'w3_thunder_1' },
+  2:{ name:'번개 박쥐', monster:'w3_thunder_2.png', hp:700000,  gold:860000,  lvl:810, speed:2.3, achId:'w3_thunder_2' },
+  3:{ name:'스톰 나이트', monster:'w3_thunder_3.png', hp:860000,  gold:1100000, lvl:820, speed:2.1, scale:2.4, achId:'w3_thunder_3' },
+  4:{ name:'천둥 골렘', monster:'w3_thunder_4.png', hp:1100000, gold:1450000, lvl:830, speed:1.85, scale:2.7, achId:'w3_thunder_4' },
+  5:{ name:'👑 제우스', monster:'w3_thunder_5_zeus.png', hp:1650000, gold:2400000, lvl:840, speed:1.65, scale:2.5, achId:'w3_zeus' }
 };
 
 const divineStages = {
-  1:{ name:'크로노스', monster:'w3_divine_1_cronos.png', hp:1400000, gold:2600000, lvl:235, speed:100.0, scale:5.5, offsetY:100, achId:'w3_cronos' },
-  2:{ name:'가이아', monster:'w3_divine_2_gaia.png', hp:1850000, gold:3200000, lvl:245, speed:100.0, scale:5.2, offsetY:100, achId:'w3_gaia' },
-  3:{ name:'카오스', monster:'w3_divine_3_chaos.png', hp:2400000, gold:4200000, lvl:255, speed:100.0, scale:5.3, offsetY:100, achId:'w3_chaos' }
+  1:{ name:'크로노스', monster:'w3_divine_1_cronos.png', hp:1400000, gold:2600000, lvl:850, speed:100.0, scale:5.5, offsetY:100, achId:'w3_cronos' },
+  2:{ name:'가이아', monster:'w3_divine_2_gaia.png', hp:1850000, gold:3200000, lvl:860, speed:100.0, scale:5.2, offsetY:100, achId:'w3_gaia' },
+  3:{ name:'카오스', monster:'w3_divine_3_chaos.png', hp:2400000, gold:4200000, lvl:870, speed:100.0, scale:5.3, offsetY:100, achId:'w3_chaos' }
 };
 
 /* =========================
@@ -681,13 +681,13 @@ const divineStages = {
      카오스 인장 1%
 ========================= */
 const riftStages = {
-  1:{ name:'🎲 확률의 도사', monster:'rift_1.png', hp:900000, gold:1500000, lvl:230, speed:2.0, scale:4.0, achId:'rift_1', drop:'dice', dropRate:0.13, bg:'bg_rift_1.png' },
-  2:{ name:'🌓 양면의 문지기', monster:'rift_2.png', hp:1100000, gold:1800000, lvl:235, speed:1.9, scale:3.5, achId:'rift_2', drop:'dual', dropRate:0.10, bg:'bg_rift_2.png' },
-  3:{ name:'⚖️ 균형의 심판관', monster:'rift_3.png', hp:1300000, gold:2200000, lvl:240, speed:1.8, scale:2.4, achId:'rift_3', drop:'scale', dropRate:0.05, bg:'bg_rift_3.png' },
-  4:{ name:'🌀 심연의 분열체', monster:'rift_4.png', hp:1600000, gold:2800000, lvl:250, speed:1.7, scale:2.6, achId:'rift_4', drop:'chaos', dropRate:1.00, bg:'bg_rift_4.png' }
+  1:{ name:'🎲 확률의 도사', monster:'rift_1.png', hp:900000, gold:1500000, lvl:880, speed:2.0, scale:4.0, achId:'rift_1', drop:'dice', dropRate:0.13, bg:'bg_rift_1.png' },
+  2:{ name:'🌓 양면의 문지기', monster:'rift_2.png', hp:1100000, gold:1800000, lvl:890, speed:1.9, scale:3.5, achId:'rift_2', drop:'dual', dropRate:0.10, bg:'bg_rift_2.png' },
+  3:{ name:'⚖️ 균형의 심판관', monster:'rift_3.png', hp:1300000, gold:2200000, lvl:900, speed:1.8, scale:2.4, achId:'rift_3', drop:'scale', dropRate:0.05, bg:'bg_rift_3.png' },
+  4:{ name:'🌀 심연의 분열체', monster:'rift_4.png', hp:1600000, gold:2800000, lvl:910, speed:1.7, scale:2.6, achId:'rift_4', drop:'chaos', dropRate:1.00, bg:'bg_rift_4.png' }
 };
 
-const STAGE_LEVEL_GAP = 10;
+const STAGE_LEVEL_GAP = 0;   // lvl 값은 각 스테이지에 직접 지정 (10 간격 보장)
 const STAGE_HP_MULTIPLIER = 5;
 
 function applyStageLevelGapAndHp(stageMap, levelGap, hpMultiplier) {
@@ -860,9 +860,10 @@ const HP_POTION_KEY_MAP = {
   large: 'hpPotionLarge'
 };
 const HP_POTION_HEAL_RATIO_MAP = {
-  small: 0.2,
-  medium: 0.5,
-  large: 1
+  // 소: 8%, 중: 20%, 대: 40% (레벨당 HP 10 증가에 맞춰 상향)
+  small: 0.08,
+  medium: 0.20,
+  large: 0.40
 };
 const ACTIVE_SKILL_SLOT_COUNT = 3;
 const activeSkillCooldownUntil = Array.from({ length: ACTIVE_SKILL_SLOT_COUNT }, () => 0);
@@ -923,9 +924,9 @@ const monsterAttackDamage =
    UI 초기화
 ========================= */
 log.innerText = `${data.name} 등장!`;
-goldText.innerText = `💰 ${GameData.gold}`;
+goldText.innerText = `💰 ${fmtNum(GameData.gold)}`;
 refreshPassiveSkillTotals();
-damageText.innerText = `공격력: ${Math.max(1, Math.floor(GameData.getCurrentDamage() * (Number(passiveSkillTotals.damageMul) || 1)))}`;
+damageText.innerText = `공격력: ${fmtNum(Math.max(1, Math.floor(GameData.getCurrentDamage() * (Number(passiveSkillTotals.damageMul) || 1))))}`;
 
 if (GameData.currentHp <= 0) {
   GameData.currentHp = getBattleMaxHp();
@@ -958,14 +959,14 @@ if (GameData.protectTicket <= 0 && GameData.protectActive) {
 function updateMonsterHP() {
   const ratio = data.hp > 0 ? (hp / data.hp) * 100 : 0;
   monsterHpFill.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
-  monsterHpText.innerText = `몬스터 HP ${hp} / ${data.hp}`;
+  monsterHpText.innerText = `몬스터 HP ${fmtNum(hp)} / ${fmtNum(data.hp)}`;
 }
 
 function updatePlayerHP() {
   const maxHpForBattle = getBattleMaxHp();
   const ratio = maxHpForBattle > 0 ? (GameData.currentHp / maxHpForBattle) * 100 : 0;
   playerHpFill.style.width = `${Math.max(0, Math.min(100, ratio))}%`;
-  playerHpText.innerText = `유저 HP ${GameData.currentHp} / ${maxHpForBattle}`;
+  playerHpText.innerText = `유저 HP ${fmtNum(GameData.currentHp)} / ${fmtNum(maxHpForBattle)}`;
 
   const isLowHp = ratio <= LOW_HP_WARNING_RATIO;
   if (playerStatusEl) {
@@ -1044,7 +1045,7 @@ function useHpPotion(type) {
   const recovered = Math.max(0, GameData.currentHp - beforeHp);
 
   const labels = { small: 'HP 물약(소)', medium: 'HP 물약(중)', large: 'HP 물약(대)' };
-  log.innerText = `${labels[type]} 사용! +${recovered} HP`;
+  log.innerText = `${labels[type]} 사용! +${fmtNum(recovered)} HP`;
 
   updatePlayerHP();
 }
@@ -1379,7 +1380,7 @@ function applyDamageToPlayer(amount, reasonText, sourceType = 'hit') {
   if (GameData.isDead()) {
     if (tryUseProtectTicket()) {
       if (reasonText) {
-        log.innerText = `${reasonText} -${finalDamage} HP (보호권 발동)`;
+        log.innerText = `${reasonText} -${fmtNum(finalDamage)} HP (보호권 발동)`;
       }
       return false;
     }
@@ -1388,7 +1389,7 @@ function applyDamageToPlayer(amount, reasonText, sourceType = 'hit') {
   }
 
   if (reasonText) {
-    log.innerText = `${reasonText} -${finalDamage} HP`;
+    log.innerText = `${reasonText} -${fmtNum(finalDamage)} HP`;
   }
   return false;
 }
@@ -1555,7 +1556,7 @@ function tryUseProtectTicket() {
   GameData.save();
   updatePlayerHP();
 
-  log.innerText = `🛡️ 보호권 발동! HP ${recoverHp}로 복귀했습니다.`;
+  log.innerText = `🛡️ 보호권 발동! HP ${fmtNum(recoverHp)}로 복귀했습니다.`;
   return true;
 }
 
@@ -1732,6 +1733,7 @@ function renderActiveSkillBar() {
 function handleMonsterDefeat(extraNote = '') {
   dead = true;
   battleStats.monsterKillCount++;
+  if (window.DailyQuest) DailyQuest.trackKill();
   renderBattleStatsPanel();
   clearBossPatternEffectVisual();
 
@@ -1739,7 +1741,7 @@ function handleMonsterDefeat(extraNote = '') {
   img.style.opacity = '0.3';
 
   const earned = GameData.earnGold(data.gold);
-  goldText.innerText = `💰 ${GameData.gold}`;
+  goldText.innerText = `💰 ${fmtNum(GameData.gold)}`;
 
   GameData.killStats[data.achId] = (GameData.killStats[data.achId] || 0) + 1;
 
@@ -1753,7 +1755,7 @@ function handleMonsterDefeat(extraNote = '') {
   GameData.save();
   if (window.Achievement) Achievement.checkAll();
 
-  const rewardParts = [`${data.name} 처치! +${earned}G`];
+  const rewardParts = [`${data.name} 처치! +${fmtNum(earned)}G`];
   if (dropName) rewardParts.push(`🎁 ${dropName}`);
   if (battleLootNames.length > 0) {
     rewardParts.push(`장비/룬 드랍: ${battleLootNames.join(', ')}`);
@@ -1839,6 +1841,14 @@ function performPlayerAttack(skillDef = null) {
   img.classList.add('hit');
   setTimeout(() => img.classList.remove('hit'), 120);
 
+  // 공격 이펙트: 스킬이면 전용 이펙트, 아니면 기본 슬래시
+  if (skillDef && typeof playSkillEffect === 'function') {
+    playSkillEffect(skillDef.id, img);
+  } else if (typeof slashEffect === 'function') {
+    slashEffect(img);
+  }
+  if (typeof showAttackDamage === 'function') showAttackDamage(playerDamage, img);
+
   const selfDamage = getSelfDamageOnPlayerAttack();
   if (selfDamage > 0) {
     const diedBySelfDamage = applyDamageToPlayer(selfDamage, '망자의 굴레 반동', 'dot');
@@ -1852,13 +1862,13 @@ function performPlayerAttack(skillDef = null) {
   }
 
   const messageParts = [
-    skillDef ? `${skillDef.name} 사용! ${data.name}에게 ${playerDamage} 피해` : `${data.name}에게 ${playerDamage} 피해`
+    skillDef ? `${skillDef.name} 사용! ${data.name}에게 ${fmtNum(playerDamage)} 피해` : `${data.name}에게 ${fmtNum(playerDamage)} 피해`
   ];
   if (monsterHeal > 0) {
-    messageParts.push(`보스 흡혈 +${monsterHeal} HP`);
+    messageParts.push(`보스 흡혈 +${fmtNum(monsterHeal)} HP`);
   }
   if (selfDamage > 0) {
-    messageParts.push(`반동 -${selfDamage} HP`);
+    messageParts.push(`반동 -${fmtNum(selfDamage)} HP`);
   }
   if (lockMs > 0) {
     messageParts.push(`행동 지연 ${Math.max(1, Math.ceil(lockMs / 1000))}초`);

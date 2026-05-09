@@ -208,6 +208,15 @@ const Achievement = {
       damageMul: 2.0,
       check: () => GameData.level >= 1e16
     },
+    {
+      id: 'upgrade_jesus',
+      title: '예수님',
+      desc: '1자 달성',
+      category: 'upgrade',
+      target: 1e24,
+      damageMul: 5.0,
+      check: () => GameData.level >= 1e24
+    },
 
     {
       id: 'gold_10m',
@@ -232,6 +241,15 @@ const Achievement = {
       target: 100_000_000_000,
       goldMul: 1.5,
       check: () => GameData.totalGold >= 100_000_000_000
+    },
+    {
+      id: 'gold_elon',
+      title: '만사 무사',
+      desc: '1해 골드 달성',
+      category: 'gold',
+      target: 1e20,
+      goldMul: 3.0,
+      check: () => GameData.totalGold >= 1e20
     },
 
     {

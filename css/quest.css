@@ -1,0 +1,267 @@
+/* =============================================
+   QUEST.CSS — 픽셀 RPG 일일 퀘스트 화면
+   ============================================= */
+
+/* ── 래퍼 ── */
+.quest-wrapper {
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  background-image:
+    linear-gradient(rgba(48, 48, 160, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(48, 48, 160, 0.08) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 0%, rgba(80, 80, 200, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(68, 136, 255, 0.06) 0%, transparent 50%);
+  background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+  background-color: var(--px-bg2);
+  background-attachment: fixed, fixed, fixed, fixed;
+}
+
+/* ── sticky 헤더 ── */
+.quest-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+
+  background: var(--px-bg);
+  border-bottom: 4px solid var(--px-border);
+  box-shadow:
+    0 4px 0 0 var(--px-border2),
+    0 0 24px rgba(48, 48, 160, 0.35);
+}
+
+.quest-top::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--px-border2) 20%,
+    var(--px-gold) 50%,
+    var(--px-border2) 80%,
+    transparent 100%
+  );
+}
+
+/* ── 타이틀 ── */
+.quest-title {
+  font-family: var(--px-font-kr);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--px-gold);
+  letter-spacing: 0.04em;
+  text-shadow:
+    3px 3px 0 var(--px-gold3),
+    0 0 20px rgba(240, 192, 0, 0.5);
+  -webkit-font-smoothing: none;
+}
+
+/* ── 타이머 ── */
+.quest-timer {
+  font-family: var(--px-font);
+  font-size: 8px;
+  color: var(--px-text2);
+  line-height: 1.4;
+}
+
+/* ── 퀘스트 목록 ── */
+.quest-list {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  flex: 1;
+}
+
+/* ── 퀘스트 카드 ── */
+.quest-card {
+  background: var(--px-panel);
+  border: 2px solid var(--px-border);
+  padding: 14px 12px;
+  display: grid;
+  gap: 8px;
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+}
+
+.quest-card.done {
+  border-color: var(--px-rare);
+  background: color-mix(in srgb, var(--px-rare) 6%, var(--px-panel));
+}
+
+.quest-card.claimed {
+  opacity: 0.6;
+  border-color: var(--px-border);
+}
+
+/* ── 퀘스트 라벨 ── */
+.quest-label {
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--px-white);
+  -webkit-font-smoothing: none;
+}
+
+/* ── 보상 표시 ── */
+.quest-reward {
+  font-family: var(--px-font-kr);
+  font-size: 12px;
+  color: var(--px-gold);
+  margin-top: 2px;
+}
+
+/* ── 진행도 바 ── */
+.quest-progress-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quest-progress-bar {
+  flex: 1;
+  height: 10px;
+  background: var(--px-bg);
+  border: 1px solid var(--px-border);
+  overflow: hidden;
+
+  clip-path: polygon(
+    0 2px, 2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%,
+    2px 100%, 0 calc(100% - 2px)
+  );
+}
+
+.quest-progress-fill {
+  height: 100%;
+  background: var(--px-rare);
+  box-shadow: 0 0 8px rgba(68, 136, 255, 0.6);
+  transition: width 0.3s ease;
+}
+
+.quest-progress-text {
+  font-family: var(--px-font);
+  font-size: 8px;
+  color: var(--px-text2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── 수령 버튼 ── */
+.claim-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+
+  font-family: var(--px-font-kr);
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--px-text2);
+
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border);
+
+  clip-path: polygon(
+    0 5px, 5px 0, calc(100% - 5px) 0, 100% 5px,
+    100% calc(100% - 5px), calc(100% - 5px) 100%,
+    5px 100%, 0 calc(100% - 5px)
+  );
+
+  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  transition: transform 0.08s steps(1), box-shadow 0.08s, filter 0.1s;
+}
+
+.claim-btn.active {
+  border-color: var(--px-rare);
+  color: var(--px-white);
+  box-shadow:
+    0 4px 0 0 rgba(0, 0, 0, 0.8),
+    0 0 12px rgba(68, 136, 255, 0.4);
+}
+
+.claim-btn.active:hover {
+  filter: brightness(1.25);
+  border-color: #66aaff;
+}
+
+.claim-btn.active:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.claim-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── 수령 완료 표시 ── */
+.claim-done {
+  text-align: center;
+  font-family: var(--px-font-kr);
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--px-text2);
+  padding: 8px 0;
+}
+
+/* ── 뒤로가기 버튼 ── */
+.back-btn {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 4px 12px 0;
+  padding: 13px;
+  text-align: center;
+
+  font-family: var(--px-font-kr);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--px-text);
+
+  background: var(--px-bg3);
+  border: 2px solid var(--px-border);
+
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+
+  box-shadow:
+    0 4px 0 0 rgba(0, 0, 0, 0.8),
+    inset 0 2px 0 rgba(255, 255, 255, 0.06);
+
+  cursor: pointer;
+  transition: filter 0.1s, transform 0.08s steps(1), box-shadow 0.08s;
+}
+
+.back-btn:hover {
+  border-color: var(--px-border2);
+  filter: brightness(1.2);
+  color: var(--px-white);
+}
+
+.back-btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 400px) {
+  .quest-wrapper { padding-bottom: 12px; }
+  .quest-list    { padding: 8px; }
+}

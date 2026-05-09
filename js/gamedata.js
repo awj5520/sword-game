@@ -8,6 +8,49 @@ const FATE_SUCCESS_RATE_BONUS = {
   chaos: 10,
 };
 
+const DAMAGE_SCALING_TUNING = {
+  // Soft cap: below start => linear, above start => slope 비율만큼 감소
+  achievementSoftCapStart: 2.0,
+  achievementSoftCapSlope: 0.05,   // 0.10→0.05: 2x 이상 구간에서 획득량 95% 감소
+  world3SoftCapStart: 1.2,         // 1.3→1.2: 소프트캡 시작점 낮춤
+  world3SoftCapSlope: 0.15,        // 0.25→0.15: 더 강한 감소
+  hadesSoftCapStart: 1.1,          // 1.15→1.1
+  hadesSoftCapSlope: 0.20,         // 0.25→0.20
+
+  // World 3 보스 처치 배율 (10킬마다 누적)
+  world3BossGrowthPerMilestone: 1.02, // 1.03→1.02: 성장 속도 완화
+  world3BossHardCap: 2.0              // 2.6→2.0: 상한선 낮춤
+};
+
+/* ── 한국식 숫자 단위 포맷 (전역) ── */
+window.fmtNum = function(n) {
+  const v = Number(n) || 0;
+  if (!isFinite(v)) return '∞';
+  const abs = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+  const fmt1 = (x) => {
+    const rounded = x >= 100 ? Math.round(x) : Math.round(x * 10) / 10;
+    return (rounded % 1 === 0)
+      ? rounded.toLocaleString('ko-KR')
+      : rounded.toFixed(1);
+  };
+  if (abs >= 1e24) return sign + fmt1(abs / 1e24) + '자';
+  if (abs >= 1e20) return sign + fmt1(abs / 1e20) + '해';
+  if (abs >= 1e16) return sign + fmt1(abs / 1e16) + '경';
+  if (abs >= 1e12) return sign + fmt1(abs / 1e12) + '조';
+  if (abs >= 1e8)  return sign + fmt1(abs / 1e8)  + '억';
+  if (abs >= 1e4)  return sign + fmt1(abs / 1e4)  + '만';
+  return sign + Math.floor(abs).toLocaleString('ko-KR');
+};
+
+function applySoftCapMultiplier(raw, capStart, slope) {
+  const value = Math.max(1, Number(raw) || 1);
+  const start = Math.max(1, Number(capStart) || 1);
+  const gainSlope = Math.max(0, Math.min(1, Number(slope) || 0));
+  if (value <= start) return value;
+  return start + (value - start) * gainSlope;
+}
+
 const DEFAULT_BATTLE_STATS = {
   totalBattles: 0,
   totalBattleSeconds: 0,
@@ -80,14 +123,25 @@ const GameData = {
      기본 스탯
   ========================= */
   level: Number(localStorage.getItem('level')) || 0,
-  damage: Number(localStorage.getItem('damage')) || 10,
+  damage: (() => {
+    const lv = Number(localStorage.getItem('level')) || 0;
+    return Math.max(1, lv * 30);
+  })(),
   gold: Number(localStorage.getItem('gold')) || 0,
 
   /* =========================
      ❤️ 플레이어 HP
   ========================= */
-  maxHp: Number(localStorage.getItem('maxHp')) || 100,
-  currentHp: Number(localStorage.getItem('currentHp')) || 100,
+  maxHp: (() => {
+    const lv = Number(localStorage.getItem('level')) || 0;
+    return 210 + lv * 10;
+  })(),
+  currentHp: (() => {
+    const lv = Number(localStorage.getItem('level')) || 0;
+    const maxHp = 210 + lv * 10;
+    const saved = Number(localStorage.getItem('currentHp'));
+    return Number.isFinite(saved) && saved > 0 ? Math.min(saved, maxHp) : maxHp;
+  })(),
 
   /* =========================
      🏆 업적 배율
@@ -192,6 +246,9 @@ const GameData = {
     }
   })(),
   skillResetTicket: Number(localStorage.getItem('skillResetTicket')) || 0,
+  dailyQuestState: (() => {
+    try { return JSON.parse(localStorage.getItem('dailyQuestState') || 'null'); } catch { return null; }
+  })(),
 
   now() {
     return Date.now();
@@ -351,9 +408,25 @@ const GameData = {
     let dmg = this.damage + bonuses.damageFlat;
     dmg *= bonuses.damageMul;
 
-    dmg *= this.achievementDamageMul;
-    dmg *= this.hadesDamageMul;
-    dmg *= this.world3BossPowerMul;
+    const achievementMul = applySoftCapMultiplier(
+      this.achievementDamageMul,
+      DAMAGE_SCALING_TUNING.achievementSoftCapStart,
+      DAMAGE_SCALING_TUNING.achievementSoftCapSlope
+    );
+    const hadesMul = applySoftCapMultiplier(
+      this.hadesDamageMul,
+      DAMAGE_SCALING_TUNING.hadesSoftCapStart,
+      DAMAGE_SCALING_TUNING.hadesSoftCapSlope
+    );
+    const world3Mul = applySoftCapMultiplier(
+      this.world3BossPowerMul,
+      DAMAGE_SCALING_TUNING.world3SoftCapStart,
+      DAMAGE_SCALING_TUNING.world3SoftCapSlope
+    );
+
+    dmg *= achievementMul;
+    dmg *= hadesMul;
+    dmg *= world3Mul;
 
     if (this.damageBuffUntil > this.now()) {
       dmg *= 1.5;
@@ -453,15 +526,18 @@ const GameData = {
     localStorage.setItem('equippedActiveSkills', JSON.stringify(this.equippedActiveSkills));
     localStorage.setItem('equippedPassiveSkills', JSON.stringify(this.equippedPassiveSkills));
     localStorage.setItem('skillResetTicket', this.skillResetTicket);
+    if (this.dailyQuestState !== undefined) {
+      localStorage.setItem('dailyQuestState', JSON.stringify(this.dailyQuestState));
+    }
   },
 
   resetAllProgress() {
     Object.assign(this, {
       level: 0,
-      damage: 10,
+      damage: 1,
       gold: 0,
-      maxHp: 100,
-      currentHp: 100,
+      maxHp: 210,
+      currentHp: 210,
       achievementDamageMul: 1.0,
       achievementGoldMul: 1.0,
       damageBuffUntil: 0,
@@ -524,9 +600,9 @@ const GameData = {
   },
 
   getBaseSuccessRate() {
-    if (this.level < 10) return 100;
-    if (this.level < 30) return Math.max(95 - (this.level - 10), 75);
-    if (this.level < 60) return Math.max(75 - (this.level - 30) * 0.67, 55);
+    if (this.level < 10)  return 100;
+    if (this.level < 30)  return Math.max(95 - (this.level - 10), 75);
+    if (this.level < 60)  return Math.max(75 - (this.level - 30) * 0.67, 55);
     if (this.level < 100) return Math.max(55 - (this.level - 60) * 0.5, 35);
     if (this.level < 200) return Math.max(35 - (this.level - 100) * 0.15, 20);
     return 20;
@@ -543,6 +619,7 @@ const GameData = {
     let rate = this.getBaseSuccessRate();
     const bonus = Number(FATE_SUCCESS_RATE_BONUS[fateType] || 0);
     rate += bonus;
+   
 
     return Math.max(1, Math.min(100, Math.round(rate)));
   },
@@ -575,18 +652,14 @@ const GameData = {
     if (!fateType) {
       if (success) {
         if (isDouble) {
-          this.damage += 10;
           this.level += 2;
-
           this.doubleGuaranteeTicket--;
           if (this.doubleGuaranteeTicket <= 0) {
             this.doubleGuaranteeTicket = 0;
             this.doubleGuaranteeActive = false;
           }
         } else {
-          this.damage += 5;
           this.level += 1;
-
           if (isGuarantee) {
             this.guaranteeTicket--;
             if (this.guaranteeTicket <= 0) {
@@ -595,9 +668,6 @@ const GameData = {
             }
           }
         }
-
-        this.maxHp += 5;
-        this.currentHp += 5;
       } else {
         if (this.noDropActive && this.noDropTicket > 0) {
           this.noDropTicket--;
@@ -616,14 +686,12 @@ const GameData = {
 
       if (success) {
         if (isDouble) {
-          this.damage += 10;
           this.doubleGuaranteeTicket--;
           if (this.doubleGuaranteeTicket <= 0) {
             this.doubleGuaranteeTicket = 0;
             this.doubleGuaranteeActive = false;
           }
         } else {
-          this.damage += 5;
           if (isGuarantee) {
             this.guaranteeTicket--;
             if (this.guaranteeTicket <= 0) {
@@ -632,9 +700,6 @@ const GameData = {
             }
           }
         }
-
-        this.maxHp += 5;
-        this.currentHp += 5;
       }
 
       if (fateType === 'dice') {
@@ -678,17 +743,13 @@ const GameData = {
         }
       }
 
-      const normalizedNextLevel = Math.max(0, Math.floor(Number(fateNextLevel) || 0));
-      const levelDelta = normalizedNextLevel - startLevel;
-      const expectedStatDelta = levelDelta * 5;
-      const alreadyAppliedDamageDelta = success ? (isDouble ? 10 : 5) : 0;
-      const alreadyAppliedHpDelta = success ? 5 : 0;
-
-      this.level = normalizedNextLevel;
-      this.damage = Math.max(1, this.damage + (expectedStatDelta - alreadyAppliedDamageDelta));
-      this.maxHp = Math.max(1, this.maxHp + (expectedStatDelta - alreadyAppliedHpDelta));
-      this.currentHp = Math.max(0, this.currentHp + (expectedStatDelta - alreadyAppliedHpDelta));
+      this.level = Math.max(0, Math.floor(Number(fateNextLevel) || 0));
     }
+
+    // 레벨 기반 스탯 재계산
+    this.damage = Math.max(1, this.level * 30);
+    this.maxHp = 210 + this.level * 10;
+    this.clampCurrentHpToMax();
 
     this.save();
     if (window.Achievement) Achievement.checkAll();
@@ -705,7 +766,10 @@ const GameData = {
       if (id === 'w3_poseidon') this.atlantisToken++;
       if (id === 'w3_hades') this.underworldToken++;
       if (id === 'w3_zeus') this.thunderToken++;
-      this.world3BossPowerMul *= 1.05;
+      this.world3BossPowerMul = Math.min(
+        DAMAGE_SCALING_TUNING.world3BossHardCap,
+        this.world3BossPowerMul * DAMAGE_SCALING_TUNING.world3BossGrowthPerMilestone
+      );
     }
 
     if (id === 'w3_poseidon' && kills >= 100 && this.poseidonGoldMul < 1.5) {

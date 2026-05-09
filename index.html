@@ -24,9 +24,14 @@
         </div>
 
         <div class="stats">
-            <div id="damage-text" class="stat">
-                공격력 <span>10</span>
+            <div class="damage-wrapper">
+                <div id="damage-text" class="stat clickable" onclick="toggleDamageBreakdown()">
+                    ⚔️ 공격력 <span id="damage-value">0</span> <span class="stat-arrow">▼</span>
+                </div>
+                <div id="damage-breakdown" class="damage-breakdown" style="display:none"></div>
             </div>
+
+            <div id="hp-text" class="stat"></div>
 
             <div id="success-rate" class="stat rate">
                 강화 성공 확률 <span>100%</span>
@@ -62,6 +67,8 @@
                 🌠 3세계 사냥터
             </button>
 
+            <button class="btn quest" onclick="location.href='quest.html'">📋 일일 퀘스트</button>
+            <button class="btn dungeon" onclick="location.href='dungeon.html'">⚔️ 웨이브 던전</button>
             <button class="btn shop" onclick="location.href='shop.html'">🛒 상점</button>
             <button class="btn bag" onclick="location.href='inventory.html'">🎒 배낭</button>
         </div>

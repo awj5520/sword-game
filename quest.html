@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"><title>일일 퀘스트</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/quest.css">
+</head>
+<body>
+<div class="quest-wrapper">
+  <!-- sticky 헤더 -->
+  <div class="quest-top">
+    <div class="quest-title">📋 일일 퀘스트</div>
+    <div id="quest-reset-timer" class="quest-timer">리셋까지 --:--:--</div>
+  </div>
+
+  <div id="quest-list" class="quest-list"></div>
+
+  <button class="back-btn" onclick="location.href='index.html'">← 메인으로</button>
+</div>
+
+<script src="js/gamedata.js"></script>
+<script src="js/item-defs.js"></script>
+<script src="js/daily-quest.js"></script>
+<script src="js/quest-ui.js"></script>
+</body>
+</html>
