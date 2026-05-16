@@ -2,33 +2,146 @@
    DUNGEON.JS — 웨이브 던전 전체 로직
    ============================================= */
 
-/* ── 상수 ── */
-const DUNGEON_WAVE_COUNT = 10;
+/* ── 타이밍 상수 ── */
 const PLAYER_ATK_INTERVAL = 1500;  // ms
 const MONSTER_ATK_INTERVAL = 2500; // ms
-const INTER_WAVE_HEAL = 0.35;      // 35% HP 회복
+const INTER_WAVE_HEAL = 0.35;      // 웨이브 간 35% HP 회복
 
-const WAVE_HP_MULTS   = [8, 12, 17, 23, 50, 28, 37, 47, 60, 130];
-const WAVE_DMG_RATIOS = [0.03, 0.04, 0.05, 0.06, 0.09, 0.06, 0.07, 0.09, 0.11, 0.14];
-const WAVE_GOLD_MULTS = [5, 8, 12, 16, 35, 20, 26, 34, 44, 90];
-const WAVE_NAMES = [
-  '동굴 임프', '어둠의 골렘', '독충 군집', '망령 기사', '👑 어비스 감시자',
-  '화염 마귀', '얼음 거인', '번개 정령', '심연의 그림자', '👑 던전 군주'
+/* =============================================
+   구간 정의 (ZONE_DEFS)
+   ─ 10층마다 1구간, 구간당 몬스터 4종
+     · mob1 : 1~3층
+     · mob2 : 4~6층
+     · mob3 : 7~9층
+     · boss : 10층 (10배수)
+   ─ bg    : 구간 전체 배경 이미지 (공통)
+============================================= */
+const ZONE_DEFS = [
+  {
+    name: '동굴 임프 구간',
+    bg:   'images/dungeon/bg_zone1.png',
+    monsters: [
+      { name: '동굴 임프',     img: 'images/dungeon/zone1_mob1.png' },
+      { name: '어둠 임프',     img: 'images/dungeon/zone1_mob2.png' },
+      { name: '맹독 임프',     img: 'images/dungeon/zone1_mob3.png' },
+      { name: '👑 임프 군주',  img: 'images/dungeon/zone1_boss.png' },
+    ]
+  },
+  {
+    name: '골렘 구간',
+    bg:   'images/dungeon/bg_zone2.png',
+    monsters: [
+      { name: '돌 골렘',       img: 'images/dungeon/zone2_mob1.png' },
+      { name: '철 골렘',       img: 'images/dungeon/zone2_mob2.png' },
+      { name: '어둠의 골렘',   img: 'images/dungeon/zone2_mob3.png' },
+      { name: '👑 골렘 군주',  img: 'images/dungeon/zone2_boss.png' },
+    ]
+  },
+  {
+    name: '독충 구간',
+    bg:   'images/dungeon/bg_zone3.png',
+    monsters: [
+      { name: '독 벌레',       img: 'images/dungeon/zone3_mob1.png' },
+      { name: '갑각 독충',     img: 'images/dungeon/zone3_mob2.png' },
+      { name: '거대 독충',     img: 'images/dungeon/zone3_mob3.png' },
+      { name: '👑 독충 여왕',  img: 'images/dungeon/zone3_boss.png' },
+    ]
+  },
+  {
+    name: '망령 구간',
+    bg:   'images/dungeon/bg_zone4.png',
+    monsters: [
+      { name: '망령 병사',     img: 'images/dungeon/zone4_mob1.png' },
+      { name: '망령 기사',     img: 'images/dungeon/zone4_mob2.png' },
+      { name: '저주받은 망령', img: 'images/dungeon/zone4_mob3.png' },
+      { name: '👑 망령 군주',  img: 'images/dungeon/zone4_boss.png' },
+    ]
+  },
+  {
+    name: '심연 구간',
+    bg:   'images/dungeon/bg_zone5.png',
+    monsters: [
+      { name: '어비스 정찰자', img: 'images/dungeon/zone5_mob1.png' },
+      { name: '어비스 전사',   img: 'images/dungeon/zone5_mob2.png' },
+      { name: '어비스 군주',   img: 'images/dungeon/zone5_mob3.png' },
+      { name: '👑 어비스 감시자', img: 'images/dungeon/zone5_boss.png' },
+    ]
+  },
+  {
+    name: '화염 구간',
+    bg:   'images/dungeon/bg_zone6.png',
+    monsters: [
+      { name: '화염 임프',     img: 'images/dungeon/zone6_mob1.png' },
+      { name: '화염 마귀',     img: 'images/dungeon/zone6_mob2.png' },
+      { name: '불꽃 군주',     img: 'images/dungeon/zone6_mob3.png' },
+      { name: '👑 화염 왕',    img: 'images/dungeon/zone6_boss.png' },
+    ]
+  },
+  {
+    name: '빙하 구간',
+    bg:   'images/dungeon/bg_zone7.png',
+    monsters: [
+      { name: '빙하 정령',     img: 'images/dungeon/zone7_mob1.png' },
+      { name: '서리 기사',     img: 'images/dungeon/zone7_mob2.png' },
+      { name: '얼음 거인',     img: 'images/dungeon/zone7_mob3.png' },
+      { name: '👑 서리 군주',  img: 'images/dungeon/zone7_boss.png' },
+    ]
+  },
+  {
+    name: '번개 구간',
+    bg:   'images/dungeon/bg_zone8.png',
+    monsters: [
+      { name: '번개 정령',     img: 'images/dungeon/zone8_mob1.png' },
+      { name: '폭풍 기사',     img: 'images/dungeon/zone8_mob2.png' },
+      { name: '번개 마법사',   img: 'images/dungeon/zone8_mob3.png' },
+      { name: '👑 뇌신',       img: 'images/dungeon/zone8_boss.png' },
+    ]
+  },
+  {
+    name: '암흑 구간',
+    bg:   'images/dungeon/bg_zone9.png',
+    monsters: [
+      { name: '심연의 그림자', img: 'images/dungeon/zone9_mob1.png' },
+      { name: '어둠의 포식자', img: 'images/dungeon/zone9_mob2.png' },
+      { name: '공허의 군주',   img: 'images/dungeon/zone9_mob3.png' },
+      { name: '👑 암흑 군주',  img: 'images/dungeon/zone9_boss.png' },
+    ]
+  },
+  {
+    name: '던전 군주 구간',
+    bg:   'images/dungeon/bg_zone10.png',
+    monsters: [
+      { name: '던전 수호자',   img: 'images/dungeon/zone10_mob1.png' },
+      { name: '던전 기사',     img: 'images/dungeon/zone10_mob2.png' },
+      { name: '던전 마법사',   img: 'images/dungeon/zone10_mob3.png' },
+      { name: '👑 던전 군주',  img: 'images/dungeon/zone10_boss.png' },
+    ]
+  },
 ];
 
-/* ── 웨이브별 몬스터 이미지 경로 (1~10) ── */
-const WAVE_MONSTER_IMGS = [
-  'images/dungeon/monster_1.png',   // 1층  동굴 임프
-  'images/dungeon/monster_2.png',   // 2층  어둠의 골렘
-  'images/dungeon/monster_3.png',   // 3층  독충 군집
-  'images/dungeon/monster_4.png',   // 4층  망령 기사
-  'images/dungeon/monster_5.png',   // 5층  어비스 감시자 (중간 보스)
-  'images/dungeon/monster_6.png',   // 6층  화염 마귀
-  'images/dungeon/monster_7.png',   // 7층  얼음 거인
-  'images/dungeon/monster_8.png',   // 8층  번개 정령
-  'images/dungeon/monster_9.png',   // 9층  심연의 그림자
-  'images/dungeon/monster_10.png',  // 10층 던전 군주 (최종 보스)
-];
+/* 전체 층수 = 구간 수 × 10 */
+const DUNGEON_WAVE_COUNT = ZONE_DEFS.length * 10;
+
+/* ── 웨이브 정보 계산 ── */
+function getWaveInfo(wave) {
+  const zoneIdx    = Math.floor((wave - 1) / 10);          // 0-based 구간 번호
+  const posInZone  = ((wave - 1) % 10) + 1;                // 구간 내 위치 (1~10)
+  const isBoss     = (posInZone === 10);
+  const zone       = ZONE_DEFS[Math.min(zoneIdx, ZONE_DEFS.length - 1)];
+
+  // mob 인덱스: 1~3층→0, 4~6층→1, 7~9층→2, 10층→3(보스)
+  const monsterIdx = isBoss ? 3 : Math.min(2, Math.floor((posInZone - 1) / 3));
+  const monster    = zone.monsters[monsterIdx];
+
+  // 스탯 스케일링 (구간마다 1.5배 성장)
+  const zoneMul  = Math.pow(1.5, zoneIdx);
+  const posMul   = isBoss ? 8.0 : (1.0 + (posInZone - 1) * 0.28);
+  const hpMult   = Math.max(1, Math.round(8 * zoneMul * posMul));
+  const dmgRatio = Math.min(0.30, 0.03 + zoneIdx * 0.015 + (isBoss ? 0.04 : 0));
+  const goldMult = Math.max(1, Math.round((5 + zoneIdx * 8) * (isBoss ? 6 : 1)));
+
+  return { zone, monster, isBoss, hpMult, dmgRatio, goldMult };
+}
 
 /* ── 로컬 상태 ── */
 let dungeonActive = false;
@@ -52,7 +165,13 @@ function dfmt(n) {
 function el(id) { return document.getElementById(id); }
 
 function showPanel(id) {
-  ['d-start-screen', 'd-battle-screen', 'd-wave-clear-screen', 'd-fail-screen', 'd-complete-screen']
+  const isBattle = (id === 'd-battle-screen');
+
+  // 전투 레이아웃 (몬스터 영역 + UI)
+  el('d-battle-layout').style.display = isBattle ? 'flex' : 'none';
+
+  // 비전투 패널들
+  ['d-start-screen', 'd-wave-clear-screen', 'd-fail-screen', 'd-complete-screen']
     .forEach(p => { el(p).style.display = p === id ? '' : 'none'; });
 }
 
@@ -90,7 +209,12 @@ function dungeonUpdatePotionUI() {
 
 /* ── 배지 갱신 ── */
 function updateWaveBadge() {
-  el('d-wave-badge').textContent = `WAVE ${currentWave} / ${DUNGEON_WAVE_COUNT}`;
+  if (currentWave > 0) {
+    const zoneIdx = Math.floor((currentWave - 1) / 10) + 1;
+    el('d-wave-badge').textContent = `구간 ${zoneIdx}  |  WAVE ${currentWave} / ${DUNGEON_WAVE_COUNT}`;
+  } else {
+    el('d-wave-badge').textContent = `WAVE 0 / ${DUNGEON_WAVE_COUNT}`;
+  }
 }
 
 /* ── 베스트 웨이브 ── */
@@ -131,21 +255,19 @@ function nextWave() {
   currentWave++;
   updateWaveBadge();
 
-  const wi = currentWave - 1; // 0-based index
-  monsterMaxHp = Math.max(1, Math.floor(playerDmg * WAVE_HP_MULTS[wi]));
+  const info = getWaveInfo(currentWave);
+  monsterMaxHp = Math.max(1, Math.floor(playerDmg * info.hpMult));
   monsterHp    = monsterMaxHp;
-  monsterDmg   = Math.max(1, Math.floor(playerMaxHp * WAVE_DMG_RATIOS[wi]));
+  monsterDmg   = Math.max(1, Math.floor(playerMaxHp * info.dmgRatio));
 
-  el('d-monster-name').textContent = `[${currentWave}층] ${WAVE_NAMES[wi]}`;
+  el('d-monster-name').textContent = `[${currentWave}층] ${info.monster.name}`;
   el('d-log').textContent = '전투 시작!';
 
-  // 몬스터 이미지 교체
+  // 몬스터 이미지 + 배경 교체
   const monsterImg = el('d-monster-img');
-  monsterImg.src = WAVE_MONSTER_IMGS[wi];
+  monsterImg.src = info.monster.img;
   monsterImg.classList.remove('d-monster-img--hit');
-
-  // 배경 이미지 표시
-  el('d-bg-wrap').style.display = '';
+  el('d-bg-img').src = info.zone.bg;
 
   updateMonsterHpBar();
   showPanel('d-battle-screen');
@@ -196,8 +318,7 @@ function waveCleared() {
   dungeonActive = false;
 
   // 골드 지급
-  const wi = currentWave - 1;
-  const goldBase = GameData.level * WAVE_GOLD_MULTS[wi];
+  const goldBase = GameData.level * getWaveInfo(currentWave).goldMult;
   const earned = GameData.earnGold(goldBase);
   totalGoldEarned += earned;
   GameData.save();
@@ -247,7 +368,7 @@ function dungeonFail() {
 /* ── 완전 클리어 ── */
 function dungeonComplete() {
   el('d-complete-info').innerHTML =
-    `모든 ${DUNGEON_WAVE_COUNT}층 클리어!<br>💰 총 ${dfmt(totalGoldEarned)} 골드 획득`;
+    `모든 ${DUNGEON_WAVE_COUNT}층 정복!<br>💰 총 ${dfmt(totalGoldEarned)} 골드 획득`;
   showPanel('d-complete-screen');
 }
 
@@ -301,7 +422,6 @@ document.getElementById('d-next-wave-btn').addEventListener('click', goNextWave)
 
 document.getElementById('d-retry-btn').addEventListener('click', function () {
   showPanel('d-start-screen');
-  el('d-bg-wrap').style.display = 'none';
   dungeonActive = false;
   currentWave = 0;
   updateWaveBadge();
@@ -310,7 +430,6 @@ document.getElementById('d-retry-btn').addEventListener('click', function () {
 
 document.getElementById('d-done-btn').addEventListener('click', function () {
   showPanel('d-start-screen');
-  el('d-bg-wrap').style.display = 'none';
   dungeonActive = false;
   currentWave = 0;
   updateWaveBadge();

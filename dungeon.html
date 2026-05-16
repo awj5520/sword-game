@@ -21,12 +21,31 @@
   <!-- 전투 필드 -->
   <div class="dungeon-field" id="dungeon-field">
 
-    <!-- 배경 이미지 (전투 중에만 표시) -->
-    <div class="d-bg-wrap" id="d-bg-wrap">
-      <img id="d-bg-img" class="d-bg-img" src="images/dungeon/bg.png" alt="" draggable="false">
+    <!-- ① 전투 레이아웃: 몬스터 영역(위) + UI(아래) -->
+    <div id="d-battle-layout" style="display:none">
+
+      <!-- 몬스터 + 배경 영역 -->
+      <div class="d-monster-area" id="d-monster-area">
+        <div class="d-bg-wrap" id="d-bg-wrap">
+          <img id="d-bg-img" class="d-bg-img" src="" alt="" draggable="false">
+        </div>
+        <img id="d-monster-img" class="d-monster-img" src="" alt="" draggable="false">
+      </div>
+
+      <!-- 전투 UI (아래 고정) -->
+      <div id="d-battle-screen" class="d-battle-ui">
+        <div id="d-monster-name" class="d-monster-name"></div>
+        <div class="d-monster-hp-bar-wrap">
+          <div class="d-monster-hp-bar"><div id="d-monster-hp-fill" class="d-monster-hp-fill"></div></div>
+          <div id="d-monster-hp-text" class="d-monster-hp-text">0 / 0</div>
+        </div>
+        <div id="d-log" class="d-log">전투 준비 중...</div>
+        <button id="d-manual-attack" class="d-action-btn d-attack-btn">⚔ 공격</button>
+      </div>
+
     </div>
 
-    <!-- 시작 전 화면 -->
+    <!-- ② 비전투 패널들 (필드 중앙) -->
     <div id="d-start-screen" class="d-panel">
       <div class="d-panel-title">⚔️ 웨이브 던전</div>
       <div class="d-panel-desc">10층의 몬스터를 처치하라!<br>층마다 보상을 획득하고<br>최종 보스를 쓰러뜨려라.</div>
@@ -34,24 +53,6 @@
       <button id="d-start-btn" class="d-action-btn">던전 입장</button>
     </div>
 
-    <!-- 전투 화면 -->
-    <div id="d-battle-screen" class="d-panel" style="display:none">
-      <div id="d-monster-name" class="d-monster-name"></div>
-      <div class="d-monster-hp-bar-wrap">
-        <div class="d-monster-hp-bar"><div id="d-monster-hp-fill" class="d-monster-hp-fill"></div></div>
-        <div id="d-monster-hp-text" class="d-monster-hp-text">0 / 0</div>
-      </div>
-
-      <!-- 몬스터 이미지 -->
-      <div class="d-monster-img-wrap">
-        <img id="d-monster-img" class="d-monster-img" src="" alt="" draggable="false">
-      </div>
-
-      <div id="d-log" class="d-log">전투 준비 중...</div>
-      <button id="d-manual-attack" class="d-action-btn d-attack-btn">⚔ 공격</button>
-    </div>
-
-    <!-- 웨이브 클리어 화면 -->
     <div id="d-wave-clear-screen" class="d-panel" style="display:none">
       <div class="d-clear-title" id="d-clear-title">WAVE CLEAR!</div>
       <div id="d-clear-reward" class="d-clear-reward"></div>
@@ -59,19 +60,18 @@
       <button id="d-next-wave-btn" class="d-action-btn">다음 층 →</button>
     </div>
 
-    <!-- 실패 화면 -->
     <div id="d-fail-screen" class="d-panel" style="display:none">
       <div class="d-fail-title">💀 전멸</div>
       <div id="d-fail-info" class="d-fail-info"></div>
       <button id="d-retry-btn" class="d-action-btn">다시 도전</button>
     </div>
 
-    <!-- 완전 클리어 화면 -->
     <div id="d-complete-screen" class="d-panel" style="display:none">
       <div class="d-complete-title">🏆 던전 정복!</div>
       <div id="d-complete-info" class="d-complete-info"></div>
       <button id="d-done-btn" class="d-action-btn">완료</button>
     </div>
+
   </div>
 
   <!-- 포션 버튼 -->

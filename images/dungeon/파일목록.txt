@@ -1,0 +1,85 @@
+== 웨이브 던전 이미지 목록 ==
+총 100층 | 10구간 × 10층 | 구간당 mob3종 + 보스1종
+
+[ 파일 규칙 ]
+배경  : bg_zone{N}.png          → 해당 구간 전체(10층) 공통 배경
+몬스터: zone{N}_mob1.png        → 1~3층 몬스터
+        zone{N}_mob2.png        → 4~6층 몬스터
+        zone{N}_mob3.png        → 7~9층 몬스터
+        zone{N}_boss.png        → 10층 보스 (10배수 층)
+
+[ 권장 크기 ]
+몬스터: 400×400px, 투명 PNG, 캐릭터 정중앙 배치
+배경  : 480×600px 이상
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+구간 1 (1~10층) — 동굴 임프 구간
+  bg_zone1.png       어두운 동굴 입구, 횃불
+  zone1_mob1.png     동굴 임프         (1~3층)
+  zone1_mob2.png     어둠 임프         (4~6층)
+  zone1_mob3.png     맹독 임프         (7~9층)
+  zone1_boss.png     👑 임프 군주      (10층)
+
+구간 2 (11~20층) — 골렘 구간
+  bg_zone2.png       지하 석조 홀, 무너진 기둥
+  zone2_mob1.png     돌 골렘           (11~13층)
+  zone2_mob2.png     철 골렘           (14~16층)
+  zone2_mob3.png     어둠의 골렘       (17~19층)
+  zone2_boss.png     👑 골렘 군주      (20층)
+
+구간 3 (21~30층) — 독충 구간
+  bg_zone3.png       독액 웅덩이, 썩은 뿌리
+  zone3_mob1.png     독 벌레           (21~23층)
+  zone3_mob2.png     갑각 독충         (24~26층)
+  zone3_mob3.png     거대 독충         (27~29층)
+  zone3_boss.png     👑 독충 여왕      (30층)
+
+구간 4 (31~40층) — 망령 구간
+  bg_zone4.png       지하 묘지, 비석, 푸른 안개
+  zone4_mob1.png     망령 병사         (31~33층)
+  zone4_mob2.png     망령 기사         (34~36층)
+  zone4_mob3.png     저주받은 망령     (37~39층)
+  zone4_boss.png     👑 망령 군주      (40층)
+
+구간 5 (41~50층) — 심연 구간
+  bg_zone5.png       심연 절벽, 보라빛 균열
+  zone5_mob1.png     어비스 정찰자     (41~43층)
+  zone5_mob2.png     어비스 전사       (44~46층)
+  zone5_mob3.png     어비스 군주       (47~49층)
+  zone5_boss.png     👑 어비스 감시자  (50층)
+
+구간 6 (51~60층) — 화염 구간
+  bg_zone6.png       용암 동굴, 불꽃 기둥
+  zone6_mob1.png     화염 임프         (51~53층)
+  zone6_mob2.png     화염 마귀         (54~56층)
+  zone6_mob3.png     불꽃 군주         (57~59층)
+  zone6_boss.png     👑 화염 왕        (60층)
+
+구간 7 (61~70층) — 빙하 구간
+  bg_zone7.png       빙하 동굴, 고드름, 파란 얼음
+  zone7_mob1.png     빙하 정령         (61~63층)
+  zone7_mob2.png     서리 기사         (64~66층)
+  zone7_mob3.png     얼음 거인         (67~69층)
+  zone7_boss.png     👑 서리 군주      (70층)
+
+구간 8 (71~80층) — 번개 구간
+  bg_zone8.png       번개 균열 석벽, 노란 섬광
+  zone8_mob1.png     번개 정령         (71~73층)
+  zone8_mob2.png     폭풍 기사         (74~76층)
+  zone8_mob3.png     번개 마법사       (77~79층)
+  zone8_boss.png     👑 뇌신           (80층)
+
+구간 9 (81~90층) — 암흑 구간
+  bg_zone9.png       완전한 어둠, 검은 안개, 보라 빛
+  zone9_mob1.png     심연의 그림자     (81~83층)
+  zone9_mob2.png     어둠의 포식자     (84~86층)
+  zone9_mob3.png     공허의 군주       (87~89층)
+  zone9_boss.png     👑 암흑 군주      (90층)
+
+구간 10 (91~100층) — 던전 군주 구간
+  bg_zone10.png      왕좌 홀, 해골 기둥, 핏빛 달빛
+  zone10_mob1.png    던전 수호자       (91~93층)
+  zone10_mob2.png    던전 기사         (94~96층)
+  zone10_mob3.png    던전 마법사       (97~99층)
+  zone10_boss.png    👑 던전 군주      (100층)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

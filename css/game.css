@@ -144,15 +144,23 @@
 ========================= */
 
 .top-ui {
-    padding: 12px;
+    padding: 10px 12px 8px;
     z-index: 10;
 }
 
+/* ── 픽셀 HP 바 ── */
 .hp-bar {
-    height: 18px;
-    background: rgba(0,0,0,0.4);
-    border-radius: 10px;
+    height: 14px;
+    background: var(--px-bg3, #0a0a14);
+    border: 2px solid var(--px-border, #2a2a4a);
+    border-radius: 0;
     overflow: hidden;
+    clip-path: polygon(
+        0 3px, 3px 0, calc(100% - 3px) 0, 100% 3px,
+        100% calc(100% - 3px), calc(100% - 3px) 100%,
+        3px 100%, 0 calc(100% - 3px)
+    );
+    image-rendering: pixelated;
 }
 
 #hp-fill {
@@ -219,30 +227,47 @@
 ========================= */
 
 .bottom-ui {
-    background: rgba(0,0,0,0.55);
-    padding: 14px;
+    background: rgba(2, 2, 12, 0.82);
+    border-top: 3px solid var(--px-border, #2a2a4a);
+    box-shadow: 0 -2px 0 0 var(--px-border2, #44448a),
+                0 -12px 32px rgba(0,0,0,0.6);
+    padding: 10px 12px 12px;
     text-align: center;
-    backdrop-filter: blur(4px);
     z-index: 10;
-
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 8px;
 }
 
 #log {
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: #fff;
+    font-family: var(--px-font-kr, sans-serif);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--px-text2, #aaa);
+    width: 100%;
+    max-width: 360px;
+    background: rgba(4,4,18,0.7);
+    border: 1px solid var(--px-border, #2a2a4a);
+    padding: 5px 10px;
+    clip-path: polygon(
+        0 3px, 3px 0, calc(100% - 3px) 0, 100% 3px,
+        100% calc(100% - 3px), calc(100% - 3px) 100%,
+        3px 100%, 0 calc(100% - 3px)
+    );
+    margin: 0;
 }
 
 .info {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
-    font-size: 14px;
+    font-family: var(--px-font-kr, sans-serif);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--px-text2, #aaa);
     width: 100%;
     max-width: 360px;
+    margin: 0;
 }
 
 .battle-potions {
@@ -250,8 +275,8 @@
     max-width: 360px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 6px;
+    margin: 0;
 }
 
 .active-skill-bar {
@@ -259,17 +284,18 @@
     max-width: 360px;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 6px;
+    margin: 0;
 }
 
+/* ── 픽셀 스킬 슬롯 ── */
 .active-skill-btn {
     min-height: 56px;
-    padding: 9px 6px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.24);
-    background: linear-gradient(180deg, #ffd772, #d89b1f);
-    color: #2a1900;
+    padding: 8px 5px;
+    border: 2px solid var(--px-gold, #f0c000);
+    background: rgba(30, 20, 0, 0.88);
+    color: var(--px-gold, #f0c000);
+    font-family: var(--px-font-kr, sans-serif);
     font-size: 11px;
     font-weight: 800;
     cursor: pointer;
@@ -278,127 +304,206 @@
     align-items: center;
     justify-content: center;
     gap: 3px;
+    border-radius: 0;
+    clip-path: polygon(
+        0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+        100% calc(100% - 4px), calc(100% - 4px) 100%,
+        4px 100%, 0 calc(100% - 4px)
+    );
+    box-shadow: 0 3px 0 0 rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,220,0,0.15);
+    transition: filter 0.06s steps(1), transform 0.06s steps(1);
+    text-shadow: 0 0 6px rgba(240,192,0,0.4);
+}
+
+.active-skill-btn:hover:not(:disabled):not(.is-cooldown) {
+    filter: brightness(1.25);
+}
+
+.active-skill-btn:active:not(:disabled):not(.is-cooldown) {
+    transform: translateY(3px);
+    box-shadow: none;
 }
 
 .active-skill-meta {
-    font-size: 10px;
+    font-family: var(--px-font, monospace);
+    font-size: 9px;
     font-weight: 700;
-    color: rgba(42, 25, 0, 0.9);
+    color: var(--px-gold, #f0c000);
+    opacity: 0.85;
 }
 
+/* 쿨다운 / 비활성 */
 .active-skill-btn.is-cooldown,
 .active-skill-btn:disabled {
-    background: linear-gradient(180deg, #7f889a, #646d80);
-    color: rgba(255, 255, 255, 0.88);
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: var(--px-border, #2a2a4a);
+    background: rgba(10, 10, 22, 0.82);
+    color: var(--px-text2, #888);
     cursor: not-allowed;
+    box-shadow: 0 3px 0 0 rgba(0,0,0,0.8);
+    text-shadow: none;
 }
 
 .active-skill-btn.is-cooldown .active-skill-meta,
 .active-skill-btn:disabled .active-skill-meta {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--px-text2, #888);
+    opacity: 0.7;
 }
 
+/* 빈 슬롯 */
 .active-skill-btn.is-empty {
-    background: rgba(48, 55, 70, 0.76);
+    border-color: var(--px-border, #2a2a4a);
+    background: rgba(8, 8, 18, 0.6);
+    color: var(--px-text2, #555);
+    cursor: default;
+    box-shadow: none;
 }
 
+/* ── 픽셀 포션 버튼 ── */
 .potion-btn {
-    padding: 10px 6px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    background: linear-gradient(180deg, #4c6ef5, #2b4fbf);
-    color: #fff;
-    font-size: 12px;
+    padding: 9px 4px;
+    border: 2px solid var(--px-green, #00cc66);
+    background: rgba(0, 18, 8, 0.88);
+    color: var(--px-green, #00cc66);
+    font-family: var(--px-font-kr, sans-serif);
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 3px;
+    border-radius: 0;
+    clip-path: polygon(
+        0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+        100% calc(100% - 4px), calc(100% - 4px) 100%,
+        4px 100%, 0 calc(100% - 4px)
+    );
+    box-shadow: 0 3px 0 0 rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(0,255,100,0.1);
+    transition: filter 0.06s steps(1), transform 0.06s steps(1);
+    text-shadow: 0 0 5px rgba(0,200,80,0.35);
+}
+
+.potion-btn:hover:not(:disabled) {
+    filter: brightness(1.25);
+}
+
+.potion-btn:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: none;
 }
 
 .potion-btn:disabled {
-    background: linear-gradient(180deg, #7f889a, #646d80);
+    border-color: var(--px-border, #2a2a4a);
+    background: rgba(8, 8, 18, 0.7);
+    color: var(--px-text2, #555);
     cursor: not-allowed;
-    opacity: 0.82;
+    box-shadow: 0 3px 0 0 rgba(0,0,0,0.8);
+    text-shadow: none;
+    opacity: 1;
 }
 
 .potion-count {
-    font-size: 11px;
-    font-weight: 800;
-    color: #ffe89e;
+    font-family: var(--px-font, monospace);
+    font-size: 10px;
+    font-weight: 900;
+    color: var(--px-green, #00cc66);
+    letter-spacing: 0.05em;
 }
 
-.bottom-ui button {
+/* ── 뒤로가기 버튼 ── */
+.bottom-ui > button#back-btn {
     width: 100%;
     max-width: 360px;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(180deg, #4caf50, #1b5e20);
-    color: #fff;
-    font-weight: bold;
+    padding: 11px;
+    border: 2px solid var(--px-border2, #44448a);
+    border-radius: 0;
+    background: rgba(8, 8, 22, 0.88);
+    color: var(--px-text, #ccc);
+    font-family: var(--px-font-kr, sans-serif);
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
+    clip-path: polygon(
+        0 5px, 5px 0, calc(100% - 5px) 0, 100% 5px,
+        100% calc(100% - 5px), calc(100% - 5px) 100%,
+        5px 100%, 0 calc(100% - 5px)
+    );
+    box-shadow: 0 3px 0 0 rgba(0,0,0,0.8);
+    transition: filter 0.06s steps(1), transform 0.06s steps(1);
+    margin: 0;
 }
 
+.bottom-ui > button#back-btn:hover {
+    border-color: var(--px-white, #fff);
+    filter: brightness(1.2);
+    color: var(--px-white, #fff);
+}
+
+.bottom-ui > button#back-btn:active {
+    transform: translateY(3px);
+    box-shadow: none;
+}
+
+/* 스킬바 내 버튼은 위에서 정의한 pixel 스타일 유지 */
 .bottom-ui .active-skill-btn {
     width: auto;
     max-width: none;
-    border: 1px solid rgba(255, 255, 255, 0.24);
-    background: linear-gradient(180deg, #ffd772, #d89b1f);
-    color: #2a1900;
-    font-weight: 800;
-    padding: 9px 6px;
+    margin: 0;
 }
-
-.bottom-ui .active-skill-btn.is-cooldown,
-.bottom-ui .active-skill-btn:disabled {
-    background: linear-gradient(180deg, #7f889a, #646d80);
-    color: rgba(255, 255, 255, 0.88);
-    border-color: rgba(255, 255, 255, 0.18);
-}
-/* HP layout overrides */
+/* ── 픽셀 HP / 상태 박스 ── */
 .status-box {
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
+    background: rgba(4, 4, 16, 0.72);
+    border: 2px solid var(--px-border, #2a2a4a);
+    padding: 6px 8px;
+    clip-path: polygon(
+        0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px,
+        100% calc(100% - 4px), calc(100% - 4px) 100%,
+        4px 100%, 0 calc(100% - 4px)
+    );
 }
 
 .status-label {
-    font-size: 12px;
-    color: #fff;
-    margin-bottom: 6px;
+    font-family: var(--px-font-kr, sans-serif);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--px-text2, #aaa);
+    margin-bottom: 5px;
     text-align: left;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.hp-bar {
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 
 .hp-fill {
     height: 100%;
     width: 100%;
-    transition: width 0.2s ease;
+    transition: width 0.18s steps(6);
 }
 
 #player-hp-fill {
-    background: linear-gradient(90deg, #53e38d, #1f9f57);
+    background: var(--px-green, #00cc66);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
 }
 
 #monster-hp-fill {
-    background: linear-gradient(90deg, #ff4d4d, #ff0000);
+    background: var(--px-red, #ff4444);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
 }
 
 .monster-status {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
+/* 위험 HP — 빨간 깜빡임 */
 .player-status.is-low-hp .hp-bar {
-    border-color: #ff5050;
-    box-shadow: 0 0 10px rgba(255, 80, 80, 0.85);
-    animation: lowHpPulse 0.8s ease-in-out infinite alternate;
+    border-color: var(--px-red, #ff4444);
+    box-shadow: 0 0 0 1px var(--px-red, #ff4444),
+                0 0 12px rgba(255, 60, 60, 0.7);
+    animation: lowHpPulse 0.6s steps(1) infinite alternate;
 }
 
 .status-effects {
@@ -463,8 +568,8 @@
 }
 
 @keyframes lowHpPulse {
-    from { transform: scale(1); }
-    to { transform: scale(1.01); }
+    from { box-shadow: 0 0 0 1px var(--px-red, #ff4444), 0 0 10px rgba(255,60,60,0.5); }
+    to   { box-shadow: 0 0 0 2px var(--px-red, #ff4444), 0 0 18px rgba(255,60,60,0.9); }
 }
 
 .stage-wrapper::after {
