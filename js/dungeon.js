@@ -3,9 +3,47 @@
    ============================================= */
 
 /* ── 타이밍 상수 ── */
-const PLAYER_ATK_INTERVAL = 1500;  // ms
-const MONSTER_ATK_INTERVAL = 2500; // ms
+const PLAYER_ATK_INTERVAL = 1000;  // ms
+const MONSTER_ATK_INTERVAL = 1800; // ms
 const INTER_WAVE_HEAL = 0.35;      // 웨이브 간 35% HP 회복
+const ENRAGE_TRIGGER_HP_RATIO = 0.20;
+
+const DUNGEON_ZONE_THEMES = [
+  '임프',
+  '골렘',
+  '독충',
+  '망령',
+  '심연',
+  '화염',
+  '빙하',
+  '번개',
+  '암흑',
+  '던전'
+];
+
+const DUNGEON_STATUS_DEFS = {
+  poison: { label: '중독', durationMs: 10000, dotRatio: 0.015 },
+  burn: { label: '화상', durationMs: 9000, dotRatio: 0.020 },
+  weaken: { label: '약화', durationMs: 9000, outgoingMul: 0.82 },
+  vulnerable: { label: '방어 붕괴', durationMs: 9000, incomingMul: 1.18 }
+};
+
+function buildZoneSkillBook(theme) {
+  return {
+    A: { key: 'A', name: `${theme} A1 강타`, damageMul: 1.0, statuses: [] },
+    B1: { key: 'B1', name: `${theme} B1 분쇄`, damageMul: 1.15, statuses: [{ type: 'vulnerable', chance: 0.35 }] },
+    B2: { key: 'B2', name: `${theme} B2 독무`, damageMul: 1.08, statuses: [{ type: 'poison', chance: 0.35 }] },
+    C1: { key: 'C1', name: `${theme} C1 연속참`, damageMul: 1.22, statuses: [] },
+    C2: { key: 'C2', name: `${theme} C2 화염인장`, damageMul: 1.14, statuses: [{ type: 'burn', chance: 0.40 }] },
+    C3: { key: 'C3', name: `${theme} C3 절규`, damageMul: 1.12, statuses: [{ type: 'weaken', chance: 0.35 }] },
+    D1: { key: 'D1', name: `${theme} D1 군주강타`, damageMul: 1.35, statuses: [{ type: 'vulnerable', chance: 0.55 }] },
+    D2: { key: 'D2', name: `${theme} D2 군주독식`, damageMul: 1.28, statuses: [{ type: 'poison', chance: 0.55 }] },
+    D3: { key: 'D3', name: `${theme} D3 군주화염`, damageMul: 1.30, statuses: [{ type: 'burn', chance: 0.55 }] },
+    ENRAGE: { key: 'ENRAGE', name: `${theme} ENRAGE 광폭화`, damageMul: 1.55, statuses: [{ type: 'weaken', chance: 0.70 }] }
+  };
+}
+
+const DUNGEON_ZONE_SKILL_BOOKS = DUNGEON_ZONE_THEMES.map(buildZoneSkillBook);
 
 /* =============================================
    구간 정의 (ZONE_DEFS)
@@ -143,6 +181,36 @@ function getWaveInfo(wave) {
   return { zone, monster, isBoss, hpMult, dmgRatio, goldMult };
 }
 
+function clampZoneIndex(zoneIdx) {
+  return Math.max(0, Math.min(zoneIdx, DUNGEON_ZONE_SKILL_BOOKS.length - 1));
+}
+
+function pickRandom(items) {
+  if (!Array.isArray(items) || items.length === 0) return null;
+  const idx = Math.floor(Math.random() * items.length);
+  return items[idx];
+}
+
+function getSkillPoolByPosInZone(posInZone, skillBook) {
+  if (posInZone >= 1 && posInZone <= 3) return [skillBook.A];
+  if (posInZone >= 4 && posInZone <= 6) return [skillBook.B1, skillBook.B2];
+  if (posInZone >= 7 && posInZone <= 9) return [skillBook.C1, skillBook.C2, skillBook.C3];
+  return [skillBook.D1, skillBook.D2, skillBook.D3];
+}
+
+function selectMonsterSkillForWave(wave, currentHp, maxHp) {
+  const zoneIdx = clampZoneIndex(Math.floor((wave - 1) / 10));
+  const posInZone = ((wave - 1) % 10) + 1;
+  const skillBook = DUNGEON_ZONE_SKILL_BOOKS[zoneIdx];
+  const pool = [...getSkillPoolByPosInZone(posInZone, skillBook)];
+
+  if (posInZone === 10 && maxHp > 0 && currentHp / maxHp <= ENRAGE_TRIGGER_HP_RATIO) {
+    pool.push(skillBook.ENRAGE);
+  }
+
+  return pickRandom(pool) || { key: 'BASIC', name: '기본 공격', damageMul: 1.0, statuses: [] };
+}
+
 /* ── 로컬 상태 ── */
 let dungeonActive = false;
 let currentWave = 0;
@@ -155,14 +223,174 @@ let playerDmg = 0;
 let atkTimer = null;
 let monsterAtkTimer = null;
 let totalGoldEarned = 0;
+let dungeonStatusEffects = {};
+let dungeonSkillFxTimer = null;
+
+const dungeonFieldEl = document.getElementById('dungeon-field');
+const dungeonMonsterAreaEl = document.getElementById('d-monster-area');
+const dungeonSkillFxTextEl = document.createElement('div');
+dungeonSkillFxTextEl.className = 'd-skill-fx-text';
+if (dungeonMonsterAreaEl) {
+  dungeonMonsterAreaEl.appendChild(dungeonSkillFxTextEl);
+}
 
 /* ── 포맷 ── */
 function dfmt(n) {
   return (typeof fmtNum === 'function') ? fmtNum(n) : Number(n).toLocaleString('ko-KR');
 }
 
+function resetDungeonStatusEffects() {
+  dungeonStatusEffects = {};
+}
+
+function cleanupDungeonStatusEffects() {
+  const now = Date.now();
+  Object.keys(dungeonStatusEffects).forEach((type) => {
+    const expiresAt = Number(dungeonStatusEffects[type]) || 0;
+    if (expiresAt <= now) {
+      delete dungeonStatusEffects[type];
+    }
+  });
+}
+
+function hasDungeonStatus(type) {
+  cleanupDungeonStatusEffects();
+  const expiresAt = Number(dungeonStatusEffects[type]) || 0;
+  return expiresAt > Date.now();
+}
+
+function applyDungeonStatus(type, durationMs) {
+  if (!DUNGEON_STATUS_DEFS[type]) return false;
+  const safeDurationMs = Math.max(0, Math.floor(Number(durationMs) || 0));
+  if (safeDurationMs <= 0) return false;
+
+  const now = Date.now();
+  const nextUntil = now + safeDurationMs;
+  const currentUntil = Number(dungeonStatusEffects[type]) || 0;
+  dungeonStatusEffects[type] = Math.max(currentUntil, nextUntil);
+  return true;
+}
+
+function getPlayerIncomingStatusMul() {
+  let mult = 1;
+  if (hasDungeonStatus('vulnerable')) {
+    mult *= Number(DUNGEON_STATUS_DEFS.vulnerable.incomingMul) || 1;
+  }
+  return Math.max(0.01, mult);
+}
+
+function getPlayerOutgoingStatusMul() {
+  let mult = 1;
+  if (hasDungeonStatus('weaken')) {
+    mult *= Number(DUNGEON_STATUS_DEFS.weaken.outgoingMul) || 1;
+  }
+  return Math.max(0.01, mult);
+}
+
+function applyDungeonDotDamage() {
+  let totalDot = 0;
+  const labels = [];
+
+  ['poison', 'burn'].forEach((type) => {
+    if (!hasDungeonStatus(type)) return;
+    const def = DUNGEON_STATUS_DEFS[type];
+    const dotRatio = Math.max(0, Number(def.dotRatio) || 0);
+    const dotDamage = Math.max(1, Math.floor(playerMaxHp * dotRatio));
+    totalDot += dotDamage;
+    labels.push(`${def.label} -${dfmt(dotDamage)}`);
+  });
+
+  if (totalDot > 0) {
+    playerHp -= totalDot;
+  }
+
+  return { totalDot, labels };
+}
+
+function tryApplySkillStatuses(skill) {
+  const applied = [];
+  const entries = Array.isArray(skill?.statuses) ? skill.statuses : [];
+
+  entries.forEach((entry) => {
+    const type = entry.type;
+    const def = DUNGEON_STATUS_DEFS[type];
+    if (!def) return;
+
+    const chance = Math.max(0, Math.min(1, Number(entry.chance) || 0));
+    if (Math.random() >= chance) return;
+
+    if (applyDungeonStatus(type, def.durationMs)) {
+      applied.push(def.label);
+    }
+  });
+
+  return applied;
+}
+
 /* ── UI 요소 ── */
 function el(id) { return document.getElementById(id); }
+
+function getDungeonSkillFxClass(skill) {
+  const key = String(skill?.key || '');
+  const statuses = Array.isArray(skill?.statuses) ? skill.statuses : [];
+  const statusTypes = statuses.map((entry) => entry.type);
+
+  if (key === 'ENRAGE') return 'd-skill-fx-enrage';
+  if (statusTypes.includes('poison')) return 'd-skill-fx-poison';
+  if (statusTypes.includes('burn')) return 'd-skill-fx-burn';
+  if (statusTypes.includes('vulnerable')) return 'd-skill-fx-heavy';
+  if (statusTypes.includes('weaken')) return 'd-skill-fx-heavy';
+  if ((Number(skill?.damageMul) || 1) >= 1.4) return 'd-skill-fx-heavy';
+  return 'd-skill-fx-basic';
+}
+
+function clearDungeonSkillEffectVisual() {
+  if (dungeonFieldEl) {
+    dungeonFieldEl.classList.remove(
+      'd-skill-fx-active',
+      'd-skill-fx-basic',
+      'd-skill-fx-heavy',
+      'd-skill-fx-poison',
+      'd-skill-fx-burn',
+      'd-skill-fx-enrage'
+    );
+  }
+
+  const monsterImg = el('d-monster-img');
+  if (monsterImg) {
+    monsterImg.classList.remove('d-monster-img--skill-strike');
+  }
+
+  dungeonSkillFxTextEl.classList.remove('show');
+  dungeonSkillFxTextEl.textContent = '';
+
+  if (dungeonSkillFxTimer) {
+    clearTimeout(dungeonSkillFxTimer);
+    dungeonSkillFxTimer = null;
+  }
+}
+
+function playDungeonSkillEffect(skill) {
+  if (!skill || !dungeonFieldEl) return;
+
+  clearDungeonSkillEffectVisual();
+
+  const visualClass = getDungeonSkillFxClass(skill);
+  dungeonFieldEl.classList.add('d-skill-fx-active', visualClass);
+
+  const monsterImg = el('d-monster-img');
+  if (monsterImg) {
+    monsterImg.classList.add('d-monster-img--skill-strike');
+  }
+
+  dungeonSkillFxTextEl.textContent = `⚠ ${skill.name || '특수 기술'}`;
+  void dungeonSkillFxTextEl.offsetWidth;
+  dungeonSkillFxTextEl.classList.add('show');
+
+  dungeonSkillFxTimer = setTimeout(() => {
+    clearDungeonSkillEffectVisual();
+  }, 700);
+}
 
 function showPanel(id) {
   const isBattle = (id === 'd-battle-screen');
@@ -243,6 +471,8 @@ function startDungeon() {
   totalGoldEarned = 0;
   currentWave  = 0;
   dungeonActive = true;
+  resetDungeonStatusEffects();
+  clearDungeonSkillEffectVisual();
 
   updatePlayerHpBar();
   dungeonUpdatePotionUI();
@@ -254,6 +484,8 @@ function nextWave() {
   clearTimers();
   currentWave++;
   updateWaveBadge();
+  resetDungeonStatusEffects();
+  clearDungeonSkillEffectVisual();
 
   const info = getWaveInfo(currentWave);
   monsterMaxHp = Math.max(1, Math.floor(playerDmg * info.hpMult));
@@ -267,6 +499,7 @@ function nextWave() {
   const monsterImg = el('d-monster-img');
   monsterImg.src = info.monster.img;
   monsterImg.classList.remove('d-monster-img--hit');
+  monsterImg.classList.remove('d-monster-img--skill-strike');
   el('d-bg-img').src = info.zone.bg;
 
   updateMonsterHpBar();
@@ -281,8 +514,13 @@ function nextWave() {
 function playerAttack() {
   if (!dungeonActive) return;
 
-  monsterHp -= playerDmg;
-  el('d-log').textContent = `⚔ ${dfmt(playerDmg)} 피해!`;
+  const outgoingMul = getPlayerOutgoingStatusMul();
+  const finalPlayerDamage = Math.max(1, Math.floor(playerDmg * outgoingMul));
+  monsterHp -= finalPlayerDamage;
+  const weakened = hasDungeonStatus('weaken');
+  el('d-log').textContent = weakened
+    ? `⚔ ${dfmt(finalPlayerDamage)} 피해! (약화)`
+    : `⚔ ${dfmt(finalPlayerDamage)} 피해!`;
   updateMonsterHpBar();
 
   // 몬스터 피격 모션
@@ -301,8 +539,32 @@ function playerAttack() {
 function monsterAttack() {
   if (!dungeonActive) return;
 
-  playerHp -= monsterDmg;
-  el('d-log').textContent = `💥 몬스터가 ${dfmt(monsterDmg)} 피해!`;
+  const skill = selectMonsterSkillForWave(currentWave, monsterHp, monsterMaxHp);
+  playDungeonSkillEffect(skill);
+  const dotResult = applyDungeonDotDamage();
+  if (playerHp <= 0) {
+    playerHp = 0;
+    updatePlayerHpBar();
+    dungeonFail();
+    return;
+  }
+
+  const incomingMul = getPlayerIncomingStatusMul();
+  const finalMonsterDamage = Math.max(
+    1,
+    Math.floor(monsterDmg * (Number(skill.damageMul) || 1) * incomingMul)
+  );
+  playerHp -= finalMonsterDamage;
+  const appliedStatuses = tryApplySkillStatuses(skill);
+
+  const logs = [`💥 ${skill.name} -${dfmt(finalMonsterDamage)} HP`];
+  if (dotResult.labels.length > 0) {
+    logs.push(`지속피해: ${dotResult.labels.join(', ')}`);
+  }
+  if (appliedStatuses.length > 0) {
+    logs.push(`상태이상: ${appliedStatuses.join(', ')}`);
+  }
+  el('d-log').textContent = logs.join(' | ');
   updatePlayerHpBar();
 
   if (playerHp <= 0) {
@@ -316,6 +578,7 @@ function monsterAttack() {
 function waveCleared() {
   clearTimers();
   dungeonActive = false;
+  clearDungeonSkillEffectVisual();
 
   // 골드 지급
   const goldBase = GameData.level * getWaveInfo(currentWave).goldMult;
@@ -358,6 +621,7 @@ function goNextWave() {
 function dungeonFail() {
   clearTimers();
   dungeonActive = false;
+  clearDungeonSkillEffectVisual();
   syncHpToGameData();
 
   el('d-fail-info').innerHTML =
@@ -367,6 +631,7 @@ function dungeonFail() {
 
 /* ── 완전 클리어 ── */
 function dungeonComplete() {
+  clearDungeonSkillEffectVisual();
   el('d-complete-info').innerHTML =
     `모든 ${DUNGEON_WAVE_COUNT}층 정복!<br>💰 총 ${dfmt(totalGoldEarned)} 골드 획득`;
   showPanel('d-complete-screen');

@@ -118,6 +118,40 @@
   overflow: hidden;
 }
 
+.dungeon-field::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+}
+
+.dungeon-field.d-skill-fx-active::after {
+  opacity: 0.72;
+  animation: dSkillFlash 0.7s ease-out;
+}
+
+.dungeon-field.d-skill-fx-basic::after {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.42), rgba(0, 0, 0, 0));
+}
+
+.dungeon-field.d-skill-fx-heavy::after {
+  background: radial-gradient(circle at center, rgba(255, 128, 72, 0.60), rgba(0, 0, 0, 0));
+}
+
+.dungeon-field.d-skill-fx-poison::after {
+  background: radial-gradient(circle at center, rgba(74, 222, 128, 0.58), rgba(0, 0, 0, 0));
+}
+
+.dungeon-field.d-skill-fx-burn::after {
+  background: radial-gradient(circle at center, rgba(251, 146, 60, 0.58), rgba(0, 0, 0, 0));
+}
+
+.dungeon-field.d-skill-fx-enrage::after {
+  background: radial-gradient(circle at center, rgba(239, 68, 68, 0.66), rgba(0, 0, 0, 0));
+}
+
 /* ── 전투 레이아웃 (몬스터 위 + UI 아래) ── */
 #d-battle-layout {
   position: absolute;
@@ -129,13 +163,37 @@
 
 /* ── 몬스터 + 배경 영역 ── */
 .d-monster-area {
-  flex: 1;
-  min-height: 0;
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 46vh;
+  margin: 0 auto;
   overflow: hidden;
+  border-radius: 14px;
+  background: #1a1330;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.d-skill-fx-text {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, 0);
+  z-index: 4;
+  font-family: var(--px-font-kr);
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff7d6;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.d-skill-fx-text.show {
+  animation: dSkillTextPop 0.7s ease-out;
 }
 
 /* ── 배경 이미지 ── */
@@ -143,30 +201,26 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  pointer-events: none;
 }
 
 .d-bg-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
-  image-rendering: pixelated;
-  opacity: 0.6;
+  object-position: center;
+  display: block;
 }
 
 /* ── 몬스터 이미지 ── */
 .d-monster-img {
   position: relative;
   z-index: 1;
-  width: 400px;
-  height: 400px;
-  max-width: 90%;
-  max-height: 90%;
+  width: 80%;
+  height: 68%;
   object-fit: contain;
-  object-position: center center;
-  image-rendering: pixelated;
-  filter: drop-shadow(0 4px 16px rgba(255, 60, 60, 0.5));
+  object-position: bottom center;
+  margin-bottom: 4%;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .5));
   transition: filter 0.15s;
   cursor: pointer;
 }
@@ -183,6 +237,29 @@
 
 .d-monster-img--hit {
   animation: monsterHit 0.32s steps(2) forwards;
+}
+
+.d-monster-img--skill-strike {
+  animation: dMonsterSkillPulse 0.5s ease-out;
+  filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.72));
+}
+
+@keyframes dSkillFlash {
+  0% { opacity: 0; }
+  25% { opacity: 0.78; }
+  100% { opacity: 0; }
+}
+
+@keyframes dSkillTextPop {
+  0% { opacity: 0; transform: translate(-50%, 10px) scale(0.92); }
+  25% { opacity: 1; transform: translate(-50%, -8px) scale(1.05); }
+  100% { opacity: 0; transform: translate(-50%, -30px) scale(1); }
+}
+
+@keyframes dMonsterSkillPulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.09); }
+  100% { transform: scale(1); }
 }
 
 /* ── 전투 UI 패널 (하단 고정) ── */
