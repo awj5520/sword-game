@@ -1,6 +1,8 @@
-// 운명 아이템 성공 확률 보정값 (%p)
-// 예) 10이면 기본 확률에서 +10%p, -5이면 -5%p
-// 이 값만 바꾸면 운명 아이템 강화 성공확률을 직접 조정할 수 있습니다.
+// 🎲 운명 아이템 성공 확률: 활성화 시 종류 무관 무조건 이 값(%)으로 고정.
+//    이 값만 바꾸면 모든 운명 아이템의 강화 성공확률을 한 번에 조정할 수 있습니다.
+const FATE_FIXED_SUCCESS_RATE = 50;
+
+// (구) 운명 아이템별 보정값 — 현재는 미사용. FATE_FIXED_SUCCESS_RATE로 일괄 고정됨.
 const FATE_SUCCESS_RATE_BONUS = {
   dice: 5,
   dual: 10,
@@ -612,14 +614,15 @@ const GameData = {
      강화 확률
   ========================= */
   getSuccessRate(fateType = this.getActiveFateType()) {
+    // 🎲 운명 아이템(주사위/양면/저울/카오스)이 활성화된 경우: 무조건 고정 확률.
+    //    저울 pity·카오스 항상성공보다도 우선 적용.
+    if (fateType) return FATE_FIXED_SUCCESS_RATE;
+
     if (this.fateScalePity) return 100;
     if (this.doubleGuaranteeActive && this.doubleGuaranteeTicket > 0) return 100;
     if (this.guaranteeActive && this.guaranteeTicket > 0) return 100;
 
     let rate = this.getBaseSuccessRate();
-    const bonus = Number(FATE_SUCCESS_RATE_BONUS[fateType] || 0);
-    rate += bonus;
-   
 
     return Math.max(1, Math.min(100, Math.round(rate)));
   },
@@ -636,7 +639,8 @@ const GameData = {
     const fateType = this.getActiveFateType();
 
     const rate = this.getSuccessRate(fateType);
-    let success = this.fateScalePity
+    // 운명 아이템 활성 중에는 항상 확률(50%) 판정. 저울 pity 강제성공은 비-운명 강화에만 적용.
+    let success = (!fateType && this.fateScalePity)
       ? true
       : (Math.random() * 100 < rate);
 
