@@ -6,6 +6,43 @@
 
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/hunt.css">
+
+    <style>
+        /* ── 잠긴 스테이지 버튼 ── */
+        .monster-text.locked {
+            cursor: not-allowed;
+            opacity: 0.55;
+            filter: grayscale(0.6) brightness(0.8);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .monster-text.locked:hover {
+            filter: grayscale(0.6) brightness(0.8);
+            transform: none;
+            box-shadow:
+                0 3px 0 0 rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+            border-color: var(--px-border);
+            color: var(--px-text);
+        }
+        .monster-text.locked:active {
+            transform: none;
+            box-shadow:
+                0 3px 0 0 rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .monster-text .lock-icon {
+            flex-shrink: 0;
+        }
+        .monster-text .lock-req {
+            margin-left: auto;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--px-red);
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body>
 
@@ -27,15 +64,20 @@
 const params = new URLSearchParams(location.search);
 const world = Number(params.get('world') || 1);
 
-/* 🔒 2세계 제한 */
-if (world === 2 && GameData.level < 300) {
-    alert('2세계는 강화 +300 이상 필요합니다!');
-    location.href = 'index.html';
-}
+/* ──────────────────────────────────────────────
+   스테이지별 필요 강화 레벨 규칙
+   - 세계마다 시작 레벨과 스테이지 간 간격이 다름
+   - 1세계: 0부터 +5씩
+   - 2세계: 300부터 +10씩
+   - 3세계: 700부터 +20씩
+   필요 레벨은 세계 안에서 스테이지 순서(지역 순서 × 단계)대로 누적
+────────────────────────────────────────────── */
+const WORLD_REQ_BASE = { 1: 0,  2: 300, 3: 700 };
+const WORLD_REQ_STEP = { 1: 5,  2: 10,  3: 20  };
 
-/* 🔒 3세계 제한 */
-if (world === 3 && GameData.level < 700) {
-    alert('3세계는 강화 +700 이상 필요합니다!');
+/* 세계 진입 자체 제한(첫 스테이지 레벨)에 미달하면 메인으로 돌려보냄 */
+if (GameData.level < (WORLD_REQ_BASE[world] || 0)) {
+    alert(`${world}세계는 강화 +${WORLD_REQ_BASE[world]} 이상 필요합니다!`);
     location.href = 'index.html';
 }
 
@@ -143,7 +185,13 @@ const DATA = {
 
 const grid = document.getElementById('region-grid');
 
+/* 현재 세계의 시작 레벨/간격 */
+const reqBase = WORLD_REQ_BASE[world] || 0;
+const reqStep = WORLD_REQ_STEP[world] || 5;
+
 /* 렌더링 */
+let stageIndex = 0; /* 세계 안에서 스테이지 순서 (0부터) */
+
 (DATA[world] || []).forEach(region => {
     const box = document.createElement('div');
     box.className = 'region-box';
@@ -154,14 +202,33 @@ const grid = document.getElementById('region-grid');
     box.appendChild(title);
 
     region.monsters.forEach(([name, stage]) => {
+        /* 이 스테이지의 필요 강화 레벨 */
+        const reqLevel = reqBase + stageIndex * reqStep;
+        stageIndex++;
+
+        /* 현재 레벨로 매번 판정 → 레벨이 내려가면 자동으로 다시 잠김 */
+        const locked = GameData.level < reqLevel;
+
         const btn = document.createElement('button');
-        btn.className = 'monster-text';
-        btn.innerText = name;
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            location.href =
-                `stage.html?world=${world}&area=${region.area}&stage=${stage}`;
-        };
+        btn.className = 'monster-text' + (locked ? ' locked' : '');
+
+        if (locked) {
+            /* 잠긴 경우: 자물쇠 + 필요 레벨 표시, 클릭 차단 */
+            btn.innerHTML =
+                `<span class="lock-icon">🔒</span> ${name}` +
+                `<span class="lock-req">+${reqLevel} 필요</span>`;
+            btn.disabled = true;
+            btn.title = `강화 +${reqLevel} 이상 필요`;
+        } else {
+            /* 해제된 경우: 평소대로 입장 가능 */
+            btn.innerText = name;
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                location.href =
+                    `stage.html?world=${world}&area=${region.area}&stage=${stage}`;
+            };
+        }
+
         box.appendChild(btn);
     });
 
