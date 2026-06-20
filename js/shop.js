@@ -16,8 +16,7 @@ const SHOP_ITEM_META = {
   antiBleed: { icon: '🩸', rarity: 'rarity-rare', tag: 'CURE' },
   antiBurn: { icon: '🔥', rarity: 'rarity-rare', tag: 'CURE' },
   antiShock: { icon: '⚡', rarity: 'rarity-rare', tag: 'CURE' },
-  antiFrost: { icon: '❄', rarity: 'rarity-rare', tag: 'CURE' },
-  skillReset: { icon: '📜', rarity: 'rarity-legend', tag: 'UTILITY' }
+  antiFrost: { icon: '❄', rarity: 'rarity-rare', tag: 'CURE' }
 };
 
 function createShopItem(type, name, desc, price) {
@@ -54,8 +53,7 @@ function ensureShopItems() {
     { type: 'antiBleed', name: '출혈 무효화 물약', desc: '출혈 상태이상 1회 무효화 (자동 발동)', price: 1300 },
     { type: 'antiBurn', name: '화상 무효화 물약', desc: '화상 상태이상 1회 무효화 (자동 발동)', price: 1300 },
     { type: 'antiShock', name: '감전 무효화 물약', desc: '감전 상태이상 1회 무효화 (자동 발동)', price: 1400 },
-    { type: 'antiFrost', name: '빙결 무효화 물약', desc: '빙결 상태이상 1회 무효화 (자동 발동)', price: 1400 },
-    { type: 'skillReset', name: '스킬 초기화권', desc: '배낭에서 장착된 액티브/패시브 스킬 슬롯 초기화', price: 25000 }
+    { type: 'antiFrost', name: '빙결 무효화 물약', desc: '빙결 상태이상 1회 무효화 (자동 발동)', price: 1400 }
   ];
 
   items.forEach((data) => {
@@ -83,16 +81,24 @@ function buy(type) {
   switch (type) {
     case 'damage':
       price = 500;
+      if ((GameData.damagePotion || 0) >= MAX_HP_POTION_STACK) {
+        alert('공격력 물약은 최대 20개까지 보유할 수 있습니다.');
+        return;
+      }
       if (GameData.gold < price) return;
       GameData.gold -= price;
-      GameData.damageBuffUntil = now + 10 * 60 * 1000;
+      GameData.damagePotion = Math.min(MAX_HP_POTION_STACK, (GameData.damagePotion || 0) + 1);
       break;
 
     case 'gold':
       price = 500;
+      if ((GameData.goldPotion || 0) >= MAX_HP_POTION_STACK) {
+        alert('골드 물약은 최대 20개까지 보유할 수 있습니다.');
+        return;
+      }
       if (GameData.gold < price) return;
       GameData.gold -= price;
-      GameData.goldBuffUntil = now + 10 * 60 * 1000;
+      GameData.goldPotion = Math.min(MAX_HP_POTION_STACK, (GameData.goldPotion || 0) + 1);
       break;
 
     case 'nodrop':
@@ -186,23 +192,9 @@ function buy(type) {
       GameData.antidoteFrost++;
       break;
 
-    case 'skillReset':
-      price = 25000;
-      if ((GameData.skillResetTicket || 0) >= MAX_SKILL_RESET_TICKET_STACK) {
-        alert('스킬 초기화권은 최대 99개까지 보유할 수 있습니다.');
-        return;
-      }
-      if (GameData.gold < price) return;
-      GameData.gold -= price;
-      GameData.skillResetTicket = Math.min(
-        MAX_SKILL_RESET_TICKET_STACK,
-        (GameData.skillResetTicket || 0) + 1
-      );
-      break;
-
     case 'double':
       if (!GameData.unlockDoubleGuarantee) return;
-      price = 500000;
+      price = 2000;
       if (GameData.gold < price) return;
       GameData.gold -= price;
       GameData.doubleGuaranteeTicket++;

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -54,6 +54,15 @@
             </button>
             <button id="btn-potion-large" class="potion-btn" onclick="useHpPotion('large')">
                 HP 대 <span id="potion-count-large" class="potion-count">x0</span>
+            </button>
+        </div>
+
+        <div class="battle-potions">
+            <button id="btn-potion-damage" class="potion-btn" onclick="useBuffPotion('damage')">
+                ⚔️ 공격력 <span id="potion-count-damage" class="potion-count">x0</span>
+            </button>
+            <button id="btn-potion-gold" class="potion-btn" onclick="useBuffPotion('gold')">
+                💰 골드 <span id="potion-count-gold" class="potion-count">x0</span>
             </button>
         </div>
 

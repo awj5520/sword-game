@@ -776,6 +776,10 @@ const potionLargeBtn = document.getElementById('btn-potion-large');
 const potionSmallCountEl = document.getElementById('potion-count-small');
 const potionMediumCountEl = document.getElementById('potion-count-medium');
 const potionLargeCountEl = document.getElementById('potion-count-large');
+const potionDamageBtn = document.getElementById('btn-potion-damage');
+const potionGoldBtn = document.getElementById('btn-potion-gold');
+const potionDamageCountEl = document.getElementById('potion-count-damage');
+const potionGoldCountEl = document.getElementById('potion-count-gold');
 const backBtn = document.getElementById('back-btn');
 const playerStatusEffectsEl = document.createElement('div');
 const playerPassiveEffectsEl = document.createElement('div');
@@ -865,6 +869,15 @@ const HP_POTION_HEAL_RATIO_MAP = {
   medium: 0.20,
   large: 0.40
 };
+const BUFF_POTION_KEY_MAP = {
+  damage: 'damagePotion',
+  gold: 'goldPotion'
+};
+const BUFF_POTION_UNTIL_KEY_MAP = {
+  damage: 'damageBuffUntil',
+  gold: 'goldBuffUntil'
+};
+const BUFF_POTION_DURATION_MS = 10 * 60 * 1000; // 10분
 const ACTIVE_SKILL_SLOT_COUNT = 3;
 const activeSkillCooldownUntil = Array.from({ length: ACTIVE_SKILL_SLOT_COUNT }, () => 0);
 
@@ -947,7 +960,7 @@ if (GameData.protectTicket <= 0 && GameData.protectActive) {
   GameData.save();
 }
 
-['hpPotionSmall', 'hpPotionMedium', 'hpPotionLarge'].forEach((key) => {
+['hpPotionSmall', 'hpPotionMedium', 'hpPotionLarge', 'damagePotion', 'goldPotion'].forEach((key) => {
   const value = Math.max(0, Math.floor(Number(GameData[key]) || 0));
   const clamped = Math.min(HP_POTION_MAX_STACK, value);
   if (clamped !== value) {
@@ -1016,6 +1029,61 @@ function refreshBattlePotionUI() {
   if (potionLargeBtn) {
     potionLargeBtn.disabled = unavailable || hpIsFull || largeCount <= 0;
   }
+
+  // 버프 물약 (공격력 / 골드)
+  const damageCount = Math.max(0, Math.floor(Number(GameData.damagePotion) || 0));
+  const goldCount = Math.max(0, Math.floor(Number(GameData.goldPotion) || 0));
+
+  if (potionDamageCountEl) potionDamageCountEl.innerText = `x${damageCount}`;
+  if (potionGoldCountEl) potionGoldCountEl.innerText = `x${goldCount}`;
+
+  const now = (typeof GameData.now === 'function') ? GameData.now() : Date.now();
+  const damageActive = (Number(GameData.damageBuffUntil) || 0) > now;
+  const goldActive = (Number(GameData.goldBuffUntil) || 0) > now;
+
+  if (potionDamageBtn) {
+    // 이미 버프가 켜져 있으면 중복 사용 방지
+    potionDamageBtn.disabled = unavailable || damageCount <= 0 || damageActive;
+  }
+  if (potionGoldBtn) {
+    potionGoldBtn.disabled = unavailable || goldCount <= 0 || goldActive;
+  }
+}
+
+function useBuffPotion(type) {
+  const key = BUFF_POTION_KEY_MAP[type];
+  const untilKey = BUFF_POTION_UNTIL_KEY_MAP[type];
+  if (!key || !untilKey) return;
+  if (playerDead || dead) return;
+
+  const currentCount = Math.max(0, Math.floor(Number(GameData[key]) || 0));
+  if (currentCount <= 0) {
+    refreshBattlePotionUI();
+    return;
+  }
+
+  const now = (typeof GameData.now === 'function') ? GameData.now() : Date.now();
+
+  // 이미 같은 버프가 켜져 있으면 사용하지 않음 (낭비 방지)
+  if ((Number(GameData[untilKey]) || 0) > now) {
+    log.innerText = '이미 효과가 적용 중입니다.';
+    refreshBattlePotionUI();
+    return;
+  }
+
+  GameData[key] = Math.max(0, currentCount - 1);
+  GameData[untilKey] = now + BUFF_POTION_DURATION_MS;
+  GameData.save();
+
+  const labels = { damage: '공격력 물약', gold: '골드 2배 물약' };
+  log.innerText = `${labels[type]} 사용! 10분 동안 효과 적용`;
+
+  // 공격력 물약은 표시 공격력도 즉시 갱신
+  if (type === 'damage') {
+    damageText.innerText = `공격력: ${fmtNum(Math.max(1, Math.floor(GameData.getCurrentDamage() * (Number(passiveSkillTotals.damageMul) || 1))))}`;
+  }
+
+  refreshBattlePotionUI();
 }
 
 function useHpPotion(type) {

@@ -168,6 +168,8 @@ const GameData = {
   hpPotionSmall: Number(localStorage.getItem('hpPotionSmall')) || 0,
   hpPotionMedium: Number(localStorage.getItem('hpPotionMedium')) || 0,
   hpPotionLarge: Number(localStorage.getItem('hpPotionLarge')) || 0,
+  damagePotion: Number(localStorage.getItem('damagePotion')) || 0,
+  goldPotion: Number(localStorage.getItem('goldPotion')) || 0,
 
   noDropActive: localStorage.getItem('noDropActive') === 'true',
   guaranteeActive: localStorage.getItem('guaranteeActive') === 'true',
@@ -492,6 +494,8 @@ const GameData = {
     localStorage.setItem('hpPotionSmall', this.hpPotionSmall);
     localStorage.setItem('hpPotionMedium', this.hpPotionMedium);
     localStorage.setItem('hpPotionLarge', this.hpPotionLarge);
+    localStorage.setItem('damagePotion', this.damagePotion);
+    localStorage.setItem('goldPotion', this.goldPotion);
     localStorage.setItem('noDropActive', this.noDropActive);
     localStorage.setItem('guaranteeActive', this.guaranteeActive);
     localStorage.setItem('protectActive', this.protectActive);
@@ -555,6 +559,8 @@ const GameData = {
       hpPotionSmall: 0,
       hpPotionMedium: 0,
       hpPotionLarge: 0,
+      damagePotion: 0,
+      goldPotion: 0,
       noDropActive: false,
       guaranteeActive: false,
       protectActive: false,

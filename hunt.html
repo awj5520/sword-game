@@ -75,11 +75,9 @@ const world = Number(params.get('world') || 1);
 const WORLD_REQ_BASE = { 1: 0,  2: 300, 3: 700 };
 const WORLD_REQ_STEP = { 1: 5,  2: 10,  3: 20  };
 
-/* 세계 진입 자체 제한(첫 스테이지 레벨)에 미달하면 메인으로 돌려보냄 */
-if (GameData.level < (WORLD_REQ_BASE[world] || 0)) {
-    alert(`${world}세계는 강화 +${WORLD_REQ_BASE[world]} 이상 필요합니다!`);
-    location.href = 'index.html';
-}
+/* 세계 진입 시 튕겨내지 않음.
+   레벨이 미달이면 해당 세계 화면은 그대로 보여주되,
+   각 스테이지는 아래 렌더링에서 자물쇠로 잠긴 상태로 표시됨. */
 
 document.getElementById('world-title').innerText =
     world === 1 ? '🌍 1세계 사냥터'

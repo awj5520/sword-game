@@ -48,6 +48,9 @@
             <button class="menu-btn" onclick="location.href='monster-codex.html'">
                 📘 몬스터 도감
             </button>
+            <button class="menu-btn" onclick="location.href='dungeon-codex.html'">
+                🏰 던전 도감
+            </button>
         </div>
 
         <div id="message" class="message"></div>
@@ -83,16 +86,8 @@
 
 <script>
 function goWorld(world) {
-    if (world === 2 && GameData.level < 300) {
-        alert('2세계는 강화 +300 이상 필요합니다!');
-        return;
-    }
-
-    if (world === 3 && GameData.level < 700) {
-        alert('3세계는 강화 +700 이상 필요합니다!');
-        return;
-    }
-
+    /* 레벨 미달이어도 사냥터 화면에는 입장 가능.
+       각 스테이지는 hunt.html에서 필요 레벨에 따라 자물쇠로 잠겨 표시됨. */
     location.href = `hunt.html?world=${world}`;
 }
 </script>

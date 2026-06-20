@@ -505,8 +505,12 @@ function equipItem(slot, itemId) {
 function refreshUI() {
   const now = Date.now();
 
-  setTextById('damage-buff', GameData.damageBuffUntil > now ? '활성화됨 (데미지 버프)' : '비활성화');
-  setTextById('gold-buff', GameData.goldBuffUntil > now ? '활성화됨 (골드 버프)' : '비활성화');
+  const dmgCount = Math.max(0, Math.floor(Number(GameData.damagePotion) || 0));
+  const goldCount = Math.max(0, Math.floor(Number(GameData.goldPotion) || 0));
+  const dmgActive = (Number(GameData.damageBuffUntil) || 0) > now;
+  const goldActive = (Number(GameData.goldBuffUntil) || 0) > now;
+  setTextById('damage-buff', `보유 ${dmgCount}개` + (dmgActive ? ' · 효과 적용 중' : '') + ' (스테이지에서 사용)');
+  setTextById('gold-buff', `보유 ${goldCount}개` + (goldActive ? ' · 효과 적용 중' : '') + ' (스테이지에서 사용)');
 
   const nCount = document.getElementById('nodrop-count');
   const nInfo = document.getElementById('nodrop-info');
